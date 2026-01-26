@@ -17,8 +17,8 @@ import {
     loadRecentlyPlayedFromStorage,
     saveRecentlyPlayedToStorage,
     addToRecentlyPlayedArray,
-} from '../js/src/utils.js';
-import { SOUNDS, CATEGORIES } from '../js/src/constants.js';
+} from '../js/utils.js';
+import { SOUNDS, CATEGORIES } from '../js/constants.js';
 
 describe('Pure Functions', () => {
     let mockStorage;

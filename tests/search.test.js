@@ -3,10 +3,10 @@
  */
 import { jest } from '@jest/globals';
 import { setupFullDOM, resetState, resetElements } from './helpers.js';
-import { state, elements } from '../js/src/state.js';
-import { SOUNDS } from '../js/src/constants.js';
-import { cacheElements, renderCategories, showSearchEmptyState, hideSearchEmptyState } from '../js/src/ui.js';
-import { filterSounds } from '../js/src/search.js';
+import { state, elements } from '../js/state.js';
+import { SOUNDS } from '../js/constants.js';
+import { cacheElements, renderCategories, showSearchEmptyState, hideSearchEmptyState } from '../js/ui.js';
+import { filterSounds } from '../js/search.js';
 
 describe('Search Functions', () => {
     beforeEach(() => {

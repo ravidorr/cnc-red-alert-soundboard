@@ -3,8 +3,8 @@
  */
 import { jest } from '@jest/globals';
 import { setupFullDOM, resetState, resetElements } from './helpers.js';
-import { state, elements } from '../js/src/state.js';
-import { cacheElements } from '../js/src/ui.js';
+import { state, elements } from '../js/state.js';
+import { cacheElements } from '../js/ui.js';
 import {
     showInstallPrompt,
     hideInstallPrompt,
@@ -13,7 +13,7 @@ import {
     triggerInstall,
     setupInstallPrompt,
     registerServiceWorker,
-} from '../js/src/install.js';
+} from '../js/install.js';
 
 describe('Install Functions', () => {
     beforeEach(() => {

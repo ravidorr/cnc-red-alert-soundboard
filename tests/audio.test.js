@@ -3,10 +3,10 @@
  */
 import { jest } from '@jest/globals';
 import { setupFullDOM, resetState, resetElements } from './helpers.js';
-import { state, elements } from '../js/src/state.js';
-import { SOUNDS } from '../js/src/constants.js';
-import { cacheElements } from '../js/src/ui.js';
-import { renderCategories } from '../js/src/ui.js';
+import { state, elements } from '../js/state.js';
+import { SOUNDS } from '../js/constants.js';
+import { cacheElements } from '../js/ui.js';
+import { renderCategories } from '../js/ui.js';
 import {
     setupAudioPlayer,
     playSound,
@@ -14,7 +14,7 @@ import {
     clearPlayingState,
     playRandomSound,
     checkUrlHash,
-} from '../js/src/audio.js';
+} from '../js/audio.js';
 
 describe('Audio Functions', () => {
     beforeEach(() => {

@@ -2,14 +2,14 @@
 
 /* Main stylesheet using CSS @import */
 
-@import url('./src/variables.css');
-@import url('./src/base.css');
-@import url('./src/accessibility.css');
-@import url('./src/layout.css');
-@import url('./src/components.css');
-@import url('./src/navigation.css');
-@import url('./src/favorites.css');
-@import url('./src/toast.css');
-@import url('./src/install.css');
-@import url('./src/effects.css');
-@import url('./src/responsive.css');
+@import url('./variables.css');
+@import url('./base.css');
+@import url('./accessibility.css');
+@import url('./layout.css');
+@import url('./components.css');
+@import url('./navigation.css');
+@import url('./favorites.css');
+@import url('./toast.css');
+@import url('./install.css');
+@import url('./effects.css');
+@import url('./responsive.css');

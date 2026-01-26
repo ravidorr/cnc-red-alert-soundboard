@@ -3,9 +3,9 @@
  */
 import { jest } from '@jest/globals';
 import { setupFullDOM, resetState, resetElements } from './helpers.js';
-import { state, elements } from '../js/src/state.js';
-import { SOUNDS, CATEGORIES } from '../js/src/constants.js';
-import { getSoundsByCategory } from '../js/src/utils.js';
+import { state, elements } from '../js/state.js';
+import { SOUNDS, CATEGORIES } from '../js/constants.js';
+import { getSoundsByCategory } from '../js/utils.js';
 import {
     cacheElements,
     renderCategories,
@@ -13,9 +13,9 @@ import {
     renderPopularSection,
     updateStats,
     showToast,
-} from '../js/src/ui.js';
-import { renderNavigation, createNavHeader } from '../js/src/navigation.js';
-import { renderRecentlyPlayedSection } from '../js/src/recently-played.js';
+} from '../js/ui.js';
+import { renderNavigation, createNavHeader } from '../js/navigation.js';
+import { renderRecentlyPlayedSection } from '../js/recently-played.js';
 
 describe('UI Rendering', () => {
     beforeEach(() => {

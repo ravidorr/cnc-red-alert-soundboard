@@ -3,8 +3,8 @@ export default {
   roots: ['<rootDir>/tests'],
   testMatch: ['**/*.test.js'],
   collectCoverageFrom: [
-    'js/src/**/*.js',
-    '!js/src/main.js'
+    'js/**/*.js',
+    '!js/main.js'
   ],
   coverageDirectory: 'coverage',
   coverageReporters: ['text', 'lcov', 'html'],

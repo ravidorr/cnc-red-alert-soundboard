@@ -2,8 +2,8 @@
  * @jest-environment jsdom
  */
 import { jest } from '@jest/globals';
-import { SOUNDS, CATEGORIES } from '../js/src/constants.js';
-import { state, elements } from '../js/src/state.js';
+import { SOUNDS, CATEGORIES } from '../js/constants.js';
+import { state, elements } from '../js/state.js';
 
 describe('Sound Data', () => {
     test('SOUNDS array should be defined', () => {

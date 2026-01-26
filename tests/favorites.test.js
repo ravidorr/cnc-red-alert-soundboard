@@ -3,9 +3,9 @@
  */
 import { jest } from '@jest/globals';
 import { setupFullDOM, resetState, resetElements } from './helpers.js';
-import { state, elements } from '../js/src/state.js';
-import { cacheElements, renderCategories } from '../js/src/ui.js';
-import { renderNavigation } from '../js/src/navigation.js';
+import { state, elements } from '../js/state.js';
+import { cacheElements, renderCategories } from '../js/ui.js';
+import { renderNavigation } from '../js/navigation.js';
 import {
     loadFavorites,
     saveFavorites,
@@ -13,7 +13,7 @@ import {
     updateFavoriteButtons,
     reorderFavorites,
     setupFavoritesDragAndDrop,
-} from '../js/src/favorites.js';
+} from '../js/favorites.js';
 
 describe('Favorites Functions', () => {
     beforeEach(() => {

@@ -3,11 +3,11 @@
  */
 import { jest } from '@jest/globals';
 import { setupFullDOM, resetState, resetElements } from './helpers.js';
-import { state, elements } from '../js/src/state.js';
-import { cacheElements, renderCategories } from '../js/src/ui.js';
-import { renderNavigation } from '../js/src/navigation.js';
-import { setupAudioPlayer, playSound, stopAllSounds } from '../js/src/audio.js';
-import { setupEventListeners } from '../js/src/events.js';
+import { state, elements } from '../js/state.js';
+import { cacheElements, renderCategories } from '../js/ui.js';
+import { renderNavigation } from '../js/navigation.js';
+import { setupAudioPlayer, playSound, stopAllSounds } from '../js/audio.js';
+import { setupEventListeners } from '../js/events.js';
 
 describe('Event Handlers', () => {
     beforeEach(() => {

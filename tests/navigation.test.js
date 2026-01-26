@@ -3,19 +3,19 @@
  */
 import { jest } from '@jest/globals';
 import { setupFullDOM, resetState, resetElements } from './helpers.js';
-import { state, elements } from '../js/src/state.js';
-import { cacheElements, renderCategories } from '../js/src/ui.js';
+import { state, elements } from '../js/state.js';
+import { cacheElements, renderCategories } from '../js/ui.js';
 import {
     renderNavigation,
     toggleCategory,
     scrollToCategory,
     createNavHeader,
-} from '../js/src/navigation.js';
+} from '../js/navigation.js';
 import {
     toggleMobileMenu,
     openMobileMenu,
     closeMobileMenu,
-} from '../js/src/mobile.js';
+} from '../js/mobile.js';
 
 describe('Navigation Functions', () => {
     beforeEach(() => {
