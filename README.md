@@ -4,6 +4,10 @@ A Progressive Web App (PWA) soundboard featuring 190 classic Command & Conquer R
 
 ![C&C Red Alert Soundboard](assets/icons/icon-192.png)
 
+## Live Demo
+
+**[https://ravidorr.github.io/cnc-red-alert-soundboard/](https://ravidorr.github.io/cnc-red-alert-soundboard/)**
+
 ## Features
 
 - **190 Sound Effects** - Unit voices, combat sounds, building effects, and more
@@ -13,9 +17,10 @@ A Progressive Web App (PWA) soundboard featuring 190 classic Command & Conquer R
 - **Drag & Drop Reordering** - Organize your favorites in any order
 - **Search** - Find sounds quickly by name
 - **PWA Support** - Install as an app, works offline
+- **Install Button** - One-click installation from the header
 - **Responsive Design** - Works on desktop and mobile
 
-## Demo
+## Local Development
 
 Open `index.html` in a browser or serve with any HTTP server:
 
@@ -51,10 +56,59 @@ cnc-red-alert-soundboard/
 │   └── styles.css      # Red Alert 1 themed styles
 ├── js/
 │   └── app.js          # Application logic
+├── tests/
+│   ├── app.test.js     # Unit tests (139 tests)
+│   └── setup.js        # Jest setup
 ├── assets/
 │   └── icons/          # PWA icons (72-512px)
 └── sounds/             # 190 WAV sound files
 ```
+
+## Development
+
+### Prerequisites
+
+- Node.js 22+ (see `.nvmrc`)
+
+### Setup
+
+```bash
+npm install
+```
+
+### Scripts
+
+| Command | Description |
+|---------|-------------|
+| `npm test` | Run tests |
+| `npm run test:watch` | Run tests in watch mode |
+| `npm run test:coverage` | Run tests with coverage report |
+| `npm run lint` | Run all linters |
+| `npm run lint:js` | Run ESLint |
+| `npm run lint:css` | Run Stylelint |
+| `npm run lint:html` | Run HTMLHint |
+| `npm run lint:fix` | Auto-fix linting issues |
+
+### Code Quality
+
+- **ESLint** - JavaScript linting
+- **Stylelint** - CSS linting
+- **HTMLHint** - HTML validation
+- **Jest** - Unit testing with jsdom
+- **Husky** - Pre-commit hooks
+
+### Pre-commit Hooks
+
+The following checks run automatically before each commit:
+
+1. JavaScript linting (no errors/warnings)
+2. CSS linting (no errors/warnings)
+3. HTML linting (no errors)
+4. Test coverage (90% minimum)
+
+### Test Coverage
+
+Current coverage: **97%+** (139 tests)
 
 ## Sound Categories
 
