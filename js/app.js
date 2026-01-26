@@ -314,7 +314,7 @@
     // Setup audio player
     function setupAudioPlayer() {
         state.audioPlayer = elements.audioPlayer;
-        
+
         state.audioPlayer.addEventListener('ended', () => {
             clearPlayingState();
         });
@@ -345,7 +345,7 @@
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             state.deferredInstallPrompt = e;
-            
+
             // Show our custom install prompt after a short delay
             setTimeout(() => {
                 showInstallPrompt();
@@ -354,15 +354,17 @@
 
         // Handle install button click
         elements.btnInstall.addEventListener('click', async () => {
-            if (!state.deferredInstallPrompt) return;
-            
+            if (!state.deferredInstallPrompt) {
+                return;
+            }
+
             state.deferredInstallPrompt.prompt();
             const { outcome } = await state.deferredInstallPrompt.userChoice;
-            
+
             if (outcome === 'accepted') {
                 console.log('PWA installed');
             }
-            
+
             state.deferredInstallPrompt = null;
             hideInstallPrompt();
         });
@@ -502,19 +504,21 @@
 
         // Insert at the beginning of content area
         elements.contentArea.insertAdjacentHTML('afterbegin', sectionHtml);
-        
+
         // Setup drag and drop handlers
         setupFavoritesDragAndDrop();
     }
-    
+
     // Setup drag and drop for favorites reordering
     function setupFavoritesDragAndDrop() {
         const favoritesSection = document.getElementById('category-favorites');
-        if (!favoritesSection) return;
-        
+        if (!favoritesSection) {
+            return;
+        }
+
         const wrappers = favoritesSection.querySelectorAll('.sound-btn-wrapper[draggable="true"]');
         let draggedElement = null;
-        
+
         wrappers.forEach(wrapper => {
             wrapper.addEventListener('dragstart', (e) => {
                 draggedElement = wrapper;
@@ -522,13 +526,13 @@
                 e.dataTransfer.effectAllowed = 'move';
                 e.dataTransfer.setData('text/plain', wrapper.dataset.file);
             });
-            
+
             wrapper.addEventListener('dragend', () => {
                 wrapper.classList.remove('dragging');
                 wrappers.forEach(w => w.classList.remove('drag-over'));
                 draggedElement = null;
             });
-            
+
             wrapper.addEventListener('dragover', (e) => {
                 e.preventDefault();
                 e.dataTransfer.dropEffect = 'move';
@@ -536,15 +540,15 @@
                     wrapper.classList.add('drag-over');
                 }
             });
-            
+
             wrapper.addEventListener('dragleave', () => {
                 wrapper.classList.remove('drag-over');
             });
-            
+
             wrapper.addEventListener('drop', (e) => {
                 e.preventDefault();
                 wrapper.classList.remove('drag-over');
-                
+
                 if (draggedElement && wrapper !== draggedElement) {
                     const draggedFile = decodeURIComponent(draggedElement.dataset.file);
                     const targetFile = decodeURIComponent(wrapper.dataset.file);
@@ -553,19 +557,21 @@
             });
         });
     }
-    
+
     // Reorder favorites by moving draggedFile to targetFile's position
     function reorderFavorites(draggedFile, targetFile) {
         const draggedIndex = state.favorites.indexOf(draggedFile);
         const targetIndex = state.favorites.indexOf(targetFile);
-        
-        if (draggedIndex === -1 || targetIndex === -1) return;
-        
+
+        if (draggedIndex === -1 || targetIndex === -1) {
+            return;
+        }
+
         // Remove dragged item
         state.favorites.splice(draggedIndex, 1);
         // Insert at target position
         state.favorites.splice(targetIndex, 0, draggedFile);
-        
+
         saveFavorites();
         renderFavoritesSection();
     }
@@ -577,7 +583,9 @@
 
         const html = sortedCategories.map(([categoryId, categoryInfo]) => {
             const sounds = SOUNDS.filter(s => s.category === categoryId);
-            if (sounds.length === 0) return '';
+            if (sounds.length === 0) {
+                return '';
+            }
 
             const buttonsHtml = sounds.map(sound => {
                 const isFav = isFavorite(sound.file);
@@ -633,7 +641,9 @@
 
         const navHtml = sortedCategories.map(([categoryId, categoryInfo]) => {
             const count = SOUNDS.filter(s => s.category === categoryId).length;
-            if (count === 0) return '';
+            if (count === 0) {
+                return '';
+            }
 
             return `
                 <div class="nav-item" data-category="${categoryId}">
@@ -780,15 +790,15 @@
         if (section) {
             // Expand if collapsed
             section.classList.remove('collapsed');
-            
+
             // Scroll with offset for fixed header (80px + 10px padding)
             const headerOffset = 90;
             const elementPosition = section.getBoundingClientRect().top;
             const offsetPosition = elementPosition + window.scrollY - headerOffset;
-            
+
             window.scrollTo({
                 top: offsetPosition,
-                behavior: 'smooth'
+                behavior: 'smooth',
             });
 
             // Update active nav item
@@ -805,21 +815,25 @@
 
         wrappers.forEach(wrapper => {
             const btn = wrapper.querySelector('.sound-btn');
-            if (!btn) return;
-            
+            if (!btn) {
+                return;
+            }
+
             const name = btn.dataset.name.toLowerCase();
             const file = decodeURIComponent(btn.dataset.file).toLowerCase();
             const matches = name.includes(state.searchTerm) || file.includes(state.searchTerm);
-            
+
             wrapper.style.display = matches ? '' : 'none';
-            if (matches) visibleCount++;
+            if (matches) {
+                visibleCount++;
+            }
         });
 
         // Show/hide empty categories
         document.querySelectorAll('.category-section').forEach(section => {
             const visibleWrappers = section.querySelectorAll('.sound-btn-wrapper:not([style*="display: none"])');
             section.style.display = visibleWrappers.length === 0 ? 'none' : '';
-            
+
             // Auto-expand categories with matches when searching
             if (state.searchTerm && visibleWrappers.length > 0) {
                 section.classList.remove('collapsed');
