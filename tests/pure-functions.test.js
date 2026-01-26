@@ -196,6 +196,14 @@ describe('Pure Functions', () => {
             const result = shouldShowInstallPrompt(mockStorage, 7);
             expect(result).toBe(false);
         });
+
+        test('should return true when dismissed more than X days ago', () => {
+            // Set dismissed timestamp to 10 days ago
+            const tenDaysAgo = Date.now() - (10 * 24 * 60 * 60 * 1000);
+            mockStorage.store.installPromptDismissed = tenDaysAgo.toString();
+            const result = shouldShowInstallPrompt(mockStorage, 7);
+            expect(result).toBe(true);
+        });
     });
 
     describe('Recently Played Functions', () => {
