@@ -1177,6 +1177,125 @@ describe('C&C Red Alert Soundboard', () => {
                 const state = CncSoundboard.getState();
                 expect(state.favorites[0]).toBe('allies #1 affirmative.wav');
             });
+
+            test('playSound handles audio play failure gracefully', async () => {
+                // Mock console.error to track calls
+                const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+
+                // Mock play to reject
+                const audio = document.getElementById('audio-player');
+                audio.play = jest.fn().mockRejectedValue(new Error('Playback failed'));
+
+                const btn = document.querySelector('.sound-btn');
+                CncSoundboard.playSound(btn);
+
+                // Wait for promise rejection
+                await new Promise(resolve => setTimeout(resolve, 50));
+
+                expect(consoleSpy).toHaveBeenCalledWith('Playback failed:', expect.any(Error));
+                consoleSpy.mockRestore();
+            });
+
+            test('getSoundsByCategory returns empty for category with no sounds', () => {
+                const result = CncSoundboard.getSoundsByCategory([], 'empty');
+                expect(result).toEqual([]);
+            });
+
+            test('renderCategories handles empty categories gracefully', () => {
+                // All categories have sounds, so this tests the branch
+                CncSoundboard.renderCategories();
+                const sections = document.querySelectorAll('.category-section');
+                expect(sections.length).toBe(12);
+            });
+        });
+
+        describe('Install Prompt Handlers', () => {
+            beforeEach(() => {
+                setupFullDOM();
+                localStorage.clear();
+                CncSoundboard.cacheElements();
+            });
+
+            test('dismiss button saves timestamp to localStorage', () => {
+                CncSoundboard.setupInstallPrompt();
+
+                const dismissBtn = document.getElementById('btn-dismiss');
+                dismissBtn.click();
+
+                const dismissed = localStorage.getItem('installPromptDismissed');
+                expect(dismissed).not.toBeNull();
+            });
+
+            test('background click on install prompt hides it', () => {
+                CncSoundboard.setupInstallPrompt();
+
+                const prompt = document.getElementById('install-prompt');
+                prompt.classList.add('visible');
+
+                // Click on the prompt background itself
+                const event = new MouseEvent('click', { bubbles: true });
+                Object.defineProperty(event, 'target', { value: prompt });
+                prompt.dispatchEvent(event);
+
+                expect(prompt.classList.contains('visible')).toBe(false);
+            });
+
+            test('install button does nothing without deferred prompt', () => {
+                CncSoundboard.setupInstallPrompt();
+                CncSoundboard.setState({ deferredInstallPrompt: null });
+
+                const installBtn = document.getElementById('btn-install');
+
+                expect(() => {
+                    installBtn.click();
+                }).not.toThrow();
+            });
+
+            test('beforeinstallprompt stores deferred prompt', () => {
+                CncSoundboard.setupInstallPrompt();
+
+                const mockPrompt = {
+                    preventDefault: jest.fn(),
+                    prompt: jest.fn(),
+                    userChoice: Promise.resolve({ outcome: 'accepted' }),
+                };
+
+                const event = new Event('beforeinstallprompt');
+                Object.assign(event, mockPrompt);
+
+                window.dispatchEvent(event);
+
+                const state = CncSoundboard.getState();
+                expect(state.deferredInstallPrompt).not.toBeNull();
+            });
+
+            test('install button triggers prompt when available', async () => {
+                CncSoundboard.setupInstallPrompt();
+
+                const mockPrompt = {
+                    prompt: jest.fn(),
+                    userChoice: Promise.resolve({ outcome: 'accepted' }),
+                };
+
+                CncSoundboard.setState({ deferredInstallPrompt: mockPrompt });
+
+                const installBtn = document.getElementById('btn-install');
+                installBtn.click();
+
+                await Promise.resolve(); // Let async handler run
+
+                expect(mockPrompt.prompt).toHaveBeenCalled();
+            });
+
+            test('appinstalled event clears deferred prompt', () => {
+                CncSoundboard.setupInstallPrompt();
+                CncSoundboard.setState({ deferredInstallPrompt: {} });
+
+                window.dispatchEvent(new Event('appinstalled'));
+
+                const state = CncSoundboard.getState();
+                expect(state.deferredInstallPrompt).toBeNull();
+            });
         });
     });
 

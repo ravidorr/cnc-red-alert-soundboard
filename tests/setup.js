@@ -48,6 +48,15 @@ Object.defineProperty(window, 'matchMedia', {
 // Mock scrollTo
 window.scrollTo = jest.fn();
 
+// Mock serviceWorker
+Object.defineProperty(navigator, 'serviceWorker', {
+    value: {
+        register: jest.fn().mockResolvedValue({ scope: '/' }),
+    },
+    writable: true,
+    configurable: true,
+});
+
 // Reset mocks before each test
 beforeEach(() => {
     localStorage.clear();
