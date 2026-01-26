@@ -2,8 +2,11 @@
  * @jest-environment jsdom
  */
 
+const CncSoundboard = require('../js/app.js');
+
 describe('C&C Red Alert Soundboard', () => {
     let localThis;
+    let mockStorage;
 
     beforeEach(() => {
         // Set up DOM
@@ -24,297 +27,185 @@ describe('C&C Red Alert Soundboard', () => {
             <button id="btn-dismiss"></button>
         `;
 
-        // Clear localStorage
-        localStorage.clear();
+        // Create mock storage
+        mockStorage = {
+            store: {},
+            getItem: jest.fn(key => mockStorage.store[key] || null),
+            setItem: jest.fn((key, value) => {
+                mockStorage.store[key] = value;
+            }),
+            clear: jest.fn(() => {
+                mockStorage.store = {};
+            }),
+        };
 
-        // Create localThis for testing
+        // Create localThis for testing with actual module functions
         localThis = {
             favorites: [],
-            SOUNDS: [
-                { file: 'test1.wav', name: 'Test Sound 1', category: 'allies' },
-                { file: 'test2.wav', name: 'Test Sound 2', category: 'soviets' },
-                { file: 'test3.wav', name: 'Another Sound', category: 'allies' },
-            ],
-            CATEGORIES: {
-                allies: { name: 'ALLIED FORCES', order: 1 },
-                soviets: { name: 'SOVIET FORCES', order: 2 },
-            },
+            SOUNDS: CncSoundboard.SOUNDS,
+            CATEGORIES: CncSoundboard.CATEGORIES,
         };
     });
 
     describe('Favorites', () => {
-        describe('loadFavorites', () => {
+        describe('loadFavoritesFromStorage', () => {
             test('should load empty array when localStorage is empty', () => {
-                localThis.loadFavorites = function() {
-                    try {
-                        const stored = localStorage.getItem('cnc-favorites');
-                        if (stored) {
-                            this.favorites = JSON.parse(stored);
-                        }
-                    } catch (e) {
-                        this.favorites = [];
-                    }
-                };
-
-                localThis.loadFavorites();
-                expect(localThis.favorites).toEqual([]);
+                const result = CncSoundboard.loadFavoritesFromStorage(mockStorage);
+                expect(result).toEqual([]);
             });
 
             test('should load favorites from localStorage', () => {
-                localStorage.setItem('cnc-favorites', JSON.stringify(['test1.wav', 'test2.wav']));
+                mockStorage.store['cnc-favorites'] = JSON.stringify(['test1.wav', 'test2.wav']);
 
-                localThis.loadFavorites = function() {
-                    try {
-                        const stored = localStorage.getItem('cnc-favorites');
-                        if (stored) {
-                            this.favorites = JSON.parse(stored);
-                        }
-                    } catch (e) {
-                        this.favorites = [];
-                    }
-                };
-
-                localThis.loadFavorites();
-                expect(localThis.favorites).toEqual(['test1.wav', 'test2.wav']);
+                const result = CncSoundboard.loadFavoritesFromStorage(mockStorage);
+                expect(result).toEqual(['test1.wav', 'test2.wav']);
             });
 
             test('should handle corrupted localStorage data', () => {
-                localStorage.setItem('cnc-favorites', 'invalid json');
+                mockStorage.store['cnc-favorites'] = 'invalid json';
 
-                localThis.loadFavorites = function() {
-                    try {
-                        const stored = localStorage.getItem('cnc-favorites');
-                        if (stored) {
-                            this.favorites = JSON.parse(stored);
-                        }
-                    } catch (e) {
-                        this.favorites = [];
-                    }
-                };
-
-                localThis.loadFavorites();
-                expect(localThis.favorites).toEqual([]);
+                const result = CncSoundboard.loadFavoritesFromStorage(mockStorage);
+                expect(result).toEqual([]);
             });
         });
 
-        describe('saveFavorites', () => {
+        describe('saveFavoritesToStorage', () => {
             test('should save favorites to localStorage', () => {
-                localThis.favorites = ['test1.wav', 'test3.wav'];
+                const favorites = ['test1.wav', 'test3.wav'];
 
-                localThis.saveFavorites = function() {
-                    localStorage.setItem('cnc-favorites', JSON.stringify(this.favorites));
-                };
+                CncSoundboard.saveFavoritesToStorage(mockStorage, favorites);
 
-                localThis.saveFavorites();
-
-                const stored = JSON.parse(localStorage.getItem('cnc-favorites'));
-                expect(stored).toEqual(['test1.wav', 'test3.wav']);
+                expect(mockStorage.setItem).toHaveBeenCalledWith(
+                    'cnc-favorites',
+                    JSON.stringify(favorites)
+                );
             });
         });
 
-        describe('toggleFavorite', () => {
-            beforeEach(() => {
-                localThis.saveFavorites = jest.fn();
-                localThis.renderFavoritesSection = jest.fn();
-                localThis.renderNavigation = jest.fn();
-                localThis.updateFavoriteButtons = jest.fn();
-                localThis.updateStats = jest.fn();
-
-                localThis.toggleFavorite = function(soundFile) {
-                    const index = this.favorites.indexOf(soundFile);
-                    if (index === -1) {
-                        this.favorites.push(soundFile);
-                    } else {
-                        this.favorites.splice(index, 1);
-                    }
-                    this.saveFavorites();
-                    this.renderFavoritesSection();
-                    this.renderNavigation();
-                    this.updateFavoriteButtons();
-                    this.updateStats();
-                };
-            });
-
+        describe('toggleFavoriteInArray', () => {
             test('should add sound to favorites if not already favorite', () => {
-                localThis.favorites = [];
+                const favorites = [];
 
-                localThis.toggleFavorite('test1.wav');
+                const result = CncSoundboard.toggleFavoriteInArray(favorites, 'test1.wav');
 
-                expect(localThis.favorites).toContain('test1.wav');
-                expect(localThis.saveFavorites).toHaveBeenCalled();
+                expect(result).toContain('test1.wav');
+                expect(favorites).toEqual([]); // Original not mutated
             });
 
             test('should remove sound from favorites if already favorite', () => {
-                localThis.favorites = ['test1.wav', 'test2.wav'];
+                const favorites = ['test1.wav', 'test2.wav'];
 
-                localThis.toggleFavorite('test1.wav');
+                const result = CncSoundboard.toggleFavoriteInArray(favorites, 'test1.wav');
 
-                expect(localThis.favorites).not.toContain('test1.wav');
-                expect(localThis.favorites).toContain('test2.wav');
+                expect(result).not.toContain('test1.wav');
+                expect(result).toContain('test2.wav');
             });
 
-            test('should call all update functions after toggle', () => {
-                localThis.toggleFavorite('test1.wav');
+            test('should not mutate original array', () => {
+                const favorites = ['test1.wav'];
 
-                expect(localThis.saveFavorites).toHaveBeenCalled();
-                expect(localThis.renderFavoritesSection).toHaveBeenCalled();
-                expect(localThis.renderNavigation).toHaveBeenCalled();
-                expect(localThis.updateFavoriteButtons).toHaveBeenCalled();
-                expect(localThis.updateStats).toHaveBeenCalled();
+                CncSoundboard.toggleFavoriteInArray(favorites, 'test1.wav');
+
+                expect(favorites).toEqual(['test1.wav']);
             });
         });
 
         describe('isFavorite', () => {
             test('should return true for favorited sound', () => {
-                localThis.favorites = ['test1.wav', 'test2.wav'];
+                const favorites = ['test1.wav', 'test2.wav'];
 
-                localThis.isFavorite = function(soundFile) {
-                    return this.favorites.includes(soundFile);
-                };
-
-                expect(localThis.isFavorite('test1.wav')).toBe(true);
+                expect(CncSoundboard.isFavorite(favorites, 'test1.wav')).toBe(true);
             });
 
             test('should return false for non-favorited sound', () => {
-                localThis.favorites = ['test1.wav'];
+                const favorites = ['test1.wav'];
 
-                localThis.isFavorite = function(soundFile) {
-                    return this.favorites.includes(soundFile);
-                };
-
-                expect(localThis.isFavorite('test2.wav')).toBe(false);
+                expect(CncSoundboard.isFavorite(favorites, 'test2.wav')).toBe(false);
             });
         });
 
-        describe('reorderFavorites', () => {
-            beforeEach(() => {
-                localThis.saveFavorites = jest.fn();
-                localThis.renderFavoritesSection = jest.fn();
-
-                localThis.reorderFavorites = function(draggedFile, targetFile) {
-                    const draggedIndex = this.favorites.indexOf(draggedFile);
-                    const targetIndex = this.favorites.indexOf(targetFile);
-
-                    if (draggedIndex === -1 || targetIndex === -1) return;
-
-                    this.favorites.splice(draggedIndex, 1);
-                    this.favorites.splice(targetIndex, 0, draggedFile);
-
-                    this.saveFavorites();
-                    this.renderFavoritesSection();
-                };
-            });
-
+        describe('reorderFavoritesArray', () => {
             test('should move dragged item to target position', () => {
-                localThis.favorites = ['a.wav', 'b.wav', 'c.wav', 'd.wav'];
+                const favorites = ['a.wav', 'b.wav', 'c.wav', 'd.wav'];
 
-                localThis.reorderFavorites('c.wav', 'a.wav');
+                const result = CncSoundboard.reorderFavoritesArray(favorites, 'c.wav', 'a.wav');
 
-                expect(localThis.favorites).toEqual(['c.wav', 'a.wav', 'b.wav', 'd.wav']);
+                expect(result).toEqual(['c.wav', 'a.wav', 'b.wav', 'd.wav']);
             });
 
             test('should not modify if dragged file not found', () => {
-                localThis.favorites = ['a.wav', 'b.wav'];
+                const favorites = ['a.wav', 'b.wav'];
 
-                localThis.reorderFavorites('x.wav', 'a.wav');
+                const result = CncSoundboard.reorderFavoritesArray(favorites, 'x.wav', 'a.wav');
 
-                expect(localThis.favorites).toEqual(['a.wav', 'b.wav']);
-                expect(localThis.saveFavorites).not.toHaveBeenCalled();
+                expect(result).toEqual(['a.wav', 'b.wav']);
             });
 
             test('should not modify if target file not found', () => {
-                localThis.favorites = ['a.wav', 'b.wav'];
+                const favorites = ['a.wav', 'b.wav'];
 
-                localThis.reorderFavorites('a.wav', 'x.wav');
+                const result = CncSoundboard.reorderFavoritesArray(favorites, 'a.wav', 'x.wav');
 
-                expect(localThis.favorites).toEqual(['a.wav', 'b.wav']);
-                expect(localThis.saveFavorites).not.toHaveBeenCalled();
+                expect(result).toEqual(['a.wav', 'b.wav']);
+            });
+
+            test('should not mutate original array', () => {
+                const favorites = ['a.wav', 'b.wav', 'c.wav'];
+
+                CncSoundboard.reorderFavoritesArray(favorites, 'c.wav', 'a.wav');
+
+                expect(favorites).toEqual(['a.wav', 'b.wav', 'c.wav']);
             });
         });
     });
 
     describe('Search/Filter', () => {
-        describe('filterSounds', () => {
-            beforeEach(() => {
-                document.getElementById('content-area').innerHTML = `
-                    <div class="category-section">
-                        <div class="sound-btn-wrapper" style="">
-                            <button class="sound-btn" data-name="Test Sound" data-file="test.wav"></button>
-                        </div>
-                        <div class="sound-btn-wrapper" style="">
-                            <button class="sound-btn" data-name="Another" data-file="another.wav"></button>
-                        </div>
-                    </div>
-                `;
+        describe('filterSoundsArray', () => {
+            const testSounds = [
+                { file: 'test1.wav', name: 'Test Sound', category: 'allies' },
+                { file: 'another.wav', name: 'Another', category: 'soviets' },
+                { file: 'special.wav', name: 'Special Effect', category: 'misc' },
+            ];
 
-                localThis.searchTerm = '';
-                localThis.elements = {
-                    visibleSounds: document.getElementById('visible-sounds'),
-                };
+            test('should return all sounds when search is empty', () => {
+                const result = CncSoundboard.filterSoundsArray(testSounds, '');
 
-                localThis.filterSounds = function() {
-                    const wrappers = document.querySelectorAll('.sound-btn-wrapper');
-                    let visibleCount = 0;
-
-                    wrappers.forEach(wrapper => {
-                        const btn = wrapper.querySelector('.sound-btn');
-                        if (!btn) return;
-
-                        const name = btn.dataset.name.toLowerCase();
-                        const file = decodeURIComponent(btn.dataset.file).toLowerCase();
-                        const matches = name.includes(this.searchTerm) || file.includes(this.searchTerm);
-
-                        wrapper.style.display = matches ? '' : 'none';
-                        if (matches) visibleCount++;
-                    });
-
-                    this.elements.visibleSounds.textContent = visibleCount;
-                };
-            });
-
-            test('should show all sounds when search is empty', () => {
-                localThis.searchTerm = '';
-                localThis.filterSounds();
-
-                const wrappers = document.querySelectorAll('.sound-btn-wrapper');
-                wrappers.forEach(w => {
-                    expect(w.style.display).toBe('');
-                });
-                expect(localThis.elements.visibleSounds.textContent).toBe('2');
+                expect(result).toEqual(testSounds);
             });
 
             test('should filter sounds by name', () => {
-                localThis.searchTerm = 'test';
-                localThis.filterSounds();
+                const result = CncSoundboard.filterSoundsArray(testSounds, 'test');
 
-                const wrappers = document.querySelectorAll('.sound-btn-wrapper');
-                expect(wrappers[0].style.display).toBe('');
-                expect(wrappers[1].style.display).toBe('none');
-                expect(localThis.elements.visibleSounds.textContent).toBe('1');
+                expect(result.length).toBe(1);
+                expect(result[0].name).toBe('Test Sound');
             });
 
             test('should filter sounds by filename', () => {
-                localThis.searchTerm = 'another';
-                localThis.filterSounds();
+                const result = CncSoundboard.filterSoundsArray(testSounds, 'another');
 
-                const wrappers = document.querySelectorAll('.sound-btn-wrapper');
-                expect(wrappers[0].style.display).toBe('none');
-                expect(wrappers[1].style.display).toBe('');
+                expect(result.length).toBe(1);
+                expect(result[0].file).toBe('another.wav');
             });
 
             test('should be case insensitive', () => {
-                localThis.searchTerm = 'test'; // searchTerm is lowercased before filtering in actual code
-                localThis.filterSounds();
+                const result = CncSoundboard.filterSoundsArray(testSounds, 'TEST');
 
-                const wrappers = document.querySelectorAll('.sound-btn-wrapper');
-                expect(wrappers[0].style.display).toBe('');
+                expect(result.length).toBe(1);
+                expect(result[0].name).toBe('Test Sound');
+            });
+
+            test('should match partial strings', () => {
+                const result = CncSoundboard.filterSoundsArray(testSounds, 'spec');
+
+                expect(result.length).toBe(1);
+                expect(result[0].name).toBe('Special Effect');
             });
         });
     });
 
     describe('Sound Categories', () => {
         test('should have correct category structure', () => {
-            const categories = localThis.CATEGORIES;
+            const categories = CncSoundboard.CATEGORIES;
 
             expect(categories.allies).toBeDefined();
             expect(categories.allies.name).toBe('ALLIED FORCES');
@@ -325,35 +216,74 @@ describe('C&C Red Alert Soundboard', () => {
             expect(categories.soviets.order).toBe(2);
         });
 
-        test('should filter sounds by category', () => {
-            const alliedSounds = localThis.SOUNDS.filter(s => s.category === 'allies');
-            const sovietSounds = localThis.SOUNDS.filter(s => s.category === 'soviets');
+        test('should have 12 categories', () => {
+            const categoryCount = Object.keys(CncSoundboard.CATEGORIES).length;
+            expect(categoryCount).toBe(12);
+        });
 
-            expect(alliedSounds.length).toBe(2);
-            expect(sovietSounds.length).toBe(1);
+        describe('getSoundsByCategory', () => {
+            test('should filter sounds by category', () => {
+                const alliedSounds = CncSoundboard.getSoundsByCategory(CncSoundboard.SOUNDS, 'allies');
+                const sovietSounds = CncSoundboard.getSoundsByCategory(CncSoundboard.SOUNDS, 'soviets');
+
+                expect(alliedSounds.length).toBeGreaterThan(0);
+                expect(sovietSounds.length).toBeGreaterThan(0);
+                expect(alliedSounds.every(s => s.category === 'allies')).toBe(true);
+                expect(sovietSounds.every(s => s.category === 'soviets')).toBe(true);
+            });
+
+            test('should return empty array for unknown category', () => {
+                const result = CncSoundboard.getSoundsByCategory(CncSoundboard.SOUNDS, 'nonexistent');
+
+                expect(result).toEqual([]);
+            });
+        });
+
+        describe('getSortedCategories', () => {
+            test('should return categories sorted by order', () => {
+                const sorted = CncSoundboard.getSortedCategories(CncSoundboard.CATEGORIES);
+
+                expect(sorted[0][0]).toBe('allies');
+                expect(sorted[0][1].order).toBe(1);
+                expect(sorted[1][0]).toBe('soviets');
+                expect(sorted[1][1].order).toBe(2);
+            });
+
+            test('should return array of [id, info] pairs', () => {
+                const sorted = CncSoundboard.getSortedCategories(CncSoundboard.CATEGORIES);
+
+                sorted.forEach(([id, info]) => {
+                    expect(typeof id).toBe('string');
+                    expect(info).toHaveProperty('name');
+                    expect(info).toHaveProperty('order');
+                });
+            });
         });
     });
 
-    describe('Statistics', () => {
-        test('updateStats should update DOM elements', () => {
-            localThis.favorites = ['test1.wav'];
-            localThis.elements = {
-                totalSounds: document.getElementById('total-sounds'),
-                totalFavorites: document.getElementById('total-favorites'),
-                visibleSounds: document.getElementById('visible-sounds'),
-            };
+    describe('Sound Data', () => {
+        test('should have sounds array', () => {
+            expect(Array.isArray(CncSoundboard.SOUNDS)).toBe(true);
+            expect(CncSoundboard.SOUNDS.length).toBeGreaterThan(0);
+        });
 
-            localThis.updateStats = function() {
-                this.elements.totalSounds.textContent = this.SOUNDS.length;
-                this.elements.totalFavorites.textContent = this.favorites.length;
-                this.elements.visibleSounds.textContent = this.SOUNDS.length;
-            };
+        test('each sound should have required properties', () => {
+            CncSoundboard.SOUNDS.forEach(sound => {
+                expect(sound).toHaveProperty('file');
+                expect(sound).toHaveProperty('name');
+                expect(sound).toHaveProperty('category');
+                expect(typeof sound.file).toBe('string');
+                expect(typeof sound.name).toBe('string');
+                expect(typeof sound.category).toBe('string');
+            });
+        });
 
-            localThis.updateStats();
+        test('each sound category should exist in CATEGORIES', () => {
+            const categoryIds = Object.keys(CncSoundboard.CATEGORIES);
 
-            expect(localThis.elements.totalSounds.textContent).toBe('3');
-            expect(localThis.elements.totalFavorites.textContent).toBe('1');
-            expect(localThis.elements.visibleSounds.textContent).toBe('3');
+            CncSoundboard.SOUNDS.forEach(sound => {
+                expect(categoryIds).toContain(sound.category);
+            });
         });
     });
 
@@ -383,14 +313,99 @@ describe('C&C Red Alert Soundboard', () => {
     });
 
     describe('Category Navigation', () => {
-        test('scrollToCategory should calculate correct offset', () => {
-            const headerOffset = 90;
-            const mockElementPosition = 500;
-            const mockScrollY = 100;
+        describe('calculateScrollOffset', () => {
+            test('should calculate correct offset', () => {
+                const elementTop = 500;
+                const scrollY = 100;
+                const headerOffset = 90;
 
-            const expectedOffset = mockElementPosition + mockScrollY - headerOffset;
+                const result = CncSoundboard.calculateScrollOffset(elementTop, scrollY, headerOffset);
 
-            expect(expectedOffset).toBe(510);
+                expect(result).toBe(510);
+            });
+
+            test('should handle zero scroll position', () => {
+                const elementTop = 200;
+                const scrollY = 0;
+                const headerOffset = 90;
+
+                const result = CncSoundboard.calculateScrollOffset(elementTop, scrollY, headerOffset);
+
+                expect(result).toBe(110);
+            });
+
+            test('should handle element at top of page', () => {
+                const elementTop = 0;
+                const scrollY = 500;
+                const headerOffset = 90;
+
+                const result = CncSoundboard.calculateScrollOffset(elementTop, scrollY, headerOffset);
+
+                expect(result).toBe(410);
+            });
+        });
+    });
+
+    describe('Install Prompt', () => {
+        describe('shouldShowInstallPrompt', () => {
+            test('should return true when never dismissed', () => {
+                const result = CncSoundboard.shouldShowInstallPrompt(mockStorage, 7);
+
+                expect(result).toBe(true);
+            });
+
+            test('should return false when dismissed recently', () => {
+                // Dismissed 1 day ago
+                const oneDayAgo = Date.now() - (1 * 24 * 60 * 60 * 1000);
+                mockStorage.store['installPromptDismissed'] = oneDayAgo.toString();
+
+                const result = CncSoundboard.shouldShowInstallPrompt(mockStorage, 7);
+
+                expect(result).toBe(false);
+            });
+
+            test('should return true when dismissed more than 7 days ago', () => {
+                // Dismissed 10 days ago
+                const tenDaysAgo = Date.now() - (10 * 24 * 60 * 60 * 1000);
+                mockStorage.store['installPromptDismissed'] = tenDaysAgo.toString();
+
+                const result = CncSoundboard.shouldShowInstallPrompt(mockStorage, 7);
+
+                expect(result).toBe(true);
+            });
+
+            test('should respect custom dismiss days', () => {
+                // Dismissed 3 days ago
+                const threeDaysAgo = Date.now() - (3 * 24 * 60 * 60 * 1000);
+                mockStorage.store['installPromptDismissed'] = threeDaysAgo.toString();
+
+                // Should not show with 7 day window
+                expect(CncSoundboard.shouldShowInstallPrompt(mockStorage, 7)).toBe(false);
+
+                // Should show with 2 day window
+                expect(CncSoundboard.shouldShowInstallPrompt(mockStorage, 2)).toBe(true);
+            });
+        });
+    });
+
+    describe('State Management', () => {
+        test('getState should return current state', () => {
+            const state = CncSoundboard.getState();
+
+            expect(state).toHaveProperty('favorites');
+            expect(state).toHaveProperty('searchTerm');
+            expect(Array.isArray(state.favorites)).toBe(true);
+        });
+
+        test('setState should update state', () => {
+            const originalState = { ...CncSoundboard.getState() };
+
+            CncSoundboard.setState({ searchTerm: 'test search' });
+
+            expect(CncSoundboard.getState().searchTerm).toBe('test search');
+
+            // Reset for other tests
+            CncSoundboard.setState(originalState);
         });
     });
 });

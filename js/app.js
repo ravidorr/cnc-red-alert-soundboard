@@ -1,6 +1,16 @@
 // C&C Red Alert Soundboard - Main Application
 
-(function() {
+(function(root, factory) {
+    'use strict';
+    // UMD pattern for browser and Node.js compatibility
+    if (typeof module === 'object' && module.exports) {
+        // Node.js/CommonJS
+        module.exports = factory();
+    } else {
+        // Browser global
+        root.CncSoundboard = factory();
+    }
+}(typeof self !== 'undefined' ? self : this, function() {
     'use strict';
 
     // Sound database with categorization
@@ -279,6 +289,158 @@
         btnDismiss: null,
     };
 
+    // ============================================
+    // Pure/Testable Functions (no DOM dependencies)
+    // ============================================
+
+    /**
+     * Load favorites from localStorage
+     * @param {Storage} storage - localStorage or mock
+     * @returns {string[]} Array of favorite file names
+     */
+    function loadFavoritesFromStorage(storage) {
+        try {
+            const stored = storage.getItem('cnc-favorites');
+            if (stored) {
+                return JSON.parse(stored);
+            }
+        } catch (e) {
+            console.error('Error loading favorites:', e);
+        }
+        return [];
+    }
+
+    /**
+     * Save favorites to localStorage
+     * @param {Storage} storage - localStorage or mock
+     * @param {string[]} favorites - Array of favorite file names
+     */
+    function saveFavoritesToStorage(storage, favorites) {
+        try {
+            storage.setItem('cnc-favorites', JSON.stringify(favorites));
+        } catch (e) {
+            console.error('Error saving favorites:', e);
+        }
+    }
+
+    /**
+     * Toggle a sound in the favorites array
+     * @param {string[]} favorites - Current favorites array
+     * @param {string} soundFile - File to toggle
+     * @returns {string[]} New favorites array
+     */
+    function toggleFavoriteInArray(favorites, soundFile) {
+        const newFavorites = [...favorites];
+        const index = newFavorites.indexOf(soundFile);
+        if (index === -1) {
+            newFavorites.push(soundFile);
+        } else {
+            newFavorites.splice(index, 1);
+        }
+        return newFavorites;
+    }
+
+    /**
+     * Check if a sound is a favorite
+     * @param {string[]} favorites - Favorites array
+     * @param {string} soundFile - File to check
+     * @returns {boolean}
+     */
+    function isFavorite(favorites, soundFile) {
+        return favorites.includes(soundFile);
+    }
+
+    /**
+     * Reorder favorites by moving draggedFile to targetFile's position
+     * @param {string[]} favorites - Current favorites array
+     * @param {string} draggedFile - File being dragged
+     * @param {string} targetFile - Drop target file
+     * @returns {string[]} New favorites array
+     */
+    function reorderFavoritesArray(favorites, draggedFile, targetFile) {
+        const draggedIndex = favorites.indexOf(draggedFile);
+        const targetIndex = favorites.indexOf(targetFile);
+
+        if (draggedIndex === -1 || targetIndex === -1) {
+            return favorites;
+        }
+
+        const newFavorites = [...favorites];
+        newFavorites.splice(draggedIndex, 1);
+        newFavorites.splice(targetIndex, 0, draggedFile);
+
+        return newFavorites;
+    }
+
+    /**
+     * Filter sounds based on search term
+     * @param {Object[]} sounds - Array of sound objects
+     * @param {string} searchTerm - Search term (will be lowercased)
+     * @returns {Object[]} Filtered sounds
+     */
+    function filterSoundsArray(sounds, searchTerm) {
+        if (!searchTerm) {
+            return sounds;
+        }
+        const term = searchTerm.toLowerCase();
+        return sounds.filter(sound => {
+            const name = sound.name.toLowerCase();
+            const file = sound.file.toLowerCase();
+            return name.includes(term) || file.includes(term);
+        });
+    }
+
+    /**
+     * Get sounds by category
+     * @param {Object[]} sounds - Array of sound objects
+     * @param {string} category - Category to filter by
+     * @returns {Object[]} Filtered sounds
+     */
+    function getSoundsByCategory(sounds, category) {
+        return sounds.filter(s => s.category === category);
+    }
+
+    /**
+     * Get sorted categories
+     * @param {Object} categories - Categories object
+     * @returns {Array} Sorted array of [categoryId, categoryInfo]
+     */
+    function getSortedCategories(categories) {
+        return Object.entries(categories).sort((a, b) => a[1].order - b[1].order);
+    }
+
+    /**
+     * Calculate scroll offset for category navigation
+     * @param {number} elementTop - Element's top position from getBoundingClientRect
+     * @param {number} scrollY - Current scroll position
+     * @param {number} headerOffset - Fixed header height + padding
+     * @returns {number} Calculated scroll position
+     */
+    function calculateScrollOffset(elementTop, scrollY, headerOffset) {
+        return elementTop + scrollY - headerOffset;
+    }
+
+    /**
+     * Check if install prompt should be shown
+     * @param {Storage} storage - localStorage or mock
+     * @param {number} dismissDays - Number of days to hide after dismiss
+     * @returns {boolean}
+     */
+    function shouldShowInstallPrompt(storage, dismissDays) {
+        const dismissedAt = storage.getItem('installPromptDismissed');
+        if (dismissedAt) {
+            const daysSinceDismissed = (Date.now() - parseInt(dismissedAt)) / (1000 * 60 * 60 * 24);
+            if (daysSinceDismissed < dismissDays) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    // ============================================
+    // DOM-dependent Functions (browser only)
+    // ============================================
+
     // Initialize the application
     function init() {
         cacheElements();
@@ -286,7 +448,7 @@
         setupAudioPlayer();
         setupInstallPrompt();
         renderCategories();
-        renderFavoritesSection(); // Must be after renderCategories since it uses insertAdjacentHTML
+        renderFavoritesSection();
         renderNavigation();
         setupEventListeners();
         updateStats();
@@ -327,18 +489,13 @@
 
     // Setup PWA install prompt
     function setupInstallPrompt() {
-        // Check if already dismissed recently (within 7 days)
-        const dismissedAt = localStorage.getItem('installPromptDismissed');
-        if (dismissedAt) {
-            const daysSinceDismissed = (Date.now() - parseInt(dismissedAt)) / (1000 * 60 * 60 * 24);
-            if (daysSinceDismissed < 7) {
-                return; // Don't show if dismissed within 7 days
-            }
+        if (!shouldShowInstallPrompt(localStorage, 7)) {
+            return;
         }
 
         // Check if already installed
         if (window.matchMedia('(display-mode: standalone)').matches) {
-            return; // Already installed as PWA
+            return;
         }
 
         // Listen for the beforeinstallprompt event
@@ -402,36 +559,19 @@
         }
     }
 
-    // Load favorites from localStorage
+    // Load favorites from localStorage (wrapper for DOM context)
     function loadFavorites() {
-        try {
-            const stored = localStorage.getItem('cnc-favorites');
-            if (stored) {
-                state.favorites = JSON.parse(stored);
-            }
-        } catch (e) {
-            console.error('Error loading favorites:', e);
-            state.favorites = [];
-        }
+        state.favorites = loadFavoritesFromStorage(localStorage);
     }
 
-    // Save favorites to localStorage
+    // Save favorites to localStorage (wrapper for DOM context)
     function saveFavorites() {
-        try {
-            localStorage.setItem('cnc-favorites', JSON.stringify(state.favorites));
-        } catch (e) {
-            console.error('Error saving favorites:', e);
-        }
+        saveFavoritesToStorage(localStorage, state.favorites);
     }
 
     // Toggle a sound as favorite
     function toggleFavorite(soundFile) {
-        const index = state.favorites.indexOf(soundFile);
-        if (index === -1) {
-            state.favorites.push(soundFile);
-        } else {
-            state.favorites.splice(index, 1);
-        }
+        state.favorites = toggleFavoriteInArray(state.favorites, soundFile);
         saveFavorites();
         renderFavoritesSection();
         renderNavigation();
@@ -439,18 +579,14 @@
         updateStats();
     }
 
-    // Check if a sound is a favorite
-    function isFavorite(soundFile) {
-        return state.favorites.includes(soundFile);
-    }
-
     // Update all favorite button states
     function updateFavoriteButtons() {
         document.querySelectorAll('.favorite-btn').forEach(btn => {
             const file = decodeURIComponent(btn.dataset.file);
-            btn.classList.toggle('is-favorite', isFavorite(file));
-            btn.innerHTML = isFavorite(file) ? '&#9733;' : '&#9734;';
-            btn.title = isFavorite(file) ? 'Remove from favorites' : 'Add to favorites';
+            const isFav = isFavorite(state.favorites, file);
+            btn.classList.toggle('is-favorite', isFav);
+            btn.innerHTML = isFav ? '&#9733;' : '&#9734;';
+            btn.title = isFav ? 'Remove from favorites' : 'Add to favorites';
         });
     }
 
@@ -560,35 +696,23 @@
 
     // Reorder favorites by moving draggedFile to targetFile's position
     function reorderFavorites(draggedFile, targetFile) {
-        const draggedIndex = state.favorites.indexOf(draggedFile);
-        const targetIndex = state.favorites.indexOf(targetFile);
-
-        if (draggedIndex === -1 || targetIndex === -1) {
-            return;
-        }
-
-        // Remove dragged item
-        state.favorites.splice(draggedIndex, 1);
-        // Insert at target position
-        state.favorites.splice(targetIndex, 0, draggedFile);
-
+        state.favorites = reorderFavoritesArray(state.favorites, draggedFile, targetFile);
         saveFavorites();
         renderFavoritesSection();
     }
 
     // Render all category sections
     function renderCategories() {
-        const sortedCategories = Object.entries(CATEGORIES)
-            .sort((a, b) => a[1].order - b[1].order);
+        const sortedCategories = getSortedCategories(CATEGORIES);
 
         const html = sortedCategories.map(([categoryId, categoryInfo]) => {
-            const sounds = SOUNDS.filter(s => s.category === categoryId);
+            const sounds = getSoundsByCategory(SOUNDS, categoryId);
             if (sounds.length === 0) {
                 return '';
             }
 
             const buttonsHtml = sounds.map(sound => {
-                const isFav = isFavorite(sound.file);
+                const isFav = isFavorite(state.favorites, sound.file);
                 return `
                 <div class="sound-btn-wrapper">
                     <button class="sound-btn" 
@@ -625,8 +749,7 @@
 
     // Render navigation sidebar
     function renderNavigation() {
-        const sortedCategories = Object.entries(CATEGORIES)
-            .sort((a, b) => a[1].order - b[1].order);
+        const sortedCategories = getSortedCategories(CATEGORIES);
 
         // Add favorites nav item if there are favorites
         let favoritesNavHtml = '';
@@ -640,7 +763,7 @@
         }
 
         const navHtml = sortedCategories.map(([categoryId, categoryInfo]) => {
-            const count = SOUNDS.filter(s => s.category === categoryId).length;
+            const count = getSoundsByCategory(SOUNDS, categoryId).length;
             if (count === 0) {
                 return '';
             }
@@ -794,7 +917,7 @@
             // Scroll with offset for fixed header (80px + 10px padding)
             const headerOffset = 90;
             const elementPosition = section.getBoundingClientRect().top;
-            const offsetPosition = elementPosition + window.scrollY - headerOffset;
+            const offsetPosition = calculateScrollOffset(elementPosition, window.scrollY, headerOffset);
 
             window.scrollTo({
                 top: offsetPosition,
@@ -808,7 +931,7 @@
         }
     }
 
-    // Filter sounds based on search
+    // Filter sounds based on search (DOM version)
     function filterSounds() {
         const wrappers = document.querySelectorAll('.sound-btn-wrapper');
         let visibleCount = 0;
@@ -866,10 +989,38 @@
         }
     }
 
-    // Initialize when DOM is ready
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', init);
-    } else {
-        init();
+    // Initialize when DOM is ready (browser only, not in test environment)
+    if (typeof document !== 'undefined' && typeof jest === 'undefined') {
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
     }
-})();
+
+    // Return public API for testing
+    return {
+        // Constants
+        SOUNDS,
+        CATEGORIES,
+
+        // Pure functions (testable)
+        loadFavoritesFromStorage,
+        saveFavoritesToStorage,
+        toggleFavoriteInArray,
+        isFavorite,
+        reorderFavoritesArray,
+        filterSoundsArray,
+        getSoundsByCategory,
+        getSortedCategories,
+        calculateScrollOffset,
+        shouldShowInstallPrompt,
+
+        // State (for testing)
+        getState: () => state,
+        setState: (newState) => Object.assign(state, newState),
+
+        // Init function (for manual initialization in tests if needed)
+        init,
+    };
+}));
