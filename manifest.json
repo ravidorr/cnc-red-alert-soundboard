@@ -2,7 +2,7 @@
     "name": "C&C Red Alert Soundboard",
     "short_name": "C&C Sounds",
     "description": "Command & Conquer Red Alert sound effects soundboard - play classic C&C audio clips",
-    "start_url": "/",
+    "start_url": "./",
     "display": "standalone",
     "background_color": "#0a0a0a",
     "theme_color": "#003300",
