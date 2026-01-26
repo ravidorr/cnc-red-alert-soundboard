@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Command & Conquer Red Alert Soundboard - Play classic C&C sound effects">
+    <meta name="theme-color" content="#003300">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="C&C Sounds">
+    
+    <title>C&C Red Alert Soundboard</title>
+    
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/icon-192.png">
+    <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="css/styles.css?v=5">
+</head>
+<body>
+    <div class="scanlines"></div>
+    
+    <header class="main-header">
+        <div class="header-content">
+            <div class="logo">
+                <span class="logo-text">C&C</span>
+                <span class="logo-subtitle">RED ALERT SOUNDBOARD</span>
+            </div>
+            <div class="header-controls">
+                <div class="search-container">
+                    <input type="text" id="search-input" placeholder="SEARCH SOUNDS..." autocomplete="off">
+                    <button id="clear-search" class="btn-icon" title="Clear search">&times;</button>
+                </div>
+                <button id="stop-all" class="btn-action">STOP ALL</button>
+            </div>
+        </div>
+        <div class="header-bar"></div>
+    </header>
+
+    <main class="main-content">
+        <div class="sidebar">
+            <nav class="category-nav" id="category-nav">
+                <div class="nav-header">CATEGORIES</div>
+                <!-- Categories will be populated by JS -->
+            </nav>
+            <div class="stats-panel">
+                <div class="stat">
+                    <span class="stat-label">SOUNDS</span>
+                    <span class="stat-value" id="total-sounds">0</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">FAVORITES</span>
+                    <span class="stat-value" id="total-favorites">0</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">VISIBLE</span>
+                    <span class="stat-value" id="visible-sounds">0</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-area" id="content-area">
+            <!-- Sound categories and buttons will be populated by JS -->
+        </div>
+    </main>
+
+    <footer class="main-footer">
+        <div class="footer-content">
+            <span class="footer-text">ESTABLISHING BATTLEFIELD CONTROL... STAND BY.</span>
+            <span class="footer-version">v1.0</span>
+        </div>
+    </footer>
+
+    <div class="now-playing" id="now-playing">
+        <span class="now-playing-label">NOW PLAYING:</span>
+        <span class="now-playing-title" id="now-playing-title">-</span>
+    </div>
+
+    <div class="install-prompt" id="install-prompt">
+        <div class="install-prompt-content">
+            <div class="install-prompt-icon">
+                <svg viewBox="0 0 24 24" width="32" height="32" fill="currentColor">
+                    <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                </svg>
+            </div>
+            <div class="install-prompt-text">
+                <div class="install-prompt-title">INSTALL SOUNDBOARD</div>
+                <div class="install-prompt-subtitle">Add to home screen for quick access</div>
+            </div>
+            <div class="install-prompt-actions">
+                <button class="btn-install" id="btn-install">INSTALL</button>
+                <button class="btn-dismiss" id="btn-dismiss">DISMISS</button>
+            </div>
+        </div>
+    </div>
+
+    <audio id="audio-player" preload="auto"></audio>
+
+    <script src="js/app.js?v=7"></script>
+</body>
+</html>
