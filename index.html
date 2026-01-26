@@ -38,9 +38,23 @@
                 <div class="search-container">
                     <label for="search-input" class="visually-hidden">Search sounds</label>
                     <input type="text" id="search-input" placeholder="Search 190 sounds..." autocomplete="off">
-                    <button id="clear-search" class="btn-icon" title="Clear search">&times;</button>
+                    <button id="clear-search" class="btn-icon" aria-label="Clear search" title="Clear search">&times;</button>
                 </div>
-                <button id="stop-all" class="btn-action">STOP ALL</button>
+                <div class="volume-container">
+                    <label for="volume-slider" class="visually-hidden">Volume</label>
+                    <button id="volume-toggle" class="btn-icon btn-volume" aria-label="Toggle mute" title="Toggle mute">
+                        <svg id="volume-icon" viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                            <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+                        </svg>
+                    </button>
+                    <input type="range" id="volume-slider" min="0" max="100" value="100" aria-label="Volume level">
+                </div>
+                <button id="stop-all" class="btn-action btn-stop">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true">
+                        <path d="M6 6h12v12H6z"/>
+                    </svg>
+                    STOP
+                </button>
                 <button id="random-sound" class="btn-action btn-random" title="Play random sound">RANDOM</button>
                 <button id="install-btn" class="btn-action btn-install-header" title="Install App">
                     <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
@@ -57,7 +71,7 @@
 
     <main class="main-content" role="main">
         <div class="sidebar" id="sidebar">
-            <nav class="category-nav" id="category-nav" aria-label="Sound categories">
+            <nav class="category-nav" id="category-nav" aria-label="Sound categories" role="list">
                 <div class="nav-header">CATEGORIES</div>
                 <!-- Categories will be populated by JS -->
             </nav>
@@ -77,14 +91,28 @@
             </div>
         </div>
 
+        <!-- Mobile category chips - shown only on mobile -->
+        <nav class="mobile-category-chips" id="mobile-category-chips" aria-label="Quick category navigation">
+            <!-- Populated by JS -->
+        </nav>
+
         <div class="content-area" id="content-area">
+            <!-- Search result indicator -->
+            <div class="search-result-indicator" id="search-result-indicator" style="display: none;">
+                <span id="search-result-text"></span>
+                <button class="btn-clear-filter" id="btn-clear-filter">Clear</button>
+            </div>
             <!-- Sound categories and buttons will be populated by JS -->
         </div>
 
         <div class="search-empty-state" id="search-empty-state" style="display: none;">
-            <div class="empty-state-icon">&#128269;</div>
+            <div class="empty-state-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="64" height="64" fill="currentColor">
+                    <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+                </svg>
+            </div>
             <div class="empty-state-title">No sounds found</div>
-            <div class="empty-state-text">No sounds match "<span id="search-empty-term"></span>"</div>
+            <div class="empty-state-text">No sounds match "<span id="search-empty-term"></span>". Try a character name like "Tanya" or a phrase like "affirmative".</div>
             <button class="btn-action btn-clear-search" id="btn-clear-search">Clear Search</button>
         </div>
     </main>
@@ -92,9 +120,34 @@
     <footer class="main-footer" role="contentinfo">
         <div class="footer-content">
             <span class="footer-text">ESTABLISHING BATTLEFIELD CONTROL... STAND BY.</span>
-            <span class="footer-version">v1.1.1</span>
+            <div class="footer-actions">
+                <button id="help-btn" class="btn-help" aria-label="Keyboard shortcuts" title="Keyboard shortcuts">?</button>
+                <span class="footer-version">v1.2.0</span>
+            </div>
         </div>
     </footer>
+
+    <!-- Keyboard shortcuts modal -->
+    <div class="shortcuts-modal" id="shortcuts-modal" role="dialog" aria-labelledby="shortcuts-title" aria-modal="true">
+        <div class="shortcuts-modal-content">
+            <h2 id="shortcuts-title" class="shortcuts-title">KEYBOARD SHORTCUTS</h2>
+            <div class="shortcuts-list">
+                <div class="shortcut-item">
+                    <kbd>Esc</kbd>
+                    <span>Stop all sounds</span>
+                </div>
+                <div class="shortcut-item">
+                    <kbd>Ctrl</kbd> + <kbd>F</kbd>
+                    <span>Focus search</span>
+                </div>
+                <div class="shortcut-item">
+                    <kbd>Arrow Up/Down</kbd>
+                    <span>Reorder favorites</span>
+                </div>
+            </div>
+            <button class="btn-dismiss" id="shortcuts-close">CLOSE</button>
+        </div>
+    </div>
 
     <div class="now-playing" id="now-playing" aria-live="polite" aria-atomic="true">
         <span class="now-playing-label">NOW PLAYING:</span>
@@ -110,7 +163,7 @@
             </div>
             <div class="install-prompt-text">
                 <div class="install-prompt-title">INSTALL SOUNDBOARD</div>
-                <div class="install-prompt-subtitle">Add to home screen for quick access</div>
+                <div class="install-prompt-subtitle">Install for offline access and quick launch</div>
             </div>
             <div class="install-prompt-actions">
                 <button class="btn-install" id="btn-install">INSTALL</button>
@@ -122,6 +175,9 @@
     <audio id="audio-player" preload="auto"></audio>
 
     <div class="toast-container" id="toast-container" aria-live="polite"></div>
+    
+    <!-- Screen reader announcements -->
+    <div id="search-announcer" class="visually-hidden" aria-live="polite" aria-atomic="true"></div>
 
     <script type="module" src="js/main.js"></script>
 </body>

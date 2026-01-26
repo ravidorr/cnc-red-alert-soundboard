@@ -5,6 +5,9 @@
 import { state, elements } from './state.js';
 import { shouldShowInstallPrompt } from './utils.js';
 
+// Track the element that triggered the modal for focus return
+let previouslyFocusedElement = null;
+
 // Setup PWA install prompt
 export function setupInstallPrompt() {
     // Check if already installed
@@ -36,6 +39,7 @@ export function setupInstallPrompt() {
     // Handle header install button click
     if (elements.installBtn) {
         elements.installBtn.addEventListener('click', async () => {
+            previouslyFocusedElement = document.activeElement;
             await triggerInstall();
         });
     }
@@ -53,6 +57,20 @@ export function setupInstallPrompt() {
         }
     });
 
+    // Close on Escape key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && elements.installPrompt.classList.contains('visible')) {
+            hideInstallPrompt();
+        }
+    });
+
+    // Focus trap within modal
+    elements.installPrompt.addEventListener('keydown', (e) => {
+        if (e.key === 'Tab' && elements.installPrompt.classList.contains('visible')) {
+            trapFocus(e);
+        }
+    });
+
     // Listen for successful install
     window.addEventListener('appinstalled', () => {
         console.log('PWA was installed');
@@ -60,6 +78,23 @@ export function setupInstallPrompt() {
         hideInstallButton();
         state.deferredInstallPrompt = null;
     });
+}
+
+// Trap focus within install modal
+function trapFocus(e) {
+    const focusableElements = elements.installPrompt.querySelectorAll(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+    );
+    const firstElement = focusableElements[0];
+    const lastElement = focusableElements[focusableElements.length - 1];
+
+    if (e.shiftKey && document.activeElement === firstElement) {
+        e.preventDefault();
+        lastElement.focus();
+    } else if (!e.shiftKey && document.activeElement === lastElement) {
+        e.preventDefault();
+        firstElement.focus();
+    }
 }
 
 // Trigger the install prompt
@@ -82,13 +117,25 @@ export async function triggerInstall() {
 
 export function showInstallPrompt() {
     if (elements.installPrompt) {
+        // Save currently focused element
+        previouslyFocusedElement = document.activeElement;
         elements.installPrompt.classList.add('visible');
+        // Focus the first focusable element in the modal
+        const firstButton = elements.installPrompt.querySelector('button');
+        if (firstButton) {
+            setTimeout(() => firstButton.focus(), 50);
+        }
     }
 }
 
 export function hideInstallPrompt() {
     if (elements.installPrompt) {
         elements.installPrompt.classList.remove('visible');
+        // Return focus to the previously focused element
+        if (previouslyFocusedElement && previouslyFocusedElement.focus) {
+            previouslyFocusedElement.focus();
+        }
+        previouslyFocusedElement = null;
     }
 }
 

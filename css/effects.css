@@ -59,3 +59,19 @@
 .category-section {
     animation: fadeIn 0.3s ease forwards;
 }
+
+/* Reduced motion: further reduce visual effects */
+@media (prefers-reduced-motion: reduce) {
+    .scanlines {
+        opacity: 0.1;
+    }
+    
+    .scanlines::after {
+        display: none;
+    }
+    
+    .header-bar {
+        animation: none;
+        opacity: 0.85;
+    }
+}

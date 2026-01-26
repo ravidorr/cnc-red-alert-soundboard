@@ -28,7 +28,7 @@ export function renderNavigation() {
         }
 
         return `
-            <button class="nav-item" data-category="${categoryId}" type="button">
+            <button class="nav-item" data-category="${categoryId}" type="button" role="listitem">
                 <span>${categoryInfo.name}</span>
                 <span class="nav-item-count">${count}</span>
             </button>
@@ -39,6 +39,47 @@ export function renderNavigation() {
     elements.categoryNav.innerHTML = '';
     elements.categoryNav.appendChild(navHeader || createNavHeader());
     elements.categoryNav.insertAdjacentHTML('beforeend', favoritesNavHtml + navHtml);
+
+    // Also render mobile category chips
+    renderMobileCategoryChips();
+}
+
+// Render mobile category chips for quick navigation
+export function renderMobileCategoryChips() {
+    const mobileChips = document.getElementById('mobile-category-chips');
+    if (!mobileChips) {
+        return;
+    }
+
+    const sortedCategories = getSortedCategories(CATEGORIES);
+
+    // Add favorites chip if there are favorites
+    let chipsHtml = '';
+    if (state.favorites.length > 0) {
+        chipsHtml += '<button class="category-chip" data-category="favorites" type="button">FAVORITES</button>';
+    }
+
+    chipsHtml += sortedCategories.map(([categoryId, categoryInfo]) => {
+        const count = getSoundsByCategory(SOUNDS, categoryId).length;
+        if (count === 0) {
+            return '';
+        }
+        // Use shorter names for mobile chips
+        const shortName = categoryInfo.name.replace('BUILDINGS & DEFENSES', 'BUILDINGS').replace('MISCELLANEOUS', 'MISC');
+        return `<button class="category-chip" data-category="${categoryId}" type="button">${shortName}</button>`;
+    }).join('');
+
+    mobileChips.innerHTML = chipsHtml;
+
+    // Add click handlers
+    mobileChips.querySelectorAll('.category-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+            scrollToCategory(chip.dataset.category);
+            // Update active state
+            mobileChips.querySelectorAll('.category-chip').forEach(c => c.classList.remove('active'));
+            chip.classList.add('active');
+        });
+    });
 }
 
 export function createNavHeader() {
@@ -56,6 +97,28 @@ export function toggleCategory(section) {
     if (header) {
         header.setAttribute('aria-expanded', isExpanded.toString());
     }
+
+    // Announce state change to screen readers
+    const categoryName = section.querySelector('.category-name');
+    if (categoryName) {
+        const name = categoryName.textContent;
+        const state = isExpanded ? 'expanded' : 'collapsed';
+        announceToScreenReader(`${name} ${state}`);
+    }
+}
+
+// Announce message to screen readers
+function announceToScreenReader(message) {
+    let announcer = document.getElementById('category-announcer');
+    if (!announcer) {
+        announcer = document.createElement('div');
+        announcer.id = 'category-announcer';
+        announcer.setAttribute('aria-live', 'polite');
+        announcer.setAttribute('aria-atomic', 'true');
+        announcer.className = 'visually-hidden';
+        document.body.appendChild(announcer);
+    }
+    announcer.textContent = message;
 }
 
 // Scroll to category
@@ -77,7 +140,13 @@ export function scrollToCategory(categoryId) {
 
         // Update active nav item
         document.querySelectorAll('.nav-item').forEach(item => {
-            item.classList.toggle('active', item.dataset.category === categoryId);
+            const isActive = item.dataset.category === categoryId;
+            item.classList.toggle('active', isActive);
+            if (isActive) {
+                item.setAttribute('aria-current', 'true');
+            } else {
+                item.removeAttribute('aria-current');
+            }
         });
     }
 }

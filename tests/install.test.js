@@ -277,6 +277,59 @@ describe('Install Functions', () => {
         });
     });
 
+    describe('Focus Management', () => {
+        beforeEach(() => {
+            cacheElements();
+            setupInstallPrompt();
+        });
+
+        test('showInstallPrompt should make modal visible', () => {
+            showInstallPrompt();
+
+            expect(elements.installPrompt.classList.contains('visible')).toBe(true);
+        });
+
+        test('hideInstallPrompt should return focus to previous element', () => {
+            const triggerBtn = document.createElement('button');
+            triggerBtn.id = 'trigger';
+            document.body.appendChild(triggerBtn);
+            triggerBtn.focus();
+
+            showInstallPrompt();
+            hideInstallPrompt();
+
+            expect(document.activeElement).toBe(triggerBtn);
+        });
+
+        test('Escape key should close modal', () => {
+            showInstallPrompt();
+
+            document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+
+            expect(elements.installPrompt.classList.contains('visible')).toBe(false);
+        });
+
+        test('Tab key handling in modal should not throw', () => {
+            showInstallPrompt();
+
+            const tabEvent = new KeyboardEvent('keydown', { key: 'Tab', bubbles: true });
+
+            expect(() => {
+                elements.installPrompt.dispatchEvent(tabEvent);
+            }).not.toThrow();
+        });
+
+        test('Shift+Tab key handling in modal should not throw', () => {
+            showInstallPrompt();
+
+            const tabEvent = new KeyboardEvent('keydown', { key: 'Tab', shiftKey: true, bubbles: true });
+
+            expect(() => {
+                elements.installPrompt.dispatchEvent(tabEvent);
+            }).not.toThrow();
+        });
+    });
+
     describe('registerServiceWorker', () => {
         test('should not throw', () => {
             expect(() => {

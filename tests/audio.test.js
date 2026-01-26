@@ -20,6 +20,7 @@ describe('Audio Functions', () => {
         resetState(state);
         resetElements(elements);
         Element.prototype.scrollIntoView = jest.fn();
+        localStorage.clear();
     });
 
     describe('setupAudioPlayer', () => {
@@ -60,6 +61,95 @@ describe('Audio Functions', () => {
             // Toast should be shown
             const toast = document.querySelector('.toast');
             expect(toast).not.toBeNull();
+        });
+
+        test('should setup volume control from localStorage', () => {
+            localStorage.setItem('soundboardVolume', '50');
+
+            // Add volume control elements
+            const volumeSlider = document.createElement('input');
+            volumeSlider.type = 'range';
+            volumeSlider.id = 'volume-slider';
+            volumeSlider.value = '100';
+            document.body.appendChild(volumeSlider);
+
+            const volumeToggle = document.createElement('button');
+            volumeToggle.id = 'volume-toggle';
+            document.body.appendChild(volumeToggle);
+
+            const volumeIcon = document.createElement('svg');
+            volumeIcon.id = 'volume-icon';
+            volumeToggle.appendChild(volumeIcon);
+
+            cacheElements();
+            setupAudioPlayer();
+
+            expect(volumeSlider.value).toBe('50');
+            expect(state.audioPlayer.volume).toBe(0.5);
+        });
+
+        test('should handle volume slider changes', () => {
+            // Add volume control elements
+            const volumeSlider = document.createElement('input');
+            volumeSlider.type = 'range';
+            volumeSlider.id = 'volume-slider';
+            volumeSlider.value = '100';
+            document.body.appendChild(volumeSlider);
+
+            const volumeToggle = document.createElement('button');
+            volumeToggle.id = 'volume-toggle';
+            document.body.appendChild(volumeToggle);
+
+            const volumeIcon = document.createElement('svg');
+            volumeIcon.id = 'volume-icon';
+            volumeToggle.appendChild(volumeIcon);
+
+            cacheElements();
+            setupAudioPlayer();
+
+            // Change volume
+            volumeSlider.value = '75';
+            volumeSlider.dispatchEvent(new Event('input'));
+
+            expect(state.audioPlayer.volume).toBe(0.75);
+            expect(localStorage.getItem('soundboardVolume')).toBe('75');
+        });
+
+        test('should handle volume mute toggle', () => {
+            // Add volume control elements
+            const volumeSlider = document.createElement('input');
+            volumeSlider.type = 'range';
+            volumeSlider.id = 'volume-slider';
+            volumeSlider.value = '80';
+            document.body.appendChild(volumeSlider);
+
+            const volumeToggle = document.createElement('button');
+            volumeToggle.id = 'volume-toggle';
+            document.body.appendChild(volumeToggle);
+
+            const volumeIcon = document.createElement('svg');
+            volumeIcon.id = 'volume-icon';
+            volumeToggle.appendChild(volumeIcon);
+
+            cacheElements();
+            setupAudioPlayer();
+
+            // Click to mute
+            volumeToggle.click();
+
+            expect(volumeSlider.value).toBe('0');
+            expect(state.audioPlayer.volume).toBe(0);
+
+            // Click to unmute
+            volumeToggle.click();
+
+            expect(parseInt(volumeSlider.value)).toBeGreaterThan(0);
+        });
+
+        test('should handle missing volume controls gracefully', () => {
+            cacheElements();
+
+            expect(() => setupAudioPlayer()).not.toThrow();
         });
     });
 

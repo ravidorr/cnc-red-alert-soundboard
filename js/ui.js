@@ -107,7 +107,7 @@ export function renderFavoritesSection() {
                         <div class="favorites-empty-icon">&#9734;</div>
                         <div class="favorites-empty-title">No Favorites Yet</div>
                         <div class="favorites-empty-text">
-                            Tip: Click &#9734; on any sound to save it here for quick access
+                            Click the star icon on any sound to save it here.
                         </div>
                     </div>
                 </div>
@@ -139,6 +139,15 @@ export function renderFavoritesSection() {
         </div>
     `).join('');
 
+    // Show drag tooltip if first time with 2+ favorites and not seen before
+    const showDragTooltip = favoriteSounds.length >= 2 && !localStorage.getItem('dragTooltipSeen');
+    const dragTooltipHtml = showDragTooltip ? `
+        <div class="drag-tooltip" id="drag-tooltip">
+            <span>Tip: Drag sounds to reorder, or use arrow keys when focused</span>
+            <button class="drag-tooltip-dismiss" id="drag-tooltip-dismiss" aria-label="Dismiss tip">Got it</button>
+        </div>
+    ` : '';
+
     const sectionHtml = `
         <section class="category-section favorites-section" id="category-favorites" data-category="favorites">
             <div class="category-header" tabindex="0" role="button" aria-expanded="true">
@@ -148,6 +157,7 @@ export function renderFavoritesSection() {
                 </div>
                 <span class="category-toggle" aria-hidden="true">&#9660;</span>
             </div>
+            ${dragTooltipHtml}
             <div class="category-content" id="category-content-favorites">
                 ${buttonsHtml}
             </div>
@@ -156,6 +166,20 @@ export function renderFavoritesSection() {
 
     // Insert at the beginning of content area
     elements.contentArea.insertAdjacentHTML('afterbegin', sectionHtml);
+
+    // Setup drag tooltip dismiss
+    if (showDragTooltip) {
+        const dismissBtn = document.getElementById('drag-tooltip-dismiss');
+        if (dismissBtn) {
+            dismissBtn.addEventListener('click', () => {
+                localStorage.setItem('dragTooltipSeen', 'true');
+                const tooltip = document.getElementById('drag-tooltip');
+                if (tooltip) {
+                    tooltip.remove();
+                }
+            });
+        }
+    }
 
     // Setup drag and drop handlers
     setupFavoritesDragAndDrop();
@@ -239,7 +263,7 @@ export function updateStats() {
  * @param {string} type - Type: 'info', 'success', or 'error'
  * @param {number} duration - How long to show the toast in ms
  */
-export function showToast(message, type = 'info', duration = 3000) {
+export function showToast(message, type = 'info', duration = 5000) {
     if (!elements.toastContainer) {
         return;
     }

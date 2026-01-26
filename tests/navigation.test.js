@@ -10,6 +10,7 @@ import {
     toggleCategory,
     scrollToCategory,
     createNavHeader,
+    renderMobileCategoryChips,
 } from '../js/navigation.js';
 import {
     toggleMobileMenu,
@@ -196,6 +197,82 @@ describe('Navigation Functions', () => {
             expect(() => openMobileMenu()).not.toThrow();
             expect(() => closeMobileMenu()).not.toThrow();
         });
+
+        test('openMobileMenu should focus first focusable element', (done) => {
+            // Add a button inside sidebar
+            const btn = document.createElement('button');
+            btn.textContent = 'Test';
+            elements.sidebar.appendChild(btn);
+
+            openMobileMenu();
+
+            // Wait for setTimeout in openMobileMenu
+            setTimeout(() => {
+                expect(document.activeElement).toBe(btn);
+                done();
+            }, 150);
+        });
+
+        test('closeMobileMenu should return focus to trigger element', () => {
+            const triggerBtn = document.createElement('button');
+            triggerBtn.id = 'trigger';
+            document.body.appendChild(triggerBtn);
+            triggerBtn.focus();
+
+            openMobileMenu();
+            closeMobileMenu();
+
+            expect(document.activeElement).toBe(triggerBtn);
+        });
+
+        test('should close menu on Escape key', () => {
+            openMobileMenu();
+
+            const escEvent = new KeyboardEvent('keydown', { key: 'Escape' });
+            document.dispatchEvent(escEvent);
+
+            expect(elements.sidebar.classList.contains('open')).toBe(false);
+        });
+
+        test('should trap focus with Tab key', () => {
+            // Add focusable elements to sidebar
+            const btn1 = document.createElement('button');
+            btn1.textContent = 'First';
+            const btn2 = document.createElement('button');
+            btn2.textContent = 'Last';
+            elements.sidebar.appendChild(btn1);
+            elements.sidebar.appendChild(btn2);
+
+            openMobileMenu();
+            btn2.focus();
+
+            // Tab from last element should cycle to first
+            const tabEvent = new KeyboardEvent('keydown', { key: 'Tab', bubbles: true });
+            document.dispatchEvent(tabEvent);
+
+            // Focus trap should prevent default and cycle
+            expect(elements.sidebar.classList.contains('open')).toBe(true);
+        });
+
+        test('should handle Tab with shift key', () => {
+            // Add focusable elements to sidebar
+            const btn1 = document.createElement('button');
+            btn1.textContent = 'First';
+            const btn2 = document.createElement('button');
+            btn2.textContent = 'Last';
+            elements.sidebar.appendChild(btn1);
+            elements.sidebar.appendChild(btn2);
+
+            openMobileMenu();
+            btn1.focus();
+
+            // Shift+Tab from first element should cycle to last
+            const tabEvent = new KeyboardEvent('keydown', { key: 'Tab', shiftKey: true, bubbles: true });
+            document.dispatchEvent(tabEvent);
+
+            // Focus trap should prevent default and cycle
+            expect(elements.sidebar.classList.contains('open')).toBe(true);
+        });
     });
 
     describe('createNavHeader', () => {
@@ -205,6 +282,121 @@ describe('Navigation Functions', () => {
             expect(header.tagName).toBe('DIV');
             expect(header.className).toBe('nav-header');
             expect(header.textContent).toBe('CATEGORIES');
+        });
+    });
+
+    describe('toggleCategory announcements', () => {
+        beforeEach(() => {
+            cacheElements();
+            renderCategories();
+        });
+
+        test('should create announcer element when toggling', () => {
+            const section = document.querySelector('.category-section');
+            toggleCategory(section);
+
+            const announcer = document.getElementById('category-announcer');
+            expect(announcer).not.toBeNull();
+            expect(announcer.getAttribute('aria-live')).toBe('polite');
+        });
+
+        test('should announce collapsed state', () => {
+            const section = document.querySelector('.category-section');
+            toggleCategory(section);
+
+            const announcer = document.getElementById('category-announcer');
+            expect(announcer.textContent).toContain('collapsed');
+        });
+
+        test('should announce expanded state', () => {
+            const section = document.querySelector('.category-section');
+            section.classList.add('collapsed');
+            toggleCategory(section);
+
+            const announcer = document.getElementById('category-announcer');
+            expect(announcer.textContent).toContain('expanded');
+        });
+    });
+
+    describe('scrollToCategory aria-current', () => {
+        beforeEach(() => {
+            cacheElements();
+            renderCategories();
+            renderNavigation();
+            window.scrollTo = jest.fn();
+        });
+
+        test('should set aria-current on active nav item', () => {
+            scrollToCategory('allies');
+
+            const activeItem = document.querySelector('.nav-item[data-category="allies"]');
+            expect(activeItem.getAttribute('aria-current')).toBe('true');
+        });
+
+        test('should only have one active nav item with aria-current at a time', () => {
+            // First scroll to allies
+            scrollToCategory('allies');
+
+            // Then scroll to a different category
+            const navItems = document.querySelectorAll('.nav-item');
+            const secondCategory = navItems[1]?.dataset.category;
+
+            if (secondCategory) {
+                scrollToCategory(secondCategory);
+
+                const itemsWithAriaCurrent = document.querySelectorAll('.nav-item[aria-current="true"]');
+                expect(itemsWithAriaCurrent.length).toBe(1);
+                expect(itemsWithAriaCurrent[0].dataset.category).toBe(secondCategory);
+            }
+        });
+    });
+
+    describe('renderMobileCategoryChips', () => {
+        beforeEach(() => {
+            cacheElements();
+            // Add mobile chips container
+            const chipsContainer = document.createElement('nav');
+            chipsContainer.id = 'mobile-category-chips';
+            document.body.appendChild(chipsContainer);
+        });
+
+        test('should render category chips', () => {
+            renderMobileCategoryChips();
+
+            const chips = document.querySelectorAll('.category-chip');
+            expect(chips.length).toBeGreaterThan(0);
+        });
+
+        test('should render favorites chip when favorites exist', () => {
+            state.favorites = ['allies_1_achnoledged.wav'];
+            renderMobileCategoryChips();
+
+            const favoritesChip = document.querySelector('.category-chip[data-category="favorites"]');
+            expect(favoritesChip).not.toBeNull();
+        });
+
+        test('should not render favorites chip when no favorites', () => {
+            state.favorites = [];
+            renderMobileCategoryChips();
+
+            const favoritesChip = document.querySelector('.category-chip[data-category="favorites"]');
+            expect(favoritesChip).toBeNull();
+        });
+
+        test('should handle missing container gracefully', () => {
+            document.getElementById('mobile-category-chips').remove();
+
+            expect(() => renderMobileCategoryChips()).not.toThrow();
+        });
+
+        test('clicking chip should update active state', () => {
+            window.scrollTo = jest.fn();
+            renderMobileCategoryChips();
+
+            const chips = document.querySelectorAll('.category-chip');
+            chips[0].click();
+
+            expect(chips[0].classList.contains('active')).toBe(true);
         });
     });
 });

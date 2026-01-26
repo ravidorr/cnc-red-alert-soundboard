@@ -12,6 +12,8 @@ import {
     updateFavoriteButtons,
     reorderFavorites,
     setupFavoritesDragAndDrop,
+    moveFavoriteUp,
+    moveFavoriteDown,
 } from '../js/favorites.js';
 
 describe('Favorites Functions', () => {
@@ -312,6 +314,91 @@ describe('Favorites Functions', () => {
 
             // Order should not change
             expect(state.favorites).toEqual(originalOrder);
+        });
+    });
+
+    describe('Keyboard Reordering', () => {
+        beforeEach(() => {
+            cacheElements();
+            renderCategories();
+        });
+
+        describe('moveFavoriteUp', () => {
+            test('should move favorite up in list', () => {
+                state.favorites = ['a.wav', 'b.wav', 'c.wav'];
+                renderFavoritesSection();
+
+                moveFavoriteUp('b.wav');
+
+                expect(state.favorites).toEqual(['b.wav', 'a.wav', 'c.wav']);
+            });
+
+            test('should not move first item up', () => {
+                state.favorites = ['a.wav', 'b.wav', 'c.wav'];
+                renderFavoritesSection();
+
+                moveFavoriteUp('a.wav');
+
+                expect(state.favorites).toEqual(['a.wav', 'b.wav', 'c.wav']);
+            });
+
+            test('should save to localStorage after move', () => {
+                state.favorites = ['a.wav', 'b.wav'];
+                renderFavoritesSection();
+
+                moveFavoriteUp('b.wav');
+
+                const stored = JSON.parse(localStorage.getItem('cnc-favorites'));
+                expect(stored).toEqual(['b.wav', 'a.wav']);
+            });
+
+            test('should not move item not in favorites', () => {
+                state.favorites = ['a.wav', 'b.wav'];
+                renderFavoritesSection();
+
+                moveFavoriteUp('nonexistent.wav');
+
+                expect(state.favorites).toEqual(['a.wav', 'b.wav']);
+            });
+        });
+
+        describe('moveFavoriteDown', () => {
+            test('should move favorite down in list', () => {
+                state.favorites = ['a.wav', 'b.wav', 'c.wav'];
+                renderFavoritesSection();
+
+                moveFavoriteDown('b.wav');
+
+                expect(state.favorites).toEqual(['a.wav', 'c.wav', 'b.wav']);
+            });
+
+            test('should not move last item down', () => {
+                state.favorites = ['a.wav', 'b.wav', 'c.wav'];
+                renderFavoritesSection();
+
+                moveFavoriteDown('c.wav');
+
+                expect(state.favorites).toEqual(['a.wav', 'b.wav', 'c.wav']);
+            });
+
+            test('should save to localStorage after move', () => {
+                state.favorites = ['a.wav', 'b.wav'];
+                renderFavoritesSection();
+
+                moveFavoriteDown('a.wav');
+
+                const stored = JSON.parse(localStorage.getItem('cnc-favorites'));
+                expect(stored).toEqual(['b.wav', 'a.wav']);
+            });
+
+            test('should not move item not in favorites', () => {
+                state.favorites = ['a.wav', 'b.wav'];
+                renderFavoritesSection();
+
+                moveFavoriteDown('nonexistent.wav');
+
+                expect(state.favorites).toEqual(['a.wav', 'b.wav']);
+            });
         });
     });
 });

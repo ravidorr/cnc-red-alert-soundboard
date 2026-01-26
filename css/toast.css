@@ -21,7 +21,7 @@
     font-family: var(--font-primary);
     font-size: 0.9rem;
     box-shadow: var(--border-glow);
-    animation: toastSlideIn 0.3s ease, toastFadeOut 0.3s ease 2.7s forwards;
+    animation: toastSlideIn 0.3s ease, toastFadeOut 0.3s ease 4.7s forwards;
     pointer-events: auto;
 }
 

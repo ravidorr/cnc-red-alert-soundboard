@@ -121,4 +121,106 @@ describe('Search Functions', () => {
             expect(emptyState.style.display).toBe('none');
         });
     });
+
+    describe('Search Announcements', () => {
+        beforeEach(() => {
+            cacheElements();
+            renderCategories();
+            // Add announcer element
+            const announcer = document.createElement('div');
+            announcer.id = 'search-announcer';
+            document.body.appendChild(announcer);
+        });
+
+        test('should announce search results to screen readers', () => {
+            state.searchTerm = 'tanya';
+            filterSounds();
+
+            const announcer = document.getElementById('search-announcer');
+            expect(announcer.textContent).toContain('Showing');
+            expect(announcer.textContent).toContain('sounds');
+        });
+
+        test('should announce no results found', () => {
+            state.searchTerm = 'xyznonexistent';
+            filterSounds();
+
+            const announcer = document.getElementById('search-announcer');
+            expect(announcer.textContent).toContain('No sounds found');
+        });
+
+        test('should clear announcement when search is cleared', () => {
+            state.searchTerm = 'tanya';
+            filterSounds();
+
+            state.searchTerm = '';
+            filterSounds();
+
+            const announcer = document.getElementById('search-announcer');
+            expect(announcer.textContent).toBe('');
+        });
+
+        test('should set aria-busy during filtering', () => {
+            state.searchTerm = 'tanya';
+            filterSounds();
+
+            // After filtering completes, aria-busy should be false
+            expect(elements.contentArea.getAttribute('aria-busy')).toBe('false');
+        });
+    });
+
+    describe('Search Result Indicator', () => {
+        beforeEach(() => {
+            cacheElements();
+            renderCategories();
+            // Add result indicator elements to content-area
+            const contentArea = document.getElementById('content-area');
+            const indicator = document.createElement('div');
+            indicator.id = 'search-result-indicator';
+            indicator.className = 'search-result-indicator';
+            indicator.style.display = 'none';
+            const resultText = document.createElement('span');
+            resultText.id = 'search-result-text';
+            indicator.appendChild(resultText);
+            contentArea.insertBefore(indicator, contentArea.firstChild);
+        });
+
+        test('should hide indicator when search is empty', () => {
+            state.searchTerm = '';
+            filterSounds();
+
+            const indicator = document.getElementById('search-result-indicator');
+            expect(indicator.style.display).toBe('none');
+        });
+
+        test('should hide indicator when no results found', () => {
+            state.searchTerm = 'xyznonexistent';
+            filterSounds();
+
+            const indicator = document.getElementById('search-result-indicator');
+            expect(indicator.style.display).toBe('none');
+        });
+
+        test('should handle missing indicator gracefully', () => {
+            document.getElementById('search-result-indicator').remove();
+
+            state.searchTerm = 'tanya';
+            expect(() => filterSounds()).not.toThrow();
+        });
+
+        test('indicator element should exist after setup', () => {
+            const indicator = document.getElementById('search-result-indicator');
+            const resultText = document.getElementById('search-result-text');
+
+            expect(indicator).not.toBeNull();
+            expect(resultText).not.toBeNull();
+        });
+
+        test('should handle missing resultText element gracefully', () => {
+            document.getElementById('search-result-text').remove();
+
+            state.searchTerm = 'tanya';
+            expect(() => filterSounds()).not.toThrow();
+        });
+    });
 });

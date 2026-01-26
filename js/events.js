@@ -4,7 +4,7 @@
 
 import { state, elements } from './state.js';
 import { playSound, stopAllSounds, playRandomSound } from './audio.js';
-import { toggleFavorite } from './favorites.js';
+import { toggleFavorite, moveFavoriteUp, moveFavoriteDown } from './favorites.js';
 import { toggleCategory, scrollToCategory } from './navigation.js';
 import { filterSounds } from './search.js';
 import { toggleMobileMenu, closeMobileMenu } from './mobile.js';
@@ -42,6 +42,20 @@ export function setupEventListeners() {
             if (header) {
                 e.preventDefault();
                 toggleCategory(header.closest('.category-section'));
+            }
+        }
+
+        // Arrow key support for favorites reordering
+        if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+            const wrapper = e.target.closest('.favorites-section .sound-btn-wrapper');
+            if (wrapper && wrapper.dataset.file) {
+                e.preventDefault();
+                const file = decodeURIComponent(wrapper.dataset.file);
+                if (e.key === 'ArrowUp') {
+                    moveFavoriteUp(file);
+                } else {
+                    moveFavoriteDown(file);
+                }
             }
         }
     });
@@ -93,6 +107,17 @@ export function setupEventListeners() {
         });
     }
 
+    // Clear filter button in search result indicator
+    const btnClearFilter = document.getElementById('btn-clear-filter');
+    if (btnClearFilter) {
+        btnClearFilter.addEventListener('click', () => {
+            elements.searchInput.value = '';
+            state.searchTerm = '';
+            filterSounds();
+            elements.searchInput.focus();
+        });
+    }
+
     // Random sound button
     if (elements.randomSoundBtn) {
         elements.randomSoundBtn.addEventListener('click', playRandomSound);
@@ -100,9 +125,14 @@ export function setupEventListeners() {
 
     // Keyboard shortcuts
     document.addEventListener('keydown', (e) => {
-        // Escape to stop sounds
+        // Escape to stop sounds (unless modal is open)
         if (e.key === 'Escape') {
-            stopAllSounds();
+            const shortcutsModal = document.getElementById('shortcuts-modal');
+            if (shortcutsModal && shortcutsModal.classList.contains('visible')) {
+                hideShortcutsModal();
+            } else {
+                stopAllSounds();
+            }
         }
         // Ctrl/Cmd + F to focus search
         if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
@@ -110,5 +140,57 @@ export function setupEventListeners() {
             elements.searchInput.focus();
             elements.searchInput.select();
         }
+        // ? to show shortcuts (when not in input)
+        if (e.key === '?' && document.activeElement.tagName !== 'INPUT') {
+            showShortcutsModal();
+        }
     });
+
+    // Help button
+    const helpBtn = document.getElementById('help-btn');
+    if (helpBtn) {
+        helpBtn.addEventListener('click', showShortcutsModal);
+    }
+
+    // Shortcuts modal close
+    const shortcutsClose = document.getElementById('shortcuts-close');
+    if (shortcutsClose) {
+        shortcutsClose.addEventListener('click', hideShortcutsModal);
+    }
+
+    // Close shortcuts on backdrop click
+    const shortcutsModal = document.getElementById('shortcuts-modal');
+    if (shortcutsModal) {
+        shortcutsModal.addEventListener('click', (e) => {
+            if (e.target === shortcutsModal) {
+                hideShortcutsModal();
+            }
+        });
+    }
+}
+
+// Shortcuts modal functions
+let shortcutsTrigger = null;
+
+function showShortcutsModal() {
+    const modal = document.getElementById('shortcuts-modal');
+    if (modal) {
+        shortcutsTrigger = document.activeElement;
+        modal.classList.add('visible');
+        const closeBtn = modal.querySelector('#shortcuts-close');
+        if (closeBtn) {
+            closeBtn.focus();
+        }
+    }
+}
+
+function hideShortcutsModal() {
+    const modal = document.getElementById('shortcuts-modal');
+    if (modal) {
+        modal.classList.remove('visible');
+        if (shortcutsTrigger && shortcutsTrigger.focus) {
+            shortcutsTrigger.focus();
+        }
+        shortcutsTrigger = null;
+    }
 }

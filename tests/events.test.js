@@ -268,5 +268,154 @@ describe('Event Handlers', () => {
 
             expect(state.audioPlayer.src).toBe(initialSrc);
         });
+
+        test('arrow keys should reorder favorites in favorites section', () => {
+            state.favorites = ['allies_1_achnoledged.wav', 'allies_1_affirmative.wav'];
+            renderFavoritesSection();
+            setupEventListeners();
+
+            const wrapper = document.querySelector('.favorites-section .sound-btn-wrapper');
+            const soundBtn = wrapper.querySelector('.sound-btn');
+
+            // Simulate ArrowDown on the button
+            const event = new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true });
+            soundBtn.dispatchEvent(event);
+
+            // First favorite should have moved down
+            expect(state.favorites[0]).toBe('allies_1_affirmative.wav');
+        });
+
+        test('arrow keys should not affect non-favorites', () => {
+            setupEventListeners();
+
+            const originalBtn = document.querySelector('.sound-btn');
+            const initialFavorites = [...state.favorites];
+
+            const event = new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true });
+            originalBtn.dispatchEvent(event);
+
+            expect(state.favorites).toEqual(initialFavorites);
+        });
+
+        test('? key should show shortcuts modal', () => {
+            // Add shortcuts modal
+            const modal = document.createElement('div');
+            modal.id = 'shortcuts-modal';
+            modal.className = 'shortcuts-modal';
+            const closeBtn = document.createElement('button');
+            closeBtn.id = 'shortcuts-close';
+            modal.appendChild(closeBtn);
+            document.body.appendChild(modal);
+
+            // Add help button
+            const helpBtn = document.createElement('button');
+            helpBtn.id = 'help-btn';
+            document.body.appendChild(helpBtn);
+
+            setupEventListeners();
+
+            document.dispatchEvent(new KeyboardEvent('keydown', { key: '?' }));
+
+            expect(modal.classList.contains('visible')).toBe(true);
+        });
+
+        test('? key should not show modal when in input', () => {
+            // Add shortcuts modal
+            const modal = document.createElement('div');
+            modal.id = 'shortcuts-modal';
+            modal.className = 'shortcuts-modal';
+            document.body.appendChild(modal);
+
+            setupEventListeners();
+
+            elements.searchInput.focus();
+            document.dispatchEvent(new KeyboardEvent('keydown', { key: '?' }));
+
+            expect(modal.classList.contains('visible')).toBe(false);
+        });
+
+        test('Escape should close shortcuts modal if open', () => {
+            // Add shortcuts modal
+            const modal = document.createElement('div');
+            modal.id = 'shortcuts-modal';
+            modal.className = 'shortcuts-modal visible';
+            document.body.appendChild(modal);
+
+            setupEventListeners();
+
+            document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+
+            expect(modal.classList.contains('visible')).toBe(false);
+        });
+
+        test('help button should show shortcuts modal', () => {
+            // Add shortcuts modal
+            const modal = document.createElement('div');
+            modal.id = 'shortcuts-modal';
+            modal.className = 'shortcuts-modal';
+            const closeBtn = document.createElement('button');
+            closeBtn.id = 'shortcuts-close';
+            modal.appendChild(closeBtn);
+            document.body.appendChild(modal);
+
+            // Add help button
+            const helpBtn = document.createElement('button');
+            helpBtn.id = 'help-btn';
+            document.body.appendChild(helpBtn);
+
+            setupEventListeners();
+
+            helpBtn.click();
+
+            expect(modal.classList.contains('visible')).toBe(true);
+        });
+
+        test('shortcuts close button should hide modal', () => {
+            // Add shortcuts modal
+            const modal = document.createElement('div');
+            modal.id = 'shortcuts-modal';
+            modal.className = 'shortcuts-modal visible';
+            const closeBtn = document.createElement('button');
+            closeBtn.id = 'shortcuts-close';
+            modal.appendChild(closeBtn);
+            document.body.appendChild(modal);
+
+            setupEventListeners();
+
+            closeBtn.click();
+
+            expect(modal.classList.contains('visible')).toBe(false);
+        });
+
+        test('clicking shortcuts modal backdrop should close it', () => {
+            // Add shortcuts modal
+            const modal = document.createElement('div');
+            modal.id = 'shortcuts-modal';
+            modal.className = 'shortcuts-modal visible';
+            document.body.appendChild(modal);
+
+            setupEventListeners();
+
+            modal.click();
+
+            expect(modal.classList.contains('visible')).toBe(false);
+        });
+
+        test('clear filter button should clear search', () => {
+            // Add clear filter button
+            const clearFilterBtn = document.createElement('button');
+            clearFilterBtn.id = 'btn-clear-filter';
+            document.body.appendChild(clearFilterBtn);
+
+            state.searchTerm = 'test';
+            elements.searchInput.value = 'test';
+
+            setupEventListeners();
+
+            clearFilterBtn.click();
+
+            expect(state.searchTerm).toBe('');
+            expect(elements.searchInput.value).toBe('');
+        });
     });
 });

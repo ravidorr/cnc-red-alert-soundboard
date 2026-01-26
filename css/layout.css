@@ -169,6 +169,94 @@
     font-size: 0.8rem;
 }
 
+.footer-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.btn-help {
+    background: var(--bg-button);
+    border: 1px solid var(--green-dark);
+    color: var(--text-dim);
+    width: 24px;
+    height: 24px;
+    font-family: var(--font-primary);
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-help:hover {
+    border-color: var(--green-primary);
+    color: var(--green-primary);
+}
+
+/* Shortcuts Modal */
+.shortcuts-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.85);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+
+.shortcuts-modal.visible {
+    display: flex;
+}
+
+.shortcuts-modal-content {
+    background: var(--bg-panel);
+    border: 2px solid var(--green-primary);
+    box-shadow: var(--glow-green-intense);
+    padding: 24px 32px;
+    max-width: 350px;
+    width: 90%;
+}
+
+.shortcuts-title {
+    font-size: 1.2rem;
+    color: var(--green-primary);
+    text-shadow: var(--glow-green);
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+    font-weight: normal;
+}
+
+.shortcuts-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.shortcut-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.shortcut-item kbd {
+    background: var(--bg-button);
+    border: 1px solid var(--green-dark);
+    color: var(--green-primary);
+    padding: 4px 8px;
+    font-family: var(--font-primary);
+    font-size: 0.8rem;
+    min-width: 24px;
+    text-align: center;
+}
+
 /* Now Playing Indicator */
 .now-playing {
     position: fixed;

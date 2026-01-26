@@ -2,6 +2,7 @@
 // Search - Search/filter functionality
 // ============================================
 
+import { SOUNDS } from './constants.js';
 import { state, elements } from './state.js';
 import { showSearchEmptyState, hideSearchEmptyState } from './ui.js';
 
@@ -9,6 +10,11 @@ import { showSearchEmptyState, hideSearchEmptyState } from './ui.js';
 export function filterSounds() {
     const wrappers = document.querySelectorAll('.sound-btn-wrapper');
     let visibleCount = 0;
+
+    // Set aria-busy while filtering
+    if (elements.contentArea) {
+        elements.contentArea.setAttribute('aria-busy', 'true');
+    }
 
     wrappers.forEach(wrapper => {
         const btn = wrapper.querySelector('.sound-btn');
@@ -46,4 +52,53 @@ export function filterSounds() {
 
     // Update visible count
     elements.visibleSounds.textContent = visibleCount;
+
+    // Clear aria-busy
+    if (elements.contentArea) {
+        elements.contentArea.setAttribute('aria-busy', 'false');
+    }
+
+    // Announce results to screen readers
+    announceSearchResults(visibleCount);
+}
+
+// Announce search results to screen readers
+function announceSearchResults(count) {
+    const announcer = document.getElementById('search-announcer');
+    if (!announcer) {
+        return;
+    }
+
+    // Only announce if there's a search term
+    if (state.searchTerm) {
+        const total = SOUNDS.length;
+        if (count === 0) {
+            announcer.textContent = `No sounds found for "${state.searchTerm}"`;
+        } else {
+            announcer.textContent = `Showing ${count} of ${total} sounds`;
+        }
+    } else {
+        announcer.textContent = '';
+    }
+
+    // Also update visible indicator
+    updateSearchResultIndicator(count);
+}
+
+// Update visible search result indicator
+function updateSearchResultIndicator(count) {
+    const indicator = document.getElementById('search-result-indicator');
+    const resultText = document.getElementById('search-result-text');
+
+    if (!indicator || !resultText) {
+        return;
+    }
+
+    if (state.searchTerm && count > 0) {
+        const total = SOUNDS.length;
+        resultText.textContent = `Showing ${count} of ${total} sounds for "${state.searchTerm}"`;
+        indicator.style.display = 'flex';
+    } else {
+        indicator.style.display = 'none';
+    }
 }

@@ -38,9 +38,9 @@ export function toggleFavorite(soundFile) {
     const sound = SOUNDS.find(s => s.file === soundFile);
     const soundName = sound ? sound.name : 'Sound';
     if (wasAdded) {
-        showToast(`Added "${soundName}" to favorites`, 'success');
+        showToast(`Added ${soundName} to favorites`, 'success');
     } else {
-        showToast(`Removed "${soundName}" from favorites`, 'info');
+        showToast(`Removed ${soundName} from favorites`, 'info');
     }
 }
 
@@ -64,6 +64,76 @@ export function reorderFavorites(draggedFile, targetFile) {
     state.favorites = reorderFavoritesArray(state.favorites, draggedFile, targetFile);
     saveFavorites();
     renderFavoritesSection();
+}
+
+// Move favorite up in the list (keyboard accessible)
+export function moveFavoriteUp(soundFile) {
+    const index = state.favorites.indexOf(soundFile);
+    if (index <= 0) {
+        return; // Already at top or not found
+    }
+    // Swap with previous item
+    const newFavorites = [...state.favorites];
+    [newFavorites[index - 1], newFavorites[index]] = [newFavorites[index], newFavorites[index - 1]];
+    state.favorites = newFavorites;
+    saveFavorites();
+    renderFavoritesSection();
+    // Announce change to screen readers
+    announceReorder(soundFile, 'up');
+    // Re-focus the moved item
+    focusFavoriteItem(soundFile);
+}
+
+// Move favorite down in the list (keyboard accessible)
+export function moveFavoriteDown(soundFile) {
+    const index = state.favorites.indexOf(soundFile);
+    if (index < 0 || index >= state.favorites.length - 1) {
+        return; // Already at bottom or not found
+    }
+    // Swap with next item
+    const newFavorites = [...state.favorites];
+    [newFavorites[index], newFavorites[index + 1]] = [newFavorites[index + 1], newFavorites[index]];
+    state.favorites = newFavorites;
+    saveFavorites();
+    renderFavoritesSection();
+    // Announce change to screen readers
+    announceReorder(soundFile, 'down');
+    // Re-focus the moved item
+    focusFavoriteItem(soundFile);
+}
+
+// Announce reorder to screen readers
+function announceReorder(soundFile, direction) {
+    const sound = SOUNDS.find(s => s.file === soundFile);
+    const soundName = sound ? sound.name : 'Sound';
+    const index = state.favorites.indexOf(soundFile) + 1;
+    const total = state.favorites.length;
+    const message = `${soundName} moved ${direction}, now ${index} of ${total}`;
+
+    // Use aria-live region if it exists, otherwise create temporary one
+    let liveRegion = document.getElementById('reorder-announcer');
+    if (!liveRegion) {
+        liveRegion = document.createElement('div');
+        liveRegion.id = 'reorder-announcer';
+        liveRegion.setAttribute('aria-live', 'polite');
+        liveRegion.setAttribute('aria-atomic', 'true');
+        liveRegion.className = 'visually-hidden';
+        document.body.appendChild(liveRegion);
+    }
+    liveRegion.textContent = message;
+}
+
+// Focus a favorite item after reorder
+function focusFavoriteItem(soundFile) {
+    setTimeout(() => {
+        const wrapper = document.querySelector(`.favorites-section .sound-btn-wrapper[data-file="${encodeURIComponent(soundFile)}"]`);
+        if (wrapper) {
+            const soundBtn = wrapper.querySelector('.sound-btn');
+            if (soundBtn) {
+                soundBtn.focus();
+            }
+        }
+    }, 50);
 }
 
 // Setup drag and drop for favorites reordering
