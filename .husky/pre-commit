@@ -1,0 +1,37 @@
+#!/bin/sh
+
+echo "Running pre-commit checks..."
+
+# Run JS linter
+echo "Checking JavaScript..."
+npm run lint:js
+if [ $? -ne 0 ]; then
+    echo "JS lint failed. Please fix the errors before committing."
+    exit 1
+fi
+
+# Run CSS linter
+echo "Checking CSS..."
+npm run lint:css
+if [ $? -ne 0 ]; then
+    echo "CSS lint failed. Please fix the errors before committing."
+    exit 1
+fi
+
+# Run HTML linter
+echo "Checking HTML..."
+npm run lint:html
+if [ $? -ne 0 ]; then
+    echo "HTML lint failed. Please fix the errors before committing."
+    exit 1
+fi
+
+# Run tests with coverage threshold (90%)
+echo "Running tests with 90% coverage threshold..."
+npm run test:coverage:check
+if [ $? -ne 0 ]; then
+    echo "Tests failed or coverage is below 90%. Please fix before committing."
+    exit 1
+fi
+
+echo "All pre-commit checks passed!"
