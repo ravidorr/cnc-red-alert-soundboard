@@ -104,6 +104,22 @@ describe('C&C Red Alert Soundboard', () => {
                     JSON.stringify(favorites)
                 );
             });
+
+            test('should handle localStorage errors gracefully', () => {
+                const errorStorage = {
+                    setItem: jest.fn(() => {
+                        throw new Error('QuotaExceededError');
+                    }),
+                };
+                const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+
+                expect(() => {
+                    CncSoundboard.saveFavoritesToStorage(errorStorage, ['test.wav']);
+                }).not.toThrow();
+
+                expect(consoleSpy).toHaveBeenCalled();
+                consoleSpy.mockRestore();
+            });
         });
 
         describe('toggleFavoriteInArray', () => {
@@ -996,7 +1012,7 @@ describe('C&C Red Alert Soundboard', () => {
 
             test('should not setup if dismissed recently', () => {
                 localStorage.setItem('installPromptDismissed', Date.now().toString());
-                
+
                 // Should not throw
                 expect(() => {
                     CncSoundboard.setupInstallPrompt();
@@ -1008,6 +1024,38 @@ describe('C&C Red Alert Soundboard', () => {
                 CncSoundboard.setupInstallPrompt();
 
                 expect(addEventSpy).toHaveBeenCalledWith('beforeinstallprompt', expect.any(Function));
+            });
+
+            test('should not setup if already installed as PWA', () => {
+                // Mock standalone mode
+                window.matchMedia = jest.fn().mockImplementation(query => ({
+                    matches: query === '(display-mode: standalone)',
+                    media: query,
+                    onchange: null,
+                    addListener: jest.fn(),
+                    removeListener: jest.fn(),
+                    addEventListener: jest.fn(),
+                    removeEventListener: jest.fn(),
+                    dispatchEvent: jest.fn(),
+                }));
+
+                const addEventSpy = jest.spyOn(window, 'addEventListener');
+                CncSoundboard.setupInstallPrompt();
+
+                // Should not add beforeinstallprompt listener
+                expect(addEventSpy).not.toHaveBeenCalledWith('beforeinstallprompt', expect.any(Function));
+
+                // Reset matchMedia mock
+                window.matchMedia = jest.fn().mockImplementation(query => ({
+                    matches: false,
+                    media: query,
+                    onchange: null,
+                    addListener: jest.fn(),
+                    removeListener: jest.fn(),
+                    addEventListener: jest.fn(),
+                    removeEventListener: jest.fn(),
+                    dispatchEvent: jest.fn(),
+                }));
             });
         });
 
@@ -1063,6 +1111,7 @@ describe('C&C Red Alert Soundboard', () => {
 
                 expect(addEventSpy).toHaveBeenCalledWith('load', expect.any(Function));
             });
+
         });
 
         describe('init', () => {
