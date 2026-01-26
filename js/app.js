@@ -1016,9 +1016,37 @@
         calculateScrollOffset,
         shouldShowInstallPrompt,
 
-        // State (for testing)
+        // DOM functions (for integration testing)
+        cacheElements,
+        renderCategories,
+        renderFavoritesSection,
+        renderNavigation,
+        filterSounds,
+        updateStats,
+        updateFavoriteButtons,
+        toggleCategory,
+        scrollToCategory,
+        playSound,
+        stopAllSounds,
+        clearPlayingState,
+        showInstallPrompt,
+        hideInstallPrompt,
+        setupAudioPlayer,
+        setupInstallPrompt,
+        setupEventListeners,
+        loadFavorites,
+        saveFavorites,
+        toggleFavorite,
+        reorderFavorites,
+        createNavHeader,
+        setupFavoritesDragAndDrop,
+        registerServiceWorker,
+
+        // State and elements (for testing)
         getState: () => state,
         setState: (newState) => Object.assign(state, newState),
+        getElements: () => elements,
+        setElements: (newElements) => Object.assign(elements, newElements),
 
         // Init function (for manual initialization in tests if needed)
         init,
