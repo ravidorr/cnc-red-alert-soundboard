@@ -1,4 +1,5 @@
 // Jest setup file
+import { jest } from '@jest/globals';
 
 // Mock localStorage
 const localStorageMock = (function() {

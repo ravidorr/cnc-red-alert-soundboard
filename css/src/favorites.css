@@ -1,0 +1,111 @@
+/* ============================================
+   Favorites - Favorites section and drag/drop
+   ============================================ */
+
+/* Favorites Section */
+.category-section.favorites-section {
+    border-color: var(--green-primary);
+    box-shadow: var(--border-glow);
+}
+
+.category-section.favorites-section .category-header {
+    background: linear-gradient(90deg, var(--green-dark) 0%, var(--bg-panel) 100%);
+}
+
+.category-section.favorites-section .category-name {
+    color: var(--green-accent);
+}
+
+.favorites-empty {
+    padding: 30px;
+    text-align: center;
+    color: var(--text-dim);
+    grid-column: 1 / -1;
+}
+
+.favorites-empty-icon {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    opacity: 0.5;
+}
+
+.favorites-empty-title {
+    font-size: 1.2rem;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+    letter-spacing: 2px;
+}
+
+.favorites-empty-text {
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+}
+
+/* Recently Played Section */
+.category-section.recent-section {
+    border-color: var(--green-dim);
+}
+
+.category-section.recent-section .category-header {
+    background: linear-gradient(90deg, var(--green-darker) 0%, var(--bg-panel) 100%);
+}
+
+.category-section.recent-section .category-name {
+    color: var(--green-dim);
+}
+
+/* Popular Sounds Section */
+.category-section.popular-section {
+    border-color: var(--green-accent);
+}
+
+.category-section.popular-section .category-header {
+    background: linear-gradient(90deg, var(--green-darker) 0%, var(--bg-panel) 100%);
+}
+
+.category-section.popular-section .category-name {
+    color: var(--green-accent);
+}
+
+/* Drag and drop for favorites */
+.favorites-section .sound-btn-wrapper {
+    cursor: grab;
+}
+
+.favorites-section .sound-btn-wrapper:active {
+    cursor: grabbing;
+}
+
+.favorites-section .sound-btn-wrapper.dragging {
+    opacity: 0.5;
+    transform: scale(0.95);
+}
+
+.favorites-section .sound-btn-wrapper.drag-over {
+    border: 2px dashed var(--green-primary);
+    background: rgba(0, 255, 0, 0.1);
+}
+
+.favorites-section .category-content {
+    min-height: 60px;
+}
+
+.drag-indicator {
+    position: absolute;
+    top: 50%;
+    left: 6px;
+    transform: translateY(-50%);
+    color: var(--text-dim);
+    font-size: 0.8rem;
+    opacity: 0.4;
+    pointer-events: none;
+}
+
+.favorites-section .sound-btn-wrapper:hover .drag-indicator {
+    opacity: 1;
+    color: var(--green-primary);
+}
+
+.favorites-section .sound-btn {
+    padding-left: 25px;
+}

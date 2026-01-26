@@ -1,0 +1,42 @@
+/* ============================================
+   Variables - CSS custom properties
+   ============================================ */
+
+:root {
+    /* Color Palette */
+    --bg-primary: #0a0a0a;
+    --bg-secondary: #0d1a0d;
+    --bg-panel: #001400;
+    --bg-button: #001a00;
+    --bg-button-hover: #002200;
+    --bg-button-active: #00ff00;
+    
+    --green-primary: #00ff00;
+    --green-accent: #33ff33;
+    --green-dim: #00cc00;
+    --green-dark: #006600;
+    --green-darker: #003300;
+    --green-border: #00aa00;
+    
+    --text-primary: #00ff00;
+    --text-secondary: #00cc00;
+    --text-dim: #00aa00; /* Improved from #008800 for WCAG AA compliance (4.5:1 ratio) */
+    --text-dark: #0a0a0a;
+    
+    --red-alert: #ff3333;
+    --red-dim: #cc0000;
+    
+    /* Typography */
+    --font-primary: 'VT323', 'Courier New', monospace;
+    --font-secondary: 'Share Tech Mono', 'Courier New', monospace;
+    
+    /* Sizes */
+    --header-height: 80px;
+    --footer-height: 40px;
+    --sidebar-width: 220px;
+    
+    /* Effects */
+    --glow-green: 0 0 10px rgba(0, 255, 0, 0.5), 0 0 20px rgba(0, 255, 0, 0.3);
+    --glow-green-intense: 0 0 10px rgba(0, 255, 0, 0.8), 0 0 30px rgba(0, 255, 0, 0.5), 0 0 50px rgba(0, 255, 0, 0.3);
+    --border-glow: 0 0 5px rgba(0, 255, 0, 0.5);
+}

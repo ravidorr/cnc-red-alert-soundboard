@@ -1,0 +1,139 @@
+/* ============================================
+   Navigation - Nav items and mobile menu
+   ============================================ */
+
+/* Navigation Header */
+.nav-header {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    padding: 10px;
+    border-bottom: 1px solid var(--green-darker);
+    margin-bottom: 10px;
+    letter-spacing: 2px;
+}
+
+/* Nav Items */
+.nav-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 8px 10px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    border: 1px solid transparent;
+    background: transparent;
+    font-family: var(--font-primary);
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
+    margin-bottom: 2px;
+    text-align: left;
+}
+
+.nav-item:hover {
+    background: var(--bg-button-hover);
+    border-color: var(--green-darker);
+    color: var(--text-primary);
+}
+
+.nav-item.active {
+    background: var(--green-darker);
+    border-color: var(--green-border);
+    color: var(--green-primary);
+}
+
+.nav-item-count {
+    background: var(--green-darker);
+    color: var(--text-dim);
+    padding: 2px 6px;
+    font-size: 0.75rem;
+    border-radius: 2px;
+}
+
+.nav-item:hover .nav-item-count,
+.nav-item.active .nav-item-count {
+    background: var(--green-dark);
+    color: var(--green-primary);
+}
+
+/* Nav item for favorites */
+.nav-item.favorites-nav {
+    border-color: var(--green-dark);
+    background: rgba(0, 255, 0, 0.05);
+}
+
+.nav-item.favorites-nav:hover,
+.nav-item.favorites-nav.active {
+    background: var(--green-darker);
+    border-color: var(--green-border);
+}
+
+/* Mobile Menu Toggle */
+.mobile-menu-toggle {
+    display: none;
+    background: none;
+    border: 2px solid var(--green-border);
+    padding: 8px;
+    cursor: pointer;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 44px;
+    height: 44px;
+}
+
+.hamburger-icon {
+    display: block;
+    width: 20px;
+    height: 2px;
+    background: var(--green-primary);
+    position: relative;
+}
+
+.hamburger-icon::before,
+.hamburger-icon::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 2px;
+    background: var(--green-primary);
+    left: 0;
+    transition: transform 0.2s ease;
+}
+
+.hamburger-icon::before {
+    top: -6px;
+}
+
+.hamburger-icon::after {
+    top: 6px;
+}
+
+.mobile-menu-toggle[aria-expanded="true"] .hamburger-icon {
+    background: transparent;
+}
+
+.mobile-menu-toggle[aria-expanded="true"] .hamburger-icon::before {
+    transform: rotate(45deg);
+    top: 0;
+}
+
+.mobile-menu-toggle[aria-expanded="true"] .hamburger-icon::after {
+    transform: rotate(-45deg);
+    top: 0;
+}
+
+.mobile-menu-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 90;
+}
+
+.mobile-menu-overlay.visible {
+    display: block;
+}

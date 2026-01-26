@@ -19,23 +19,29 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     
-    <link rel="stylesheet" href="css/styles.css?v=5">
+    <link rel="stylesheet" href="css/styles.css?v=6">
 </head>
 <body>
+    <a href="#content-area" class="skip-link">Skip to content</a>
     <div class="scanlines"></div>
     
-    <header class="main-header">
+    <header class="main-header" role="banner">
         <div class="header-content">
+            <button class="mobile-menu-toggle" id="mobile-menu-toggle" aria-label="Open categories menu" aria-expanded="false">
+                <span class="hamburger-icon"></span>
+            </button>
             <div class="logo">
                 <span class="logo-text">C&C</span>
                 <span class="logo-subtitle">RED ALERT SOUNDBOARD</span>
             </div>
             <div class="header-controls">
                 <div class="search-container">
-                    <input type="text" id="search-input" placeholder="SEARCH SOUNDS..." autocomplete="off">
+                    <label for="search-input" class="visually-hidden">Search sounds</label>
+                    <input type="text" id="search-input" placeholder="Search 190 sounds..." autocomplete="off">
                     <button id="clear-search" class="btn-icon" title="Clear search">&times;</button>
                 </div>
                 <button id="stop-all" class="btn-action">STOP ALL</button>
+                <button id="random-sound" class="btn-action btn-random" title="Play random sound">RANDOM</button>
                 <button id="install-btn" class="btn-action btn-install-header" title="Install App">
                     <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
                         <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
@@ -47,9 +53,11 @@
         <div class="header-bar"></div>
     </header>
 
-    <main class="main-content">
-        <div class="sidebar">
-            <nav class="category-nav" id="category-nav">
+    <div class="mobile-menu-overlay" id="mobile-menu-overlay"></div>
+
+    <main class="main-content" role="main">
+        <div class="sidebar" id="sidebar">
+            <nav class="category-nav" id="category-nav" aria-label="Sound categories">
                 <div class="nav-header">CATEGORIES</div>
                 <!-- Categories will be populated by JS -->
             </nav>
@@ -72,16 +80,23 @@
         <div class="content-area" id="content-area">
             <!-- Sound categories and buttons will be populated by JS -->
         </div>
+
+        <div class="search-empty-state" id="search-empty-state" style="display: none;">
+            <div class="empty-state-icon">&#128269;</div>
+            <div class="empty-state-title">No sounds found</div>
+            <div class="empty-state-text">No sounds match "<span id="search-empty-term"></span>"</div>
+            <button class="btn-action btn-clear-search" id="btn-clear-search">Clear Search</button>
+        </div>
     </main>
 
-    <footer class="main-footer">
+    <footer class="main-footer" role="contentinfo">
         <div class="footer-content">
             <span class="footer-text">ESTABLISHING BATTLEFIELD CONTROL... STAND BY.</span>
-            <span class="footer-version">v1.0</span>
+            <span class="footer-version">v1.1</span>
         </div>
     </footer>
 
-    <div class="now-playing" id="now-playing">
+    <div class="now-playing" id="now-playing" aria-live="polite" aria-atomic="true">
         <span class="now-playing-label">NOW PLAYING:</span>
         <span class="now-playing-title" id="now-playing-title">-</span>
     </div>
@@ -106,6 +121,8 @@
 
     <audio id="audio-player" preload="auto"></audio>
 
-    <script src="js/app.js?v=7"></script>
+    <div class="toast-container" id="toast-container" aria-live="polite"></div>
+
+    <script type="module" src="js/src/main.js"></script>
 </body>
 </html>

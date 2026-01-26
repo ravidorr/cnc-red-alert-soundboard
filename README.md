@@ -10,15 +10,36 @@ A Progressive Web App (PWA) soundboard featuring 190 classic Command & Conquer R
 
 ## Features
 
+### Core Features
 - **190 Sound Effects** - Unit voices, combat sounds, building effects, and more
 - **Red Alert 1 Theme** - Green terminal aesthetic with military HUD styling
 - **12 Categories** - Allied Forces, Soviet Forces, Tanya, Special Units, Civilians, Combat, Vehicles, Buildings & Defenses, Attack Dogs, Casualties, UI & Map, Miscellaneous
-- **Favorites System** - Mark sounds as favorites for quick access
-- **Drag & Drop Reordering** - Organize your favorites in any order
-- **Search** - Find sounds quickly by name
+- **Favorites System** - Mark sounds as favorites for quick access with drag-and-drop reordering
+- **Recently Played** - Quick access to your last 10 played sounds
+- **Popular Sounds** - Curated collection of iconic sounds
+- **Search** - Find sounds quickly by name with empty state feedback
+- **Random Sound** - Play a random sound with one click
+
+### PWA & Mobile
 - **PWA Support** - Install as an app, works offline
 - **Install Button** - One-click installation from the header
 - **Responsive Design** - Works on desktop and mobile
+- **Mobile Navigation** - Hamburger menu with slide-out category drawer
+
+### Sharing & Links
+- **Share Sounds** - Copy direct links to specific sounds
+- **URL Hash Support** - Share URLs that auto-play sounds (e.g., `#sound=tanya_yeah.wav`)
+
+### Accessibility (WCAG 2.1 AA)
+- **Keyboard Navigation** - Full keyboard support with visible focus indicators
+- **Screen Reader Support** - ARIA landmarks, labels, and live regions
+- **Skip Link** - Jump directly to main content
+- **Reduced Motion** - Respects `prefers-reduced-motion` preference
+- **Color Contrast** - Meets WCAG AA contrast requirements
+
+### User Feedback
+- **Toast Notifications** - Visual feedback for actions (favorites, errors, sharing)
+- **Now Playing Indicator** - Shows currently playing sound
 
 ## Local Development
 
@@ -55,10 +76,12 @@ cnc-red-alert-soundboard/
 ├── css/
 │   └── styles.css      # Red Alert 1 themed styles
 ├── js/
-│   └── app.js          # Application logic
+│   └── app.js          # Application logic (1500+ lines)
 ├── tests/
-│   ├── app.test.js     # Unit tests (139 tests)
-│   └── setup.js        # Jest setup
+│   ├── app.test.js     # Unit tests (168 tests)
+│   └── setup.js        # Jest setup with JSDOM
+├── scripts/
+│   └── rename_sounds.js # Sound file normalization utility
 ├── assets/
 │   └── icons/          # PWA icons (72-512px)
 └── sounds/             # 190 WAV sound files
@@ -108,7 +131,13 @@ The following checks run automatically before each commit:
 
 ### Test Coverage
 
-Current coverage: **97%+** (139 tests)
+Current coverage: **93%+** (168 tests)
+
+Coverage thresholds enforced by pre-commit hooks:
+- Statements: 90%
+- Branches: 80%
+- Functions: 90%
+- Lines: 90%
 
 ## Sound Categories
 
@@ -129,8 +158,16 @@ Current coverage: **97%+** (139 tests)
 
 ## Keyboard Shortcuts
 
-- `Ctrl/Cmd + F` - Focus search
-- `Escape` - Stop all sounds
+| Key | Action |
+|-----|--------|
+| `Tab` | Navigate between interactive elements |
+| `Enter` / `Space` | Activate buttons, toggle categories |
+| `Escape` | Stop all sounds, close mobile menu |
+| `Ctrl/Cmd + F` | Focus search input |
+
+### Skip Link
+
+Press `Tab` on page load to reveal the "Skip to content" link, then `Enter` to bypass the navigation.
 
 ## Browser Support
 
@@ -138,6 +175,15 @@ Current coverage: **97%+** (139 tests)
 - Firefox
 - Safari
 - Edge
+
+## Technology Stack
+
+- **Vanilla JavaScript** - No frameworks, pure ES6+
+- **CSS3** - Custom properties, Grid, Flexbox, animations
+- **HTML5** - Semantic markup with ARIA attributes
+- **Service Worker** - Offline caching with cache-first strategy
+- **Web Audio API** - Sound playback
+- **LocalStorage** - Favorites and recently played persistence
 
 ## Credits
 

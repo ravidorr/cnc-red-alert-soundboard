@@ -1,15 +1,40 @@
 // C&C Red Alert Soundboard - Service Worker
-const CACHE_NAME = 'cnc-soundboard-v1';
+const CACHE_NAME = 'cnc-soundboard-v3';
 
 // Core assets to cache immediately
 const CORE_ASSETS = [
     '/',
     '/index.html',
-    '/css/styles.css',
-    '/js/app.js',
     '/manifest.json',
     '/assets/icons/icon-192.png',
     '/assets/icons/icon-512.png',
+    // CSS files
+    '/css/styles.css',
+    '/css/src/variables.css',
+    '/css/src/base.css',
+    '/css/src/accessibility.css',
+    '/css/src/layout.css',
+    '/css/src/components.css',
+    '/css/src/navigation.css',
+    '/css/src/favorites.css',
+    '/css/src/toast.css',
+    '/css/src/install.css',
+    '/css/src/effects.css',
+    '/css/src/responsive.css',
+    // JS modules
+    '/js/src/main.js',
+    '/js/src/constants.js',
+    '/js/src/state.js',
+    '/js/src/utils.js',
+    '/js/src/audio.js',
+    '/js/src/favorites.js',
+    '/js/src/recently-played.js',
+    '/js/src/ui.js',
+    '/js/src/navigation.js',
+    '/js/src/search.js',
+    '/js/src/mobile.js',
+    '/js/src/install.js',
+    '/js/src/events.js',
 ];
 
 // Sound files to cache (generated list)
@@ -218,7 +243,7 @@ self.addEventListener('install', (event) => {
             .then(() => {
                 console.log('[SW] Core assets cached');
                 return self.skipWaiting();
-            })
+            }),
     );
 });
 
@@ -234,20 +259,20 @@ self.addEventListener('activate', (event) => {
                         .map((name) => {
                             console.log('[SW] Deleting old cache:', name);
                             return caches.delete(name);
-                        })
+                        }),
                 );
             })
             .then(() => {
                 console.log('[SW] Claiming clients');
                 return self.clients.claim();
-            })
+            }),
     );
 });
 
 // Fetch event - serve from cache, fallback to network
 self.addEventListener('fetch', (event) => {
     const url = new URL(event.request.url);
-    
+
     // Only handle same-origin requests
     if (url.origin !== location.origin) {
         return;
@@ -282,7 +307,7 @@ self.addEventListener('fetch', (event) => {
                             return caches.match('/index.html');
                         }
                     });
-            })
+            }),
     );
 });
 
@@ -303,7 +328,7 @@ self.addEventListener('message', (event) => {
                             .catch((err) => {
                                 console.log('[SW] Failed to cache:', url, err);
                             });
-                    })
+                    }),
                 );
             })
             .then(() => {

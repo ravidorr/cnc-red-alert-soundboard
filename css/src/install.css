@@ -1,0 +1,92 @@
+/* ============================================
+   Install - PWA install prompt
+   ============================================ */
+
+.install-prompt {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.85);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    animation: fadeIn 0.3s ease;
+}
+
+.install-prompt.visible {
+    display: flex;
+}
+
+.install-prompt-content {
+    background: var(--bg-panel);
+    border: 2px solid var(--green-primary);
+    box-shadow: var(--glow-green-intense), inset 0 0 50px rgba(0, 255, 0, 0.05);
+    padding: 30px 40px;
+    max-width: 400px;
+    width: 90%;
+    text-align: center;
+}
+
+.install-prompt-icon {
+    color: var(--green-primary);
+    margin-bottom: 15px;
+    filter: drop-shadow(0 0 10px rgba(0, 255, 0, 0.5));
+}
+
+.install-prompt-title {
+    font-size: 1.5rem;
+    color: var(--green-primary);
+    text-shadow: var(--glow-green);
+    letter-spacing: 3px;
+    margin-bottom: 8px;
+}
+
+.install-prompt-subtitle {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-bottom: 25px;
+}
+
+.install-prompt-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+}
+
+.btn-install {
+    background: var(--green-dark);
+    border: 2px solid var(--green-primary);
+    color: var(--green-primary);
+    font-family: var(--font-primary);
+    font-size: 1rem;
+    padding: 12px 30px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    letter-spacing: 2px;
+}
+
+.btn-install:hover {
+    background: var(--green-primary);
+    color: var(--bg-primary);
+    box-shadow: var(--glow-green);
+}
+
+.btn-dismiss {
+    background: transparent;
+    border: 1px solid var(--green-dark);
+    color: var(--text-dim);
+    font-family: var(--font-primary);
+    font-size: 0.9rem;
+    padding: 12px 20px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    letter-spacing: 1px;
+}
+
+.btn-dismiss:hover {
+    border-color: var(--text-secondary);
+    color: var(--text-secondary);
+}
