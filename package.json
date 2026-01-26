@@ -1,0 +1,23 @@
+{
+  "name": "cnc-red-alert-soundboard",
+  "version": "1.0.0",
+  "description": "Command & Conquer Red Alert Soundboard PWA",
+  "main": "js/app.js",
+  "scripts": {
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
+  },
+  "keywords": [
+    "command-and-conquer",
+    "red-alert",
+    "soundboard",
+    "pwa"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0"
+  }
+}
