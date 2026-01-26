@@ -287,6 +287,7 @@
         installPrompt: null,
         btnInstall: null,
         btnDismiss: null,
+        installBtn: null,
     };
 
     // ============================================
@@ -471,6 +472,7 @@
         elements.installPrompt = document.getElementById('install-prompt');
         elements.btnInstall = document.getElementById('btn-install');
         elements.btnDismiss = document.getElementById('btn-dismiss');
+        elements.installBtn = document.getElementById('install-btn');
     }
 
     // Setup audio player
@@ -489,10 +491,6 @@
 
     // Setup PWA install prompt
     function setupInstallPrompt() {
-        if (!shouldShowInstallPrompt(localStorage, 7)) {
-            return;
-        }
-
         // Check if already installed
         if (window.matchMedia('(display-mode: standalone)').matches) {
             return;
@@ -503,28 +501,28 @@
             e.preventDefault();
             state.deferredInstallPrompt = e;
 
-            // Show our custom install prompt after a short delay
-            setTimeout(() => {
-                showInstallPrompt();
-            }, 2000);
+            // Show the header install button
+            showInstallButton();
+
+            // Show modal prompt after delay (only if not dismissed recently)
+            if (shouldShowInstallPrompt(localStorage, 7)) {
+                setTimeout(() => {
+                    showInstallPrompt();
+                }, 2000);
+            }
         });
 
-        // Handle install button click
+        // Handle modal install button click
         elements.btnInstall.addEventListener('click', async () => {
-            if (!state.deferredInstallPrompt) {
-                return;
-            }
-
-            state.deferredInstallPrompt.prompt();
-            const { outcome } = await state.deferredInstallPrompt.userChoice;
-
-            if (outcome === 'accepted') {
-                console.log('PWA installed');
-            }
-
-            state.deferredInstallPrompt = null;
-            hideInstallPrompt();
+            await triggerInstall();
         });
+
+        // Handle header install button click
+        if (elements.installBtn) {
+            elements.installBtn.addEventListener('click', async () => {
+                await triggerInstall();
+            });
+        }
 
         // Handle dismiss button click
         elements.btnDismiss.addEventListener('click', () => {
@@ -543,8 +541,27 @@
         window.addEventListener('appinstalled', () => {
             console.log('PWA was installed');
             hideInstallPrompt();
+            hideInstallButton();
             state.deferredInstallPrompt = null;
         });
+    }
+
+    // Trigger the install prompt
+    async function triggerInstall() {
+        if (!state.deferredInstallPrompt) {
+            return;
+        }
+
+        state.deferredInstallPrompt.prompt();
+        const { outcome } = await state.deferredInstallPrompt.userChoice;
+
+        if (outcome === 'accepted') {
+            console.log('PWA installed');
+        }
+
+        state.deferredInstallPrompt = null;
+        hideInstallPrompt();
+        hideInstallButton();
     }
 
     function showInstallPrompt() {
@@ -556,6 +573,18 @@
     function hideInstallPrompt() {
         if (elements.installPrompt) {
             elements.installPrompt.classList.remove('visible');
+        }
+    }
+
+    function showInstallButton() {
+        if (elements.installBtn) {
+            elements.installBtn.classList.add('visible');
+        }
+    }
+
+    function hideInstallButton() {
+        if (elements.installBtn) {
+            elements.installBtn.classList.remove('visible');
         }
     }
 
@@ -1031,6 +1060,9 @@
         clearPlayingState,
         showInstallPrompt,
         hideInstallPrompt,
+        showInstallButton,
+        hideInstallButton,
+        triggerInstall,
         setupAudioPlayer,
         setupInstallPrompt,
         setupEventListeners,

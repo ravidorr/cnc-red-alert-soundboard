@@ -208,6 +208,30 @@ body {
     box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
 }
 
+/* Install button in header */
+.btn-install-header {
+    display: none;
+    align-items: center;
+    gap: 6px;
+    background: var(--bg-button);
+    border-color: var(--green-primary);
+    color: var(--green-primary);
+}
+
+.btn-install-header:hover {
+    background: var(--green-dark);
+    color: var(--bg-primary);
+    box-shadow: var(--border-glow);
+}
+
+.btn-install-header svg {
+    flex-shrink: 0;
+}
+
+.btn-install-header.visible {
+    display: flex;
+}
+
 .header-bar {
     height: 8px;
     background: linear-gradient(90deg, 

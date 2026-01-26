@@ -15,6 +15,7 @@ describe('C&C Red Alert Soundboard', () => {
             <input id="search-input" />
             <button id="clear-search"></button>
             <button id="stop-all"></button>
+            <button id="install-btn" class="btn-install-header"></button>
             <span id="total-sounds">0</span>
             <span id="total-favorites">0</span>
             <span id="visible-sounds">0</span>
@@ -1293,6 +1294,84 @@ describe('C&C Red Alert Soundboard', () => {
 
                 window.dispatchEvent(new Event('appinstalled'));
 
+                const state = CncSoundboard.getState();
+                expect(state.deferredInstallPrompt).toBeNull();
+            });
+
+            test('header install button triggers install', async () => {
+                CncSoundboard.setupInstallPrompt();
+
+                const mockPrompt = {
+                    prompt: jest.fn(),
+                    userChoice: Promise.resolve({ outcome: 'accepted' }),
+                };
+
+                CncSoundboard.setState({ deferredInstallPrompt: mockPrompt });
+
+                const installBtn = document.getElementById('install-btn');
+                installBtn.click();
+
+                await Promise.resolve();
+
+                expect(mockPrompt.prompt).toHaveBeenCalled();
+            });
+        });
+
+        describe('Install Button Visibility', () => {
+            beforeEach(() => {
+                setupFullDOM();
+                CncSoundboard.cacheElements();
+            });
+
+            test('showInstallButton adds visible class', () => {
+                CncSoundboard.showInstallButton();
+
+                const btn = document.getElementById('install-btn');
+                expect(btn.classList.contains('visible')).toBe(true);
+            });
+
+            test('hideInstallButton removes visible class', () => {
+                const btn = document.getElementById('install-btn');
+                btn.classList.add('visible');
+
+                CncSoundboard.hideInstallButton();
+
+                expect(btn.classList.contains('visible')).toBe(false);
+            });
+
+            test('showInstallButton handles null element', () => {
+                CncSoundboard.setElements({ installBtn: null });
+
+                expect(() => {
+                    CncSoundboard.showInstallButton();
+                }).not.toThrow();
+            });
+
+            test('hideInstallButton handles null element', () => {
+                CncSoundboard.setElements({ installBtn: null });
+
+                expect(() => {
+                    CncSoundboard.hideInstallButton();
+                }).not.toThrow();
+            });
+
+            test('triggerInstall does nothing without deferred prompt', async () => {
+                CncSoundboard.setState({ deferredInstallPrompt: null });
+
+                await expect(CncSoundboard.triggerInstall()).resolves.not.toThrow();
+            });
+
+            test('triggerInstall calls prompt and hides UI', async () => {
+                const mockPrompt = {
+                    prompt: jest.fn(),
+                    userChoice: Promise.resolve({ outcome: 'dismissed' }),
+                };
+
+                CncSoundboard.setState({ deferredInstallPrompt: mockPrompt });
+
+                await CncSoundboard.triggerInstall();
+
+                expect(mockPrompt.prompt).toHaveBeenCalled();
                 const state = CncSoundboard.getState();
                 expect(state.deferredInstallPrompt).toBeNull();
             });
