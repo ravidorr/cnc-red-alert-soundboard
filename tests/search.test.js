@@ -1,7 +1,6 @@
 /**
  * @jest-environment jsdom
  */
-import { jest } from '@jest/globals';
 import { setupFullDOM, resetState, resetElements } from './helpers.js';
 import { state, elements } from '../js/state.js';
 import { SOUNDS } from '../js/constants.js';
@@ -24,7 +23,7 @@ describe('Search Functions', () => {
         test('should show all sounds when search is empty', () => {
             state.searchTerm = '';
             filterSounds();
-            
+
             const hidden = document.querySelectorAll('.sound-btn-wrapper[style*="display: none"]');
             expect(hidden.length).toBe(0);
         });
@@ -32,7 +31,7 @@ describe('Search Functions', () => {
         test('should hide non-matching sounds', () => {
             state.searchTerm = 'tanya';
             filterSounds();
-            
+
             const visible = document.querySelectorAll('.sound-btn-wrapper:not([style*="display: none"])');
             const tanyaSounds = SOUNDS.filter(s =>
                 s.name.toLowerCase().includes('tanya') || s.file.toLowerCase().includes('tanya'),
@@ -48,7 +47,7 @@ describe('Search Functions', () => {
 
         test('showSearchEmptyState should show empty state', () => {
             showSearchEmptyState('test');
-            
+
             const emptyState = document.getElementById('search-empty-state');
             expect(emptyState.style.display).toBe('block');
         });
@@ -56,7 +55,7 @@ describe('Search Functions', () => {
         test('hideSearchEmptyState should hide empty state', () => {
             showSearchEmptyState('test');
             hideSearchEmptyState();
-            
+
             const emptyState = document.getElementById('search-empty-state');
             expect(emptyState.style.display).toBe('none');
         });

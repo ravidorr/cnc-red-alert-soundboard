@@ -9,7 +9,6 @@ import {
     renderNavigation,
     toggleCategory,
     scrollToCategory,
-    createNavHeader,
 } from '../js/navigation.js';
 import {
     toggleMobileMenu,
@@ -33,7 +32,7 @@ describe('Navigation Functions', () => {
         test('should collapse expanded category', () => {
             const section = document.querySelector('.category-section');
             expect(section.classList.contains('collapsed')).toBe(false);
-            
+
             toggleCategory(section);
             expect(section.classList.contains('collapsed')).toBe(true);
         });
@@ -41,7 +40,7 @@ describe('Navigation Functions', () => {
         test('should expand collapsed category', () => {
             const section = document.querySelector('.category-section');
             section.classList.add('collapsed');
-            
+
             toggleCategory(section);
             expect(section.classList.contains('collapsed')).toBe(false);
         });
@@ -57,7 +56,7 @@ describe('Navigation Functions', () => {
 
         test('should scroll to category section', () => {
             scrollToCategory('allies');
-            
+
             expect(window.scrollTo).toHaveBeenCalled();
         });
     });
@@ -69,7 +68,7 @@ describe('Navigation Functions', () => {
 
         test('openMobileMenu should add classes', () => {
             openMobileMenu();
-            
+
             const sidebar = document.getElementById('sidebar');
             expect(sidebar.classList.contains('open')).toBe(true);
         });
@@ -77,7 +76,7 @@ describe('Navigation Functions', () => {
         test('closeMobileMenu should remove classes', () => {
             openMobileMenu();
             closeMobileMenu();
-            
+
             const sidebar = document.getElementById('sidebar');
             expect(sidebar.classList.contains('open')).toBe(false);
         });
@@ -85,10 +84,10 @@ describe('Navigation Functions', () => {
         test('toggleMobileMenu should toggle state', () => {
             const sidebar = document.getElementById('sidebar');
             sidebar.classList.remove('open');
-            
+
             toggleMobileMenu();
             expect(sidebar.classList.contains('open')).toBe(true);
-            
+
             toggleMobileMenu();
             expect(sidebar.classList.contains('open')).toBe(false);
         });

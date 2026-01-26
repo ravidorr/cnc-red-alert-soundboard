@@ -1,7 +1,6 @@
 /**
  * @jest-environment jsdom
  */
-import { jest } from '@jest/globals';
 import { SOUNDS, CATEGORIES } from '../js/constants.js';
 import { state, elements } from '../js/state.js';
 

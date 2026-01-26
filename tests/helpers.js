@@ -37,9 +37,15 @@ export function setupFullDOM() {
 export function createMockStorage() {
     return {
         store: {},
-        getItem: jest.fn(function(key) { return this.store[key] || null; }),
-        setItem: jest.fn(function(key, value) { this.store[key] = value; }),
-        clear: jest.fn(function() { this.store = {}; }),
+        getItem: jest.fn(function(key) {
+            return this.store[key] || null;
+        }),
+        setItem: jest.fn(function(key, value) {
+            this.store[key] = value;
+        }),
+        clear: jest.fn(function() {
+            this.store = {};
+        }),
     };
 }
 

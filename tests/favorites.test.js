@@ -1,7 +1,6 @@
 /**
  * @jest-environment jsdom
  */
-import { jest } from '@jest/globals';
 import { setupFullDOM, resetState, resetElements } from './helpers.js';
 import { state, elements } from '../js/state.js';
 import { cacheElements, renderCategories } from '../js/ui.js';
@@ -11,7 +10,6 @@ import {
     saveFavorites,
     toggleFavorite,
     updateFavoriteButtons,
-    reorderFavorites,
     setupFavoritesDragAndDrop,
 } from '../js/favorites.js';
 
@@ -27,7 +25,7 @@ describe('Favorites Functions', () => {
         test('should load favorites from localStorage to state', () => {
             localStorage.setItem('cnc-favorites', '["test.wav"]');
             loadFavorites();
-            
+
             expect(state.favorites).toContain('test.wav');
         });
     });
@@ -36,7 +34,7 @@ describe('Favorites Functions', () => {
         test('should save favorites from state to localStorage', () => {
             state.favorites = ['saved.wav'];
             saveFavorites();
-            
+
             const stored = JSON.parse(localStorage.getItem('cnc-favorites'));
             expect(stored).toEqual(['saved.wav']);
         });
@@ -52,14 +50,14 @@ describe('Favorites Functions', () => {
         test('should add sound to favorites', () => {
             state.favorites = [];
             toggleFavorite('test.wav');
-            
+
             expect(state.favorites).toContain('test.wav');
         });
 
         test('should remove sound from favorites', () => {
             state.favorites = ['test.wav'];
             toggleFavorite('test.wav');
-            
+
             expect(state.favorites).not.toContain('test.wav');
         });
     });
@@ -73,7 +71,7 @@ describe('Favorites Functions', () => {
         test('should update button classes', () => {
             state.favorites = ['allies_1_achnoledged.wav'];
             updateFavoriteButtons();
-            
+
             const favBtn = document.querySelector('.favorite-btn.is-favorite');
             expect(favBtn).not.toBeNull();
         });
@@ -87,7 +85,7 @@ describe('Favorites Functions', () => {
 
         test('should not throw when no favorites section', () => {
             state.favorites = [];
-            
+
             expect(() => {
                 setupFavoritesDragAndDrop();
             }).not.toThrow();

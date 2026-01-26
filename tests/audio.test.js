@@ -4,16 +4,13 @@
 import { jest } from '@jest/globals';
 import { setupFullDOM, resetState, resetElements } from './helpers.js';
 import { state, elements } from '../js/state.js';
-import { SOUNDS } from '../js/constants.js';
-import { cacheElements } from '../js/ui.js';
-import { renderCategories } from '../js/ui.js';
+import { cacheElements, renderCategories } from '../js/ui.js';
 import {
     setupAudioPlayer,
     playSound,
     stopAllSounds,
     clearPlayingState,
     playRandomSound,
-    checkUrlHash,
 } from '../js/audio.js';
 
 describe('Audio Functions', () => {
@@ -28,7 +25,7 @@ describe('Audio Functions', () => {
         test('should initialize audio player from elements', () => {
             cacheElements();
             setupAudioPlayer();
-            
+
             expect(state.audioPlayer).not.toBeNull();
         });
     });
@@ -43,14 +40,14 @@ describe('Audio Functions', () => {
         test('should set audio source when playing', () => {
             const btn = document.querySelector('.sound-btn');
             playSound(btn);
-            
+
             expect(state.audioPlayer.src).toContain('sounds/');
         });
 
         test('should add playing class to button', () => {
             const btn = document.querySelector('.sound-btn');
             playSound(btn);
-            
+
             expect(btn.classList.contains('playing')).toBe(true);
         });
     });
@@ -66,7 +63,7 @@ describe('Audio Functions', () => {
             const btn = document.querySelector('.sound-btn');
             playSound(btn);
             stopAllSounds();
-            
+
             expect(state.audioPlayer.paused).toBe(true);
         });
     });
@@ -82,7 +79,7 @@ describe('Audio Functions', () => {
             const btn = document.querySelector('.sound-btn');
             playSound(btn);
             clearPlayingState();
-            
+
             expect(btn.classList.contains('playing')).toBe(false);
         });
     });
@@ -96,7 +93,7 @@ describe('Audio Functions', () => {
 
         test('should play a sound', () => {
             playRandomSound();
-            
+
             expect(state.audioPlayer.src).toContain('sounds/');
         });
     });
