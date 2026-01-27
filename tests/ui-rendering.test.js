@@ -285,17 +285,32 @@ describe('UI Rendering', () => {
     });
 
     describe('shareSound', () => {
+        const localThis = {};
+
         beforeEach(() => {
             cacheElements();
+            // Ensure no Web Share API by default (falls back to clipboard)
+            delete navigator.share;
+            delete navigator.canShare;
+            // Clear any previous toasts
+            if (elements.toastContainer) {
+                elements.toastContainer.innerHTML = '';
+            }
+            // Mock fetch for file sharing tests
+            localThis.originalFetch = global.fetch;
         });
 
-        test('should copy link to clipboard on success', async () => {
+        afterEach(() => {
+            global.fetch = localThis.originalFetch;
+        });
+
+        test('should copy link to clipboard on success (fallback)', async () => {
             const writeTextMock = jest.fn().mockResolvedValue();
             Object.assign(navigator, {
                 clipboard: { writeText: writeTextMock },
             });
 
-            await shareSound('test.wav');
+            await shareSound('test.wav', 'Test Sound');
 
             expect(writeTextMock).toHaveBeenCalled();
             expect(writeTextMock.mock.calls[0][0]).toContain('#sound=test.wav');
@@ -306,13 +321,14 @@ describe('UI Rendering', () => {
                 clipboard: { writeText: jest.fn().mockResolvedValue() },
             });
 
-            await shareSound('test.wav');
+            await shareSound('test.wav', 'Test Sound');
 
             // Wait for promise
             await new Promise(resolve => setTimeout(resolve, 10));
 
             const toast = document.querySelector('.toast-success');
             expect(toast).not.toBeNull();
+            expect(toast.textContent).toContain('clipboard');
         });
 
         test('should show error toast on copy failure', async () => {
@@ -320,13 +336,146 @@ describe('UI Rendering', () => {
                 clipboard: { writeText: jest.fn().mockRejectedValue(new Error()) },
             });
 
-            await shareSound('test.wav');
+            await shareSound('test.wav', 'Test Sound');
 
             // Wait for promise
             await new Promise(resolve => setTimeout(resolve, 10));
 
             const toast = document.querySelector('.toast-error');
             expect(toast).not.toBeNull();
+        });
+
+        test('should handle Web Share API abort gracefully', async () => {
+            // When user cancels share, no error toast should appear
+            const abortError = new Error('Share canceled');
+            abortError.name = 'AbortError';
+            Object.assign(navigator, {
+                share: jest.fn().mockRejectedValue(abortError),
+                clipboard: { writeText: jest.fn().mockResolvedValue() },
+            });
+
+            await shareSound('test.wav', 'Test Sound');
+
+            // Wait for promise
+            await new Promise(resolve => setTimeout(resolve, 10));
+
+            // No error toast should appear for abort
+            const errorToast = document.querySelector('.toast-error');
+            expect(errorToast).toBeNull();
+        });
+
+        test('should use Web Share API with file when supported', async () => {
+            const shareMock = jest.fn().mockResolvedValue();
+            const mockBlob = new Blob(['audio data'], { type: 'audio/wav' });
+
+            global.fetch = jest.fn().mockResolvedValue({
+                blob: () => Promise.resolve(mockBlob),
+            });
+
+            Object.assign(navigator, {
+                share: shareMock,
+                canShare: jest.fn().mockReturnValue(true),
+            });
+
+            await shareSound('test.wav', 'Test Sound');
+
+            // Wait for promise
+            await new Promise(resolve => setTimeout(resolve, 10));
+
+            expect(shareMock).toHaveBeenCalled();
+            expect(shareMock.mock.calls[0][0].files).toBeDefined();
+            expect(shareMock.mock.calls[0][0].files.length).toBe(1);
+
+            const toast = document.querySelector('.toast-success');
+            expect(toast).not.toBeNull();
+            expect(toast.textContent).toContain('shared');
+        });
+
+        test('should share URL when file sharing not supported', async () => {
+            const shareMock = jest.fn().mockResolvedValue();
+            const mockBlob = new Blob(['audio data'], { type: 'audio/wav' });
+
+            global.fetch = jest.fn().mockResolvedValue({
+                blob: () => Promise.resolve(mockBlob),
+            });
+
+            Object.assign(navigator, {
+                share: shareMock,
+                canShare: jest.fn().mockReturnValue(false),
+            });
+
+            await shareSound('test.wav', 'Test Sound');
+
+            // Wait for promise
+            await new Promise(resolve => setTimeout(resolve, 10));
+
+            expect(shareMock).toHaveBeenCalled();
+            expect(shareMock.mock.calls[0][0].url).toBeDefined();
+            expect(shareMock.mock.calls[0][0].files).toBeUndefined();
+
+            const toast = document.querySelector('.toast-success');
+            expect(toast).not.toBeNull();
+            expect(toast.textContent).toContain('Link shared');
+        });
+
+        test('should use default name when soundName not provided', async () => {
+            const shareMock = jest.fn().mockResolvedValue();
+            const mockBlob = new Blob(['audio data'], { type: 'audio/wav' });
+
+            global.fetch = jest.fn().mockResolvedValue({
+                blob: () => Promise.resolve(mockBlob),
+            });
+
+            Object.assign(navigator, {
+                share: shareMock,
+                canShare: jest.fn().mockReturnValue(false),
+            });
+
+            await shareSound('test.wav');
+
+            expect(shareMock).toHaveBeenCalled();
+            expect(shareMock.mock.calls[0][0].title).toBe('C&C Sound');
+        });
+
+        test('should fallback to clipboard when Web Share fails', async () => {
+            const clipboardMock = jest.fn().mockResolvedValue();
+            const mockBlob = new Blob(['audio data'], { type: 'audio/wav' });
+
+            global.fetch = jest.fn().mockResolvedValue({
+                blob: () => Promise.resolve(mockBlob),
+            });
+
+            Object.assign(navigator, {
+                share: jest.fn().mockRejectedValue(new Error('Share failed')),
+                canShare: jest.fn().mockReturnValue(false),
+                clipboard: { writeText: clipboardMock },
+            });
+
+            await shareSound('test.wav', 'Test Sound');
+
+            // Wait for promise
+            await new Promise(resolve => setTimeout(resolve, 10));
+
+            expect(clipboardMock).toHaveBeenCalled();
+        });
+
+        test('should include sound name in share text', async () => {
+            const shareMock = jest.fn().mockResolvedValue();
+            const mockBlob = new Blob(['audio data'], { type: 'audio/wav' });
+
+            global.fetch = jest.fn().mockResolvedValue({
+                blob: () => Promise.resolve(mockBlob),
+            });
+
+            Object.assign(navigator, {
+                share: shareMock,
+                canShare: jest.fn().mockReturnValue(true),
+            });
+
+            await shareSound('test.wav', 'Affirmative');
+
+            expect(shareMock.mock.calls[0][0].text).toContain('Affirmative');
+            expect(shareMock.mock.calls[0][0].title).toBe('Affirmative');
         });
     });
 

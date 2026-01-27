@@ -50,6 +50,7 @@
 }
 
 .nav-item:focus-visible,
+.share-btn:focus-visible,
 .favorite-btn:focus-visible,
 .btn-action:focus-visible,
 .btn-install:focus-visible,

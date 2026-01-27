@@ -8,11 +8,22 @@ import { toggleFavorite, moveFavoriteUp, moveFavoriteDown } from './favorites.js
 import { toggleCategory, scrollToCategory } from './navigation.js';
 import { filterSounds } from './search.js';
 import { toggleMobileMenu, closeMobileMenu } from './mobile.js';
+import { shareSound } from './ui.js';
 
 // Setup event listeners
 export function setupEventListeners() {
-    // Sound button and favorite button clicks
+    // Sound button, share button, and favorite button clicks
     elements.contentArea.addEventListener('click', (e) => {
+        // Handle share button click
+        const shareBtn = e.target.closest('.share-btn');
+        if (shareBtn) {
+            e.stopPropagation();
+            const file = decodeURIComponent(shareBtn.dataset.file);
+            const name = shareBtn.dataset.name;
+            shareSound(file, name);
+            return;
+        }
+
         // Handle favorite button click
         const favBtn = e.target.closest('.favorite-btn');
         if (favBtn) {

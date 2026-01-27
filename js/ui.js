@@ -55,6 +55,15 @@ export function renderCategories() {
                         title="File: ${sound.file}">
                     ${sound.name}
                 </button>
+                <button class="share-btn" 
+                        data-file="${encodeURIComponent(sound.file)}"
+                        data-name="${sound.name}"
+                        aria-label="Share ${sound.name}"
+                        title="Share sound">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true">
+                        <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"/>
+                    </svg>
+                </button>
                 <button class="favorite-btn ${isFav ? 'is-favorite' : ''}" 
                         data-file="${encodeURIComponent(sound.file)}"
                         aria-label="${favAriaLabel}"
@@ -130,6 +139,15 @@ export function renderFavoritesSection() {
                     data-category="favorites"
                     title="File: ${sound.file}">
                 ${sound.name}
+            </button>
+            <button class="share-btn" 
+                    data-file="${encodeURIComponent(sound.file)}"
+                    data-name="${sound.name}"
+                    aria-label="Share ${sound.name}"
+                    title="Share sound">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true">
+                    <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"/>
+                </svg>
             </button>
             <button class="favorite-btn is-favorite" 
                     data-file="${encodeURIComponent(sound.file)}"
@@ -212,6 +230,15 @@ export function renderPopularSection() {
                     data-category="popular"
                     title="File: ${sound.file}">
                 ${sound.name}
+            </button>
+            <button class="share-btn" 
+                    data-file="${encodeURIComponent(sound.file)}"
+                    data-name="${sound.name}"
+                    aria-label="Share ${sound.name}"
+                    title="Share sound">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true">
+                    <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"/>
+                </svg>
             </button>
             <button class="favorite-btn ${isFav ? 'is-favorite' : ''}" 
                     data-file="${encodeURIComponent(sound.file)}"
@@ -300,12 +327,51 @@ export function hideSearchEmptyState() {
     }
 }
 
-// Share a sound by copying its link
-export function shareSound(soundFile) {
-    const url = `${window.location.origin}${window.location.pathname}#sound=${encodeURIComponent(soundFile)}`;
-    navigator.clipboard.writeText(url).then(() => {
+// Share a sound using Web Share API (with file) or fallback to clipboard
+export async function shareSound(soundFile, soundName) {
+    const soundUrl = `sounds/${soundFile}`;
+    const pageUrl = `${window.location.origin}${window.location.pathname}#sound=${encodeURIComponent(soundFile)}`;
+
+    // Try Web Share API with file (works on mobile)
+    if (navigator.share) {
+        try {
+            // Fetch the audio file
+            const response = await fetch(soundUrl);
+            const blob = await response.blob();
+            const file = new File([blob], soundFile, { type: 'audio/wav' });
+
+            // Check if file sharing is supported
+            if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                await navigator.share({
+                    title: soundName || 'C&C Sound',
+                    text: `Check out this C&C Red Alert sound: ${soundName}`,
+                    files: [file],
+                });
+                showToast('Sound shared!', 'success');
+                return;
+            }
+
+            // Fallback: share URL only (no file support)
+            await navigator.share({
+                title: soundName || 'C&C Sound',
+                text: `Check out this C&C Red Alert sound: ${soundName}`,
+                url: pageUrl,
+            });
+            showToast('Link shared!', 'success');
+            return;
+        } catch (err) {
+            // User cancelled or share failed - try clipboard fallback
+            if (err.name === 'AbortError') {
+                return; // User cancelled, no message needed
+            }
+        }
+    }
+
+    // Fallback: copy link to clipboard
+    try {
+        await navigator.clipboard.writeText(pageUrl);
         showToast('Link copied to clipboard', 'success');
-    }).catch(() => {
-        showToast('Could not copy link', 'error');
-    });
+    } catch {
+        showToast('Could not share sound', 'error');
+    }
 }

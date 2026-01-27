@@ -49,6 +49,24 @@ describe('Event Handlers', () => {
             expect(state.favorites.length).toBe(1);
         });
 
+        test('clicking share button should call shareSound', async () => {
+            setupEventListeners();
+
+            // Mock clipboard API
+            const writeTextMock = jest.fn().mockResolvedValue();
+            Object.assign(navigator, {
+                clipboard: { writeText: writeTextMock },
+            });
+
+            const shareBtn = document.querySelector('.share-btn');
+            shareBtn.click();
+
+            // Wait for async operation
+            await new Promise(resolve => setTimeout(resolve, 50));
+
+            expect(writeTextMock).toHaveBeenCalled();
+        });
+
         test('clicking category header should toggle collapse', () => {
             setupEventListeners();
 
