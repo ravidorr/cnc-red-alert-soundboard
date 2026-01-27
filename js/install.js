@@ -4,6 +4,7 @@
 
 import { state, elements } from './state.js';
 import { shouldShowInstallPrompt } from './utils.js';
+import { showToast } from './ui.js';
 
 // Track the element that triggered the modal for focus return
 let previouslyFocusedElement = null;
@@ -77,6 +78,9 @@ export function setupInstallPrompt() {
         hideInstallPrompt();
         hideInstallButton();
         state.deferredInstallPrompt = null;
+
+        // Cache all sounds for offline use after installation
+        cacheAllSoundsForOffline();
     });
 }
 
@@ -149,6 +153,30 @@ export function hideInstallButton() {
     if (elements.installBtn) {
         elements.installBtn.classList.remove('visible');
     }
+}
+
+// Cache all sounds for offline use
+export function cacheAllSoundsForOffline() {
+    if (!('serviceWorker' in navigator) || !navigator.serviceWorker || !navigator.serviceWorker.controller) {
+        console.log('Service worker not available for caching');
+        return;
+    }
+
+    showToast('Downloading sounds for offline use...', 'info');
+
+    const messageChannel = new MessageChannel();
+    messageChannel.port1.onmessage = (event) => {
+        if (event.data && event.data.success) {
+            showToast('All sounds ready for offline use!', 'success');
+        } else {
+            showToast('Some sounds could not be cached', 'error');
+        }
+    };
+
+    navigator.serviceWorker.controller.postMessage(
+        { type: 'CACHE_ALL_SOUNDS' },
+        [messageChannel.port2],
+    );
 }
 
 // Register service worker for PWA

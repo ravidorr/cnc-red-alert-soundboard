@@ -22,6 +22,7 @@ A Progressive Web App (PWA) soundboard featuring 190 classic Command & Conquer R
 
 ### PWA & Mobile
 - **PWA Support** - Install as an app, works offline
+- **Automatic Offline Caching** - All sounds are automatically downloaded when you install the app
 - **Install Button** - One-click installation from the header
 - **Responsive Design** - Works on desktop and mobile
 - **Mobile Navigation** - Hamburger menu with slide-out category drawer
@@ -78,7 +79,7 @@ cnc-red-alert-soundboard/
 ├── js/
 │   └── main.js         # Application entry point (modular ES6+)
 ├── tests/
-│   ├── *.test.js       # Unit tests (384 tests, 99%+ coverage)
+│   ├── *.test.js       # Unit tests (390 tests, 99%+ coverage)
 │   └── helpers.js      # Jest test helpers
 ├── scripts/
 │   └── rename_sounds.js # Sound file normalization utility
@@ -131,7 +132,7 @@ The following checks run automatically before each commit:
 
 ### Test Coverage
 
-Current coverage: **99%+** (384 tests)
+Current coverage: **99%+** (390 tests)
 
 Coverage thresholds enforced by pre-commit hooks:
 - Statements: 90%

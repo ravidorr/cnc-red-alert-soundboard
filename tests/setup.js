@@ -58,6 +58,18 @@ Object.defineProperty(navigator, 'serviceWorker', {
     configurable: true,
 });
 
+// Mock MessageChannel (not available in JSDOM)
+global.MessageChannel = class MockMessageChannel {
+    constructor() {
+        this.port1 = { onmessage: null };
+        this.port2 = {
+            onmessage: null,
+            // Store reference to port1 so we can trigger its onmessage
+            _port1: this.port1,
+        };
+    }
+};
+
 // Reset mocks before each test
 beforeEach(() => {
     localStorage.clear();

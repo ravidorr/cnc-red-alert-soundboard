@@ -13,6 +13,7 @@ import {
     triggerInstall,
     setupInstallPrompt,
     registerServiceWorker,
+    cacheAllSoundsForOffline,
 } from '../js/install.js';
 
 describe('Install Functions', () => {
@@ -228,8 +229,16 @@ describe('Install Functions', () => {
         });
 
         test('should handle appinstalled event', () => {
+            const localThis = {};
             window.matchMedia = jest.fn().mockReturnValue({ matches: false });
             state.deferredInstallPrompt = { prompt: jest.fn() };
+            // Mock service worker for cacheAllSoundsForOffline
+            localThis.mockPostMessage = jest.fn();
+            Object.defineProperty(navigator, 'serviceWorker', {
+                value: { controller: { postMessage: localThis.mockPostMessage } },
+                writable: true,
+                configurable: true,
+            });
             setupInstallPrompt();
             showInstallPrompt();
             showInstallButton();
@@ -239,6 +248,11 @@ describe('Install Functions', () => {
             expect(elements.installPrompt.classList.contains('visible')).toBe(false);
             expect(elements.installBtn.classList.contains('visible')).toBe(false);
             expect(state.deferredInstallPrompt).toBeNull();
+            // Verify cacheAllSoundsForOffline was triggered
+            expect(localThis.mockPostMessage).toHaveBeenCalledWith(
+                { type: 'CACHE_ALL_SOUNDS' },
+                expect.any(Array),
+            );
         });
 
         test('should handle header install button click', async () => {
@@ -426,6 +440,149 @@ describe('Install Functions', () => {
 
             expect(mockRegister).toHaveBeenCalled();
             consoleSpy.mockRestore();
+        });
+    });
+
+    describe('cacheAllSoundsForOffline', () => {
+        beforeEach(() => {
+            cacheElements();
+        });
+
+        test('should return early if serviceWorker not available', () => {
+            const localThis = {};
+            localThis.consoleSpy = jest.spyOn(console, 'log').mockImplementation();
+            // Remove serviceWorker
+            const originalServiceWorker = navigator.serviceWorker;
+            delete navigator.serviceWorker;
+            Object.defineProperty(navigator, 'serviceWorker', {
+                value: undefined,
+                writable: true,
+                configurable: true,
+            });
+
+            cacheAllSoundsForOffline();
+
+            expect(localThis.consoleSpy).toHaveBeenCalledWith('Service worker not available for caching');
+            localThis.consoleSpy.mockRestore();
+            // Restore
+            Object.defineProperty(navigator, 'serviceWorker', {
+                value: originalServiceWorker,
+                writable: true,
+                configurable: true,
+            });
+        });
+
+        test('should return early if no controller', () => {
+            const localThis = {};
+            localThis.consoleSpy = jest.spyOn(console, 'log').mockImplementation();
+            Object.defineProperty(navigator, 'serviceWorker', {
+                value: { controller: null },
+                writable: true,
+                configurable: true,
+            });
+
+            cacheAllSoundsForOffline();
+
+            expect(localThis.consoleSpy).toHaveBeenCalledWith('Service worker not available for caching');
+            localThis.consoleSpy.mockRestore();
+        });
+
+        test('should send CACHE_ALL_SOUNDS message to service worker', () => {
+            const localThis = {};
+            localThis.mockPostMessage = jest.fn();
+            Object.defineProperty(navigator, 'serviceWorker', {
+                value: { controller: { postMessage: localThis.mockPostMessage } },
+                writable: true,
+                configurable: true,
+            });
+
+            cacheAllSoundsForOffline();
+
+            expect(localThis.mockPostMessage).toHaveBeenCalledWith(
+                { type: 'CACHE_ALL_SOUNDS' },
+                expect.any(Array),
+            );
+        });
+
+        test('should show info toast when starting cache', () => {
+            const localThis = {};
+            localThis.mockPostMessage = jest.fn();
+            Object.defineProperty(navigator, 'serviceWorker', {
+                value: { controller: { postMessage: localThis.mockPostMessage } },
+                writable: true,
+                configurable: true,
+            });
+
+            cacheAllSoundsForOffline();
+
+            // Check that info toast was shown
+            const toasts = document.querySelectorAll('.toast-info');
+            expect(toasts.length).toBeGreaterThan(0);
+            expect(toasts[0].textContent).toBe('Downloading sounds for offline use...');
+        });
+
+        test('should show success toast when caching completes', () => {
+            const localThis = {};
+            localThis.capturedMessageChannel = null;
+            // Override MessageChannel to capture the instance
+            const OriginalMessageChannel = global.MessageChannel;
+            global.MessageChannel = class {
+                constructor() {
+                    this.port1 = { onmessage: null };
+                    this.port2 = {};
+                    localThis.capturedMessageChannel = this;
+                }
+            };
+            localThis.mockPostMessage = jest.fn();
+            Object.defineProperty(navigator, 'serviceWorker', {
+                value: { controller: { postMessage: localThis.mockPostMessage } },
+                writable: true,
+                configurable: true,
+            });
+
+            cacheAllSoundsForOffline();
+
+            // Simulate success response from service worker by triggering port1.onmessage
+            localThis.capturedMessageChannel.port1.onmessage({ data: { success: true } });
+
+            const successToasts = document.querySelectorAll('.toast-success');
+            expect(successToasts.length).toBeGreaterThan(0);
+            expect(successToasts[0].textContent).toBe('All sounds ready for offline use!');
+
+            // Restore original MessageChannel
+            global.MessageChannel = OriginalMessageChannel;
+        });
+
+        test('should show error toast when caching fails', () => {
+            const localThis = {};
+            localThis.capturedMessageChannel = null;
+            // Override MessageChannel to capture the instance
+            const OriginalMessageChannel = global.MessageChannel;
+            global.MessageChannel = class {
+                constructor() {
+                    this.port1 = { onmessage: null };
+                    this.port2 = {};
+                    localThis.capturedMessageChannel = this;
+                }
+            };
+            localThis.mockPostMessage = jest.fn();
+            Object.defineProperty(navigator, 'serviceWorker', {
+                value: { controller: { postMessage: localThis.mockPostMessage } },
+                writable: true,
+                configurable: true,
+            });
+
+            cacheAllSoundsForOffline();
+
+            // Simulate failure response from service worker by triggering port1.onmessage
+            localThis.capturedMessageChannel.port1.onmessage({ data: { success: false } });
+
+            const errorToasts = document.querySelectorAll('.toast-error');
+            expect(errorToasts.length).toBeGreaterThan(0);
+            expect(errorToasts[0].textContent).toBe('Some sounds could not be cached');
+
+            // Restore original MessageChannel
+            global.MessageChannel = OriginalMessageChannel;
         });
     });
 });
