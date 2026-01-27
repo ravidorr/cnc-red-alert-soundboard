@@ -13,6 +13,7 @@ import {
 } from './utils.js';
 import { showToast, renderFavoritesSection, updateStats } from './ui.js';
 import { renderNavigation } from './navigation.js';
+import { showConfirmModal } from './confirm-modal.js';
 
 // Load favorites from localStorage (wrapper for DOM context)
 export function loadFavorites() {
@@ -25,15 +26,21 @@ export function saveFavorites() {
 }
 
 // Clear all favorites
-export function clearAllFavorites() {
+export async function clearAllFavorites() {
     if (state.favorites.length === 0) {
         showToast('NO TARGETS TO CLEAR', 'info');
         return;
     }
 
-    // Confirm destructive action
+    // Confirm destructive action with themed modal
     const count = state.favorites.length;
-    const confirmed = window.confirm(`CONFIRM: Clear all ${count} favorite${count === 1 ? '' : 's'}? This action cannot be undone.`);
+    const confirmed = await showConfirmModal({
+        title: 'CONFIRM OPERATION',
+        message: `Clear all ${count} target${count === 1 ? '' : 's'} from favorites? This action cannot be undone.`,
+        confirmText: 'EXECUTE',
+        cancelText: 'ABORT',
+    });
+
     if (!confirmed) {
         showToast('OPERATION CANCELLED', 'info');
         return;

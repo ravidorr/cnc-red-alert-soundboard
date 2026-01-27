@@ -519,10 +519,18 @@ describe('Event Handlers', () => {
             }).not.toThrow();
         });
 
-        test('clear all favorites button should clear favorites', () => {
-            // Mock window.confirm to return true
-            const originalConfirm = window.confirm;
-            window.confirm = () => true;
+        test('clear all favorites button should clear favorites', async () => {
+            // Setup confirm modal in DOM for testing
+            const confirmModal = document.createElement('div');
+            confirmModal.id = 'confirm-modal';
+            confirmModal.className = 'confirm-modal';
+            confirmModal.innerHTML = `
+                <h2 id="confirm-title"></h2>
+                <p id="confirm-message"></p>
+                <button id="confirm-execute">EXECUTE</button>
+                <button id="confirm-abort">ABORT</button>
+            `;
+            document.body.appendChild(confirmModal);
 
             state.favorites = ['allies_1_achnoledged.wav', 'allies_1_affirmative.wav'];
             renderFavoritesSection();
@@ -531,11 +539,19 @@ describe('Event Handlers', () => {
             const clearBtn = document.getElementById('btn-clear-favorites');
             if (clearBtn) {
                 clearBtn.click();
+
+                // Wait for modal to appear, then click execute
+                await new Promise(resolve => setTimeout(resolve, 50));
+                const executeBtn = document.getElementById('confirm-execute');
+                executeBtn.click();
+
+                // Wait for async operation to complete
+                await new Promise(resolve => setTimeout(resolve, 50));
                 expect(state.favorites.length).toBe(0);
             }
 
-            // Restore original confirm
-            window.confirm = originalConfirm;
+            // Cleanup
+            confirmModal.remove();
         });
     });
 

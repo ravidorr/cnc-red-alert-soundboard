@@ -183,10 +183,10 @@
     background: var(--bg-button);
     border: 1px solid var(--green-dark);
     color: var(--text-dim);
-    width: 24px;
-    height: 24px;
+    min-width: 44px;
+    min-height: 44px;
     font-family: var(--font-primary);
-    font-size: 0.9rem;
+    font-size: 1rem;
     cursor: pointer;
     transition: all 0.2s ease;
     display: flex;
@@ -197,6 +197,11 @@
 .btn-help:hover {
     border-color: var(--green-primary);
     color: var(--green-primary);
+}
+
+.btn-help:focus-visible {
+    outline: 3px solid var(--green-primary);
+    outline-offset: 2px;
 }
 
 /* Shortcuts Modal */
@@ -266,6 +271,34 @@
     font-size: 0.8rem;
     min-width: 24px;
     text-align: center;
+}
+
+.shortcuts-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+.btn-secondary {
+    background: transparent;
+    border: 1px solid var(--green-dark);
+    color: var(--text-dim);
+    font-family: var(--font-primary);
+    font-size: 0.9rem;
+    padding: 12px 20px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    letter-spacing: 1px;
+}
+
+.btn-secondary:hover {
+    border-color: var(--green-primary);
+    color: var(--green-primary);
+}
+
+.btn-secondary:focus-visible {
+    outline: 3px solid var(--green-primary);
+    outline-offset: 2px;
 }
 
 /* Now Playing Indicator */

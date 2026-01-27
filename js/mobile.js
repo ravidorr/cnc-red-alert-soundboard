@@ -7,6 +7,66 @@ import { elements } from './state.js';
 // Store reference to element that opened the menu
 let menuTriggerElement = null;
 
+// Mobile breakpoint (matches CSS)
+const MOBILE_BREAKPOINT = 768;
+
+/**
+ * Check if current viewport is mobile
+ * @returns {boolean}
+ */
+export function isMobileViewport() {
+    return window.innerWidth <= MOBILE_BREAKPOINT;
+}
+
+/**
+ * Initialize sidebar accessibility based on viewport
+ * On desktop: sidebar is always visible, aria-hidden="false"
+ * On mobile: sidebar is hidden by default, aria-hidden="true"
+ */
+export function initSidebarAccessibility() {
+    if (!elements.sidebar) {
+        return;
+    }
+
+    if (isMobileViewport()) {
+        // Mobile: sidebar hidden by default
+        elements.sidebar.setAttribute('aria-hidden', 'true');
+    } else {
+        // Desktop: sidebar always visible
+        elements.sidebar.setAttribute('aria-hidden', 'false');
+    }
+}
+
+/**
+ * Handle viewport resize to update sidebar accessibility
+ */
+export function setupViewportListener() {
+    let wasMovile = isMobileViewport();
+
+    window.addEventListener('resize', () => {
+        const isMobile = isMobileViewport();
+
+        // Only update if crossing the breakpoint
+        if (isMobile !== wasMovile) {
+            wasMovile = isMobile;
+
+            if (isMobile) {
+                // Switched to mobile: close menu if open, set hidden
+                closeMobileMenu();
+            } else {
+                // Switched to desktop: ensure visible
+                if (elements.sidebar) {
+                    elements.sidebar.classList.remove('open');
+                    elements.sidebar.setAttribute('aria-hidden', 'false');
+                }
+                if (elements.mobileMenuOverlay) {
+                    elements.mobileMenuOverlay.classList.remove('visible');
+                }
+            }
+        }
+    });
+}
+
 // Toggle mobile menu
 export function toggleMobileMenu() {
     const isOpen = elements.sidebar && elements.sidebar.classList.contains('open');

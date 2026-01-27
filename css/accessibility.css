@@ -60,9 +60,9 @@
     outline-offset: 2px;
 }
 
-.category-header:focus-visible {
+button.category-header:focus-visible {
     outline: 3px solid var(--green-primary);
-    outline-offset: -2px;
+    outline-offset: -3px;
 }
 
 /* Reduced Motion Support */
@@ -121,8 +121,13 @@
     }
 
     /* Category headers */
-    .category-header {
+    button.category-header {
         border-bottom: 2px solid CanvasText;
+    }
+
+    button.category-header:focus {
+        outline: 3px solid Highlight;
+        outline-offset: -3px;
     }
 
     /* Toast types */

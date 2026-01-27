@@ -86,13 +86,13 @@ export function renderRecentlyPlayedSection() {
 
     const sectionHtml = `
         <section class="category-section recent-section" id="category-recent" data-category="recent">
-            <div class="category-header" tabindex="0" role="button" aria-expanded="true" aria-label="Recently Played section, expanded, ${recentSounds.length} sounds">
-                <div class="category-title">
-                    <h2 class="category-name"><span class="section-icon" aria-hidden="true">&#128337;</span> RECENTLY PLAYED</h2>
+            <button type="button" class="category-header" aria-expanded="true" aria-controls="category-content-recent">
+                <span class="category-title">
+                    <span class="category-name"><span class="section-icon" aria-hidden="true">&#128337;</span> RECENTLY PLAYED</span>
                     <span class="category-count">(${recentSounds.length})</span>
-                </div>
+                </span>
                 <span class="category-toggle" aria-hidden="true">&#9660;</span>
-            </div>
+            </button>
             <div class="category-content" id="category-content-recent">
                 ${contentHtml}
             </div>

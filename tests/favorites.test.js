@@ -418,82 +418,107 @@ describe('Favorites Functions', () => {
             cacheElements();
             renderCategories();
             renderNavigation();
-            // Mock window.confirm to return true by default
-            localThis.originalConfirm = window.confirm;
-            localThis.confirmCalled = false;
-            window.confirm = () => {
-                localThis.confirmCalled = true;
-                return true;
-            };
+
+            // Setup confirm modal in DOM for testing
+            const confirmModal = document.createElement('div');
+            confirmModal.id = 'confirm-modal';
+            confirmModal.className = 'confirm-modal';
+            confirmModal.innerHTML = `
+                <h2 id="confirm-title"></h2>
+                <p id="confirm-message"></p>
+                <button id="confirm-execute">EXECUTE</button>
+                <button id="confirm-abort">ABORT</button>
+            `;
+            document.body.appendChild(confirmModal);
         });
 
         afterEach(() => {
-            window.confirm = localThis.originalConfirm;
+            const confirmModal = document.getElementById('confirm-modal');
+            if (confirmModal) confirmModal.remove();
         });
 
-        test('should empty favorites array when confirmed', () => {
+        test('should empty favorites array when confirmed', async () => {
             state.favorites = ['a.wav', 'b.wav', 'c.wav'];
             renderFavoritesSection();
 
-            clearAllFavorites();
+            const clearPromise = clearAllFavorites();
 
-            expect(localThis.confirmCalled).toBe(true);
+            // Wait for modal to appear, then click execute
+            await new Promise(resolve => setTimeout(resolve, 50));
+            const executeBtn = document.getElementById('confirm-execute');
+            executeBtn.click();
+
+            await clearPromise;
             expect(state.favorites).toEqual([]);
         });
 
-        test('should not empty favorites when cancelled', () => {
-            window.confirm = () => {
-                localThis.confirmCalled = true;
-                return false;
-            };
+        test('should not empty favorites when cancelled', async () => {
             state.favorites = ['a.wav', 'b.wav', 'c.wav'];
             renderFavoritesSection();
 
-            clearAllFavorites();
+            const clearPromise = clearAllFavorites();
 
-            expect(localThis.confirmCalled).toBe(true);
+            // Wait for modal to appear, then click abort
+            await new Promise(resolve => setTimeout(resolve, 50));
+            const abortBtn = document.getElementById('confirm-abort');
+            abortBtn.click();
+
+            await clearPromise;
             expect(state.favorites).toEqual(['a.wav', 'b.wav', 'c.wav']);
         });
 
-        test('should save to localStorage when confirmed', () => {
+        test('should save to localStorage when confirmed', async () => {
             state.favorites = ['a.wav', 'b.wav'];
             renderFavoritesSection();
 
-            clearAllFavorites();
+            const clearPromise = clearAllFavorites();
 
+            await new Promise(resolve => setTimeout(resolve, 50));
+            document.getElementById('confirm-execute').click();
+
+            await clearPromise;
             const stored = JSON.parse(localStorage.getItem('cnc-favorites'));
             expect(stored).toEqual([]);
         });
 
-        test('should re-render favorites section when confirmed', () => {
+        test('should re-render favorites section when confirmed', async () => {
             state.favorites = ['allies_1_achnoledged.wav'];
             renderFavoritesSection();
 
-            clearAllFavorites();
+            const clearPromise = clearAllFavorites();
 
+            await new Promise(resolve => setTimeout(resolve, 50));
+            document.getElementById('confirm-execute').click();
+
+            await clearPromise;
             const favSection = document.getElementById('category-favorites');
             const emptyState = favSection.querySelector('.favorites-empty');
             expect(emptyState).not.toBeNull();
         });
 
-        test('should show toast notification when confirmed', () => {
+        test('should show toast notification when confirmed', async () => {
             state.favorites = ['a.wav'];
             renderFavoritesSection();
 
-            clearAllFavorites();
+            const clearPromise = clearAllFavorites();
 
+            await new Promise(resolve => setTimeout(resolve, 50));
+            document.getElementById('confirm-execute').click();
+
+            await clearPromise;
             const toast = document.querySelector('.toast');
             expect(toast).not.toBeNull();
         });
 
-        test('should handle empty favorites gracefully without confirm', () => {
-            localThis.confirmCalled = false;
+        test('should handle empty favorites gracefully without confirm', async () => {
             state.favorites = [];
             renderFavoritesSection();
 
-            expect(() => clearAllFavorites()).not.toThrow();
-            // Should not show confirm dialog for empty favorites
-            expect(localThis.confirmCalled).toBe(false);
+            // Should not throw and should not show modal
+            await expect(clearAllFavorites()).resolves.not.toThrow();
+            // Modal should not be visible for empty favorites
+            const modal = document.getElementById('confirm-modal');
+            expect(modal.classList.contains('visible')).toBe(false);
         });
     });
 

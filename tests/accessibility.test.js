@@ -141,29 +141,33 @@ describe('Accessibility Features', () => {
         });
     });
 
-    describe('Category Header ARIA Labels', () => {
+    describe('Category Header ARIA Attributes', () => {
         beforeEach(() => {
             cacheElements();
             renderCategories();
         });
 
-        test('category headers should have aria-label with section info', () => {
+        test('category headers should have aria-expanded attribute', () => {
             const header = document.querySelector('.category-header');
-            const ariaLabel = header.getAttribute('aria-label');
-            expect(ariaLabel).toContain('section');
-            expect(ariaLabel).toContain('expanded');
-            expect(ariaLabel).toContain('sounds');
+            const ariaExpanded = header.getAttribute('aria-expanded');
+            expect(ariaExpanded).toBe('true');
         });
 
-        test('favorites section should have aria-label', () => {
+        test('category headers should have aria-controls attribute', () => {
+            const header = document.querySelector('.category-header');
+            const ariaControls = header.getAttribute('aria-controls');
+            expect(ariaControls).not.toBeNull();
+            expect(ariaControls).toContain('category-content-');
+        });
+
+        test('favorites section should have aria-expanded', () => {
             state.favorites = ['allies_1_achnoledged.wav'];
             renderFavoritesSection();
 
             const favSection = document.getElementById('category-favorites');
             const header = favSection.querySelector('.category-header');
-            const ariaLabel = header.getAttribute('aria-label');
-            expect(ariaLabel).toContain('Favorites');
-            expect(ariaLabel).toContain('expanded');
+            expect(header.getAttribute('aria-expanded')).toBe('true');
+            expect(header.getAttribute('aria-controls')).toBe('category-content-favorites');
         });
     });
 

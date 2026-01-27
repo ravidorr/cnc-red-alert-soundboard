@@ -10,6 +10,7 @@ import { filterSounds } from './search.js';
 import { toggleMobileMenu, closeMobileMenu } from './mobile.js';
 import { shareSound } from './ui.js';
 import { debounce } from './utils.js';
+import { showOnboardingTooltipForced } from './onboarding.js';
 
 // Debounced search function (200ms delay for performance)
 const debouncedFilterSounds = debounce(filterSounds, 200);
@@ -260,6 +261,15 @@ export function setupEventListeners() {
             if (e.target === shortcutsModal) {
                 hideShortcutsModal();
             }
+        });
+    }
+
+    // Show tips button in shortcuts modal
+    const showTipsBtn = document.getElementById('show-tips-btn');
+    if (showTipsBtn) {
+        showTipsBtn.addEventListener('click', () => {
+            hideShortcutsModal();
+            showOnboardingTooltipForced();
         });
     }
 }

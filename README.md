@@ -34,20 +34,23 @@ A Progressive Web App (PWA) soundboard featuring 190 classic Command & Conquer R
 ### Accessibility (WCAG 2.1 AA)
 - **Keyboard Navigation** - Full keyboard support with 3px visible focus indicators
 - **Screen Reader Support** - ARIA landmarks, labels, and live regions for playback announcements
+- **Semantic HTML** - Category headers use proper button elements with aria-expanded/aria-controls
 - **Skip Link** - Jump directly to main content
-- **Reduced Motion** - Respects `prefers-reduced-motion` preference
-- **Color Contrast** - Meets WCAG AA contrast requirements (5.2:1+ minimum)
+- **Reduced Motion** - Respects `prefers-reduced-motion` preference for all animations
+- **Color Contrast** - Meets WCAG AA contrast requirements (11:1+ on primary text)
 - **High Contrast Mode** - Supports Windows High Contrast Mode
 - **Touch Targets** - 44px minimum with proper spacing between targets
 - **Focus Traps** - Modal dialogs and tooltips trap keyboard focus correctly
-- **Confirmation Dialogs** - Destructive actions require user confirmation
+- **Themed Confirmation Modal** - Destructive actions use accessible themed dialogs
 - **Category Persistence** - Collapsed categories are remembered across sessions
+- **Responsive Sidebar** - aria-hidden dynamically managed based on viewport
 
 ### User Feedback
 - **Toast Notifications** - Dismissible notifications with keyboard support
 - **Now Playing Indicator** - Shows currently playing sound
-- **First-Time Onboarding** - Helpful tips for new users
-- **Themed Microcopy** - Military-style feedback messages matching C&C aesthetic
+- **First-Time Onboarding** - Helpful tips for new users with 30s display time
+- **Replay Onboarding** - "Show Tips" button in help modal to replay onboarding
+- **Themed Microcopy** - Military-style feedback messages ("SIGNAL LOST", "COMMS SILENCED")
 
 ## Local Development
 
@@ -86,7 +89,7 @@ cnc-red-alert-soundboard/
 ├── js/
 │   └── main.js         # Application entry point (modular ES6+)
 ├── tests/
-│   ├── *.test.js       # Unit tests (416 tests, 97%+ coverage)
+│   ├── *.test.js       # Unit tests (452 tests, 95%+ coverage)
 │   └── helpers.js      # Jest test helpers
 ├── scripts/
 │   └── rename_sounds.js # Sound file normalization utility
@@ -139,7 +142,7 @@ The following checks run automatically before each commit:
 
 ### Test Coverage
 
-Current coverage: **95%+** (417 tests)
+Current coverage: **95%+** (452 tests)
 
 Coverage thresholds enforced by pre-commit hooks:
 - Statements: 90%

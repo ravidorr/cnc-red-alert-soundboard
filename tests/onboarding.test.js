@@ -7,6 +7,7 @@ import {
     hasSeenOnboarding,
     markOnboardingSeen,
     showOnboardingTooltip,
+    showOnboardingTooltipForced,
 } from '../js/onboarding.js';
 
 describe('Onboarding Functions', () => {
@@ -159,6 +160,109 @@ describe('Onboarding Functions', () => {
 
             const tooltip = document.getElementById('onboarding-tooltip');
             expect(tooltip.classList.contains('hiding')).toBe(true);
+        });
+    });
+
+    describe('showOnboardingTooltipForced', () => {
+        const localThis = {};
+
+        beforeEach(() => {
+            document.body.innerHTML = '';
+            localThis.originalLocalStorage = global.localStorage;
+            localThis.mockStorage = createMockStorage();
+            Object.defineProperty(global, 'localStorage', {
+                value: localThis.mockStorage,
+                writable: true,
+            });
+        });
+
+        afterEach(() => {
+            Object.defineProperty(global, 'localStorage', {
+                value: localThis.originalLocalStorage,
+                writable: true,
+            });
+        });
+
+        test('should create tooltip element even if previously seen', () => {
+            localThis.mockStorage.store['cnc-onboarding-seen'] = 'true';
+
+            showOnboardingTooltipForced();
+
+            const tooltip = document.getElementById('onboarding-tooltip');
+            expect(tooltip).not.toBeNull();
+        });
+
+        test('should have correct ARIA attributes', () => {
+            showOnboardingTooltipForced();
+
+            const tooltip = document.getElementById('onboarding-tooltip');
+            expect(tooltip.getAttribute('role')).toBe('dialog');
+            expect(tooltip.getAttribute('aria-labelledby')).toBe('onboarding-title');
+        });
+
+        test('should contain mission briefing title', () => {
+            showOnboardingTooltipForced();
+
+            const title = document.getElementById('onboarding-title');
+            expect(title.textContent).toBe('MISSION BRIEFING');
+        });
+
+        test('should contain tips', () => {
+            showOnboardingTooltipForced();
+
+            const tips = document.querySelectorAll('.onboarding-tips li');
+            expect(tips.length).toBe(3);
+        });
+
+        test('clicking dismiss button should remove tooltip', (done) => {
+            showOnboardingTooltipForced();
+
+            const dismissBtn = document.getElementById('onboarding-dismiss');
+            dismissBtn.click();
+
+            setTimeout(() => {
+                const tooltip = document.getElementById('onboarding-tooltip');
+                expect(tooltip).toBeNull();
+                done();
+            }, 350);
+        });
+
+        test('clicking dismiss should NOT mark onboarding as seen', () => {
+            showOnboardingTooltipForced();
+
+            const dismissBtn = document.getElementById('onboarding-dismiss');
+            dismissBtn.click();
+
+            // Should NOT call setItem for onboarding-seen when using forced
+            const calls = localThis.mockStorage.setItem.mock.calls.filter(
+                call => call[0] === 'cnc-onboarding-seen',
+            );
+            expect(calls.length).toBe(0);
+        });
+
+        test('pressing Escape should dismiss tooltip', (done) => {
+            showOnboardingTooltipForced();
+
+            const tooltip = document.getElementById('onboarding-tooltip');
+            const escEvent = new KeyboardEvent('keydown', { key: 'Escape', bubbles: true });
+            tooltip.dispatchEvent(escEvent);
+
+            setTimeout(() => {
+                const tooltipAfter = document.getElementById('onboarding-tooltip');
+                expect(tooltipAfter).toBeNull();
+                done();
+            }, 350);
+        });
+
+        test('should remove existing tooltip before showing new one', () => {
+            showOnboardingTooltipForced();
+            const firstTooltip = document.getElementById('onboarding-tooltip');
+
+            showOnboardingTooltipForced();
+            const secondTooltip = document.getElementById('onboarding-tooltip');
+
+            // Should be a new tooltip, not the same reference
+            expect(document.querySelectorAll('.onboarding-tooltip').length).toBe(1);
         });
     });
 });

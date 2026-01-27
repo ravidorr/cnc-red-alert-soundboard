@@ -70,14 +70,14 @@
     <div class="mobile-menu-overlay" id="mobile-menu-overlay"></div>
 
     <main class="main-content" role="main">
-        <aside class="sidebar" id="sidebar" aria-label="Categories menu" aria-hidden="true">
+        <aside class="sidebar" id="sidebar" aria-label="Categories menu">
             <nav class="category-nav" id="category-nav" aria-label="Sound categories">
                 <div class="nav-header">CATEGORIES</div>
                 <!-- Categories will be populated by JS -->
             </nav>
             <div class="stats-panel">
                 <div class="stat">
-                    <span class="stat-label">VISIBLE</span>
+                    <span class="stat-label">DEPLOYED</span>
                     <span class="stat-value" id="visible-sounds" aria-live="polite" aria-atomic="true">0</span>
                 </div>
             </div>
@@ -114,7 +114,7 @@
             <span class="footer-text">ESTABLISHING BATTLEFIELD CONTROL... STAND BY.</span>
             <div class="footer-actions">
                 <button id="help-btn" class="btn-help" aria-label="Keyboard shortcuts" title="Keyboard shortcuts">?</button>
-                <span class="footer-version">v1.9.0</span>
+                <span class="footer-version">v2.0.0</span>
             </div>
         </div>
     </footer>
@@ -150,7 +150,10 @@
                     <span>SHOW COMMANDS</span>
                 </div>
             </div>
-            <button class="btn-dismiss" id="shortcuts-close">CLOSE</button>
+            <div class="shortcuts-actions">
+                <button class="btn-secondary" id="show-tips-btn">SHOW TIPS</button>
+                <button class="btn-dismiss" id="shortcuts-close">CLOSE</button>
+            </div>
         </div>
     </div>
 
@@ -178,6 +181,18 @@
     </div>
 
     <audio id="audio-player" preload="auto"></audio>
+
+    <!-- Confirmation modal for destructive actions -->
+    <div class="confirm-modal" id="confirm-modal" role="alertdialog" aria-labelledby="confirm-title" aria-describedby="confirm-message" aria-modal="true">
+        <div class="confirm-modal-content">
+            <h2 id="confirm-title" class="confirm-title">CONFIRM OPERATION</h2>
+            <p id="confirm-message" class="confirm-message"></p>
+            <div class="confirm-actions">
+                <button class="btn-confirm-execute" id="confirm-execute">EXECUTE</button>
+                <button class="btn-confirm-abort" id="confirm-abort">ABORT</button>
+            </div>
+        </div>
+    </div>
 
     <button id="back-to-top" class="btn-back-to-top" aria-label="Back to top" title="Back to top">
         <span aria-hidden="true">&#9650;</span>

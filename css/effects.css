@@ -76,4 +76,12 @@
         animation: none;
         opacity: 0.85;
     }
+    
+    .footer-text {
+        animation: none;
+    }
+    
+    .category-section {
+        animation: none;
+    }
 }

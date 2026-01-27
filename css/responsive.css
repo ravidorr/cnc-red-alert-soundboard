@@ -325,9 +325,13 @@
         text-overflow: ellipsis;
     }
     
-    /* Smaller category chips on very small screens */
+    /* Category chips with WCAG compliant touch targets (44px min) */
     .category-chip {
-        padding: 4px 8px;
-        font-size: 0.7rem;
+        padding: 10px 12px;
+        font-size: 0.75rem;
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 }

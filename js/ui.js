@@ -72,13 +72,13 @@ export function renderCategories() {
 
         return `
             <section class="category-section" id="category-${categoryId}" data-category="${categoryId}">
-                <div class="category-header" tabindex="0" role="button" aria-expanded="true" aria-label="${categoryInfo.name} section, expanded, ${sounds.length} sounds">
-                    <div class="category-title">
-                        <h2 class="category-name">${categoryInfo.name}</h2>
+                <button type="button" class="category-header" aria-expanded="true" aria-controls="category-content-${categoryId}">
+                    <span class="category-title">
+                        <span class="category-name">${categoryInfo.name}</span>
                         <span class="category-count">(${sounds.length})</span>
-                    </div>
+                    </span>
                     <span class="category-toggle" aria-hidden="true">&#9660;</span>
-                </div>
+                </button>
                 <div class="category-content" id="category-content-${categoryId}">
                     ${buttonsHtml}
                 </div>
@@ -101,13 +101,13 @@ export function renderFavoritesSection() {
     if (state.favorites.length === 0) {
         const emptyHtml = `
             <section class="category-section favorites-section" id="category-favorites" data-category="favorites">
-                <div class="category-header" tabindex="0" role="button" aria-expanded="true" aria-label="Favorites section, expanded, 0 sounds">
-                    <div class="category-title">
-                        <h2 class="category-name"><span class="section-icon" aria-hidden="true">&#9733;</span> FAVORITES</h2>
+                <button type="button" class="category-header" aria-expanded="true" aria-controls="category-content-favorites">
+                    <span class="category-title">
+                        <span class="category-name"><span class="section-icon" aria-hidden="true">&#9733;</span> FAVORITES</span>
                         <span class="category-count">(0)</span>
-                    </div>
+                    </span>
                     <span class="category-toggle" aria-hidden="true">&#9660;</span>
-                </div>
+                </button>
                 <div class="category-content" id="category-content-favorites">
                     <div class="favorites-empty">
                         <div class="favorites-empty-icon" aria-hidden="true">&#9734;</div>
@@ -165,15 +165,15 @@ export function renderFavoritesSection() {
 
     const sectionHtml = `
         <section class="category-section favorites-section" id="category-favorites" data-category="favorites">
-            <div class="category-header" tabindex="0" role="button" aria-expanded="true" aria-label="Favorites section, expanded, ${favoriteSounds.length} sounds">
-                <div class="category-title">
-                    <h2 class="category-name"><span class="section-icon" aria-hidden="true">&#9733;</span> FAVORITES</h2>
-                    <span class="category-count">(${favoriteSounds.length})</span>
-                </div>
-                <div class="category-actions">
-                    <button class="btn-clear-favorites" id="btn-clear-favorites" aria-label="Clear all favorites" title="Clear all favorites">CLEAR</button>
+            <div class="category-header-wrapper">
+                <button type="button" class="category-header" aria-expanded="true" aria-controls="category-content-favorites">
+                    <span class="category-title">
+                        <span class="category-name"><span class="section-icon" aria-hidden="true">&#9733;</span> FAVORITES</span>
+                        <span class="category-count">(${favoriteSounds.length})</span>
+                    </span>
                     <span class="category-toggle" aria-hidden="true">&#9660;</span>
-                </div>
+                </button>
+                <button class="btn-clear-favorites" id="btn-clear-favorites" aria-label="Clear all favorites" title="Clear all favorites">CLEAR</button>
             </div>
             ${dragTooltipHtml}
             <div class="category-content" id="category-content-favorites">
@@ -251,13 +251,13 @@ export function renderPopularSection() {
 
     const sectionHtml = `
         <section class="category-section popular-section" id="category-popular" data-category="popular">
-            <div class="category-header" tabindex="0" role="button" aria-expanded="true" aria-label="Popular Sounds section, expanded, ${popularSounds.length} sounds">
-                <div class="category-title">
-                    <h2 class="category-name"><span class="section-icon" aria-hidden="true">&#128293;</span> POPULAR SOUNDS</h2>
+            <button type="button" class="category-header" aria-expanded="true" aria-controls="category-content-popular">
+                <span class="category-title">
+                    <span class="category-name"><span class="section-icon" aria-hidden="true">&#128293;</span> POPULAR SOUNDS</span>
                     <span class="category-count">(${popularSounds.length})</span>
-                </div>
+                </span>
                 <span class="category-toggle" aria-hidden="true">&#9660;</span>
-            </div>
+            </button>
             <div class="category-content" id="category-content-popular">
                 ${buttonsHtml}
             </div>

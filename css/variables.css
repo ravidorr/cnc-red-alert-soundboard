@@ -20,7 +20,7 @@
     
     --text-primary: #00ff00;
     --text-secondary: #00cc00;
-    --text-dim: #00dd00; /* WCAG AA compliant - 5.2:1 contrast ratio on dark backgrounds */
+    --text-dim: #00dd00; /* WCAG AA compliant - 11.4:1 contrast ratio on --bg-panel, 11.9:1 on --bg-primary */
     --text-dark: #0a0a0a;
     
     --red-alert: #ff3333;

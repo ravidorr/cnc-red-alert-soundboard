@@ -10,6 +10,7 @@ import { setupAudioPlayer, checkUrlHash } from './audio.js';
 import { setupInstallPrompt, registerServiceWorker } from './install.js';
 import { setupEventListeners } from './events.js';
 import { showOnboardingTooltip } from './onboarding.js';
+import { initSidebarAccessibility, setupViewportListener } from './mobile.js';
 
 // Initialize the application
 function init() {
@@ -28,6 +29,10 @@ function init() {
     updateStats();
     registerServiceWorker();
     checkUrlHash();
+
+    // Initialize sidebar accessibility based on viewport
+    initSidebarAccessibility();
+    setupViewportListener();
 
     // Show onboarding tooltip for first-time users (after a short delay)
     setTimeout(() => {
@@ -56,5 +61,6 @@ export * from './mobile.js';
 export * from './install.js';
 export * from './events.js';
 export * from './onboarding.js';
+export * from './confirm-modal.js';
 
 export { init };

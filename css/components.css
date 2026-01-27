@@ -88,14 +88,29 @@
     border-color: var(--red-dim);
 }
 
+/* Volume slider with larger hit area - visual track drawn via pseudo-element */
 #volume-slider {
     width: 80px;
-    height: 4px;
+    height: 24px;
     -webkit-appearance: none;
     appearance: none;
+    background: transparent;
+    cursor: pointer;
+    position: relative;
+}
+
+/* Create visual track with larger clickable area */
+#volume-slider::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 4px;
+    transform: translateY(-50%);
     background: var(--green-darker);
     border: 1px solid var(--green-dark);
-    cursor: pointer;
+    pointer-events: none;
 }
 
 #volume-slider::-webkit-slider-thumb {
@@ -201,19 +216,47 @@
     background: var(--bg-secondary);
 }
 
-.category-header {
+/* Category header as button element */
+button.category-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    width: 100%;
     padding: 12px 15px;
     background: linear-gradient(90deg, var(--green-darker) 0%, var(--bg-panel) 100%);
+    border: none;
     border-bottom: 1px solid var(--green-border);
     cursor: pointer;
     user-select: none;
+    font-family: var(--font-primary);
+    text-align: left;
 }
 
-.category-header:hover {
+button.category-header:hover {
     background: linear-gradient(90deg, var(--green-dark) 0%, var(--bg-panel) 100%);
+}
+
+button.category-header:focus-visible {
+    outline: 3px solid var(--green-primary);
+    outline-offset: -3px;
+}
+
+/* Wrapper for favorites header with clear button */
+.category-header-wrapper {
+    display: flex;
+    align-items: stretch;
+    background: linear-gradient(90deg, var(--green-dark) 0%, var(--bg-panel) 100%);
+    border-bottom: 1px solid var(--green-border);
+}
+
+.category-header-wrapper button.category-header {
+    flex: 1;
+    border-bottom: none;
+}
+
+.category-header-wrapper .btn-clear-favorites {
+    border-bottom: none;
+    border-left: 1px solid var(--green-border);
 }
 
 .category-title {
