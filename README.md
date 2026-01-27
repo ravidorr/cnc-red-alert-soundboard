@@ -32,13 +32,15 @@ A Progressive Web App (PWA) soundboard featuring 190 classic Command & Conquer R
 - **URL Hash Support** - Share URLs that auto-play sounds (e.g., `#sound=tanya_yeah.wav`)
 
 ### Accessibility (WCAG 2.1 AA)
-- **Keyboard Navigation** - Full keyboard support with visible focus indicators
-- **Screen Reader Support** - ARIA landmarks, labels, and live regions
+- **Keyboard Navigation** - Full keyboard support with 3px visible focus indicators
+- **Screen Reader Support** - ARIA landmarks, labels, and live regions for playback announcements
 - **Skip Link** - Jump directly to main content
 - **Reduced Motion** - Respects `prefers-reduced-motion` preference
 - **Color Contrast** - Meets WCAG AA contrast requirements (5.2:1+ minimum)
 - **High Contrast Mode** - Supports Windows High Contrast Mode
 - **Touch Targets** - 44px minimum with proper spacing between targets
+- **Focus Traps** - Modal dialogs and tooltips trap keyboard focus correctly
+- **Confirmation Dialogs** - Destructive actions require user confirmation
 - **Category Persistence** - Collapsed categories are remembered across sessions
 
 ### User Feedback
@@ -137,7 +139,7 @@ The following checks run automatically before each commit:
 
 ### Test Coverage
 
-Current coverage: **97%+** (416 tests)
+Current coverage: **95%+** (417 tests)
 
 Coverage thresholds enforced by pre-commit hooks:
 - Statements: 90%
@@ -194,6 +196,20 @@ Press `Tab` on page load to reveal the "Skip to content" link, then `Enter` to b
 - **Service Worker** - Offline caching with cache-first strategy
 - **Web Audio API** - Sound playback
 - **LocalStorage** - Favorites and recently played persistence
+
+## User Personas
+
+### Primary: "The Nostalgic Commander"
+- **Role:** Gaming enthusiast, 25-45 years old
+- **Technical Level:** Moderate - comfortable with web apps
+- **Goals:** Quickly find and play nostalgic C&C sounds for entertainment, share with friends
+- **Context:** Casual use, often on mobile, low-stress environment
+
+### Secondary: "The Content Creator"
+- **Role:** Streamer, YouTuber, meme creator
+- **Technical Level:** High - uses multiple tools
+- **Goals:** Quick access to sound clips for content, download/share functionality
+- **Context:** Frequent use during streaming/editing sessions
 
 ## Credits
 

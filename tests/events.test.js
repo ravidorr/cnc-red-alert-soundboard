@@ -520,6 +520,10 @@ describe('Event Handlers', () => {
         });
 
         test('clear all favorites button should clear favorites', () => {
+            // Mock window.confirm to return true
+            const originalConfirm = window.confirm;
+            window.confirm = () => true;
+
             state.favorites = ['allies_1_achnoledged.wav', 'allies_1_affirmative.wav'];
             renderFavoritesSection();
             setupEventListeners();
@@ -529,6 +533,9 @@ describe('Event Handlers', () => {
                 clearBtn.click();
                 expect(state.favorites.length).toBe(0);
             }
+
+            // Restore original confirm
+            window.confirm = originalConfirm;
         });
     });
 

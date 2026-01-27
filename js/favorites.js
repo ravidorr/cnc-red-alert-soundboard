@@ -27,16 +27,25 @@ export function saveFavorites() {
 // Clear all favorites
 export function clearAllFavorites() {
     if (state.favorites.length === 0) {
-        showToast('No favorites to clear', 'info');
+        showToast('NO TARGETS TO CLEAR', 'info');
         return;
     }
+
+    // Confirm destructive action
+    const count = state.favorites.length;
+    const confirmed = window.confirm(`CONFIRM: Clear all ${count} favorite${count === 1 ? '' : 's'}? This action cannot be undone.`);
+    if (!confirmed) {
+        showToast('OPERATION CANCELLED', 'info');
+        return;
+    }
+
     state.favorites = [];
     saveFavorites();
     renderFavoritesSection();
     renderNavigation();
     updateFavoriteButtons();
     updateStats();
-    showToast('All targets cleared', 'info');
+    showToast('ALL TARGETS CLEARED', 'info');
 }
 
 // Toggle a sound as favorite

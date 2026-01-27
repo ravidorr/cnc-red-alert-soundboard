@@ -412,22 +412,50 @@ describe('Favorites Functions', () => {
     });
 
     describe('clearAllFavorites', () => {
+        const localThis = {};
+
         beforeEach(() => {
             cacheElements();
             renderCategories();
             renderNavigation();
+            // Mock window.confirm to return true by default
+            localThis.originalConfirm = window.confirm;
+            localThis.confirmCalled = false;
+            window.confirm = () => {
+                localThis.confirmCalled = true;
+                return true;
+            };
         });
 
-        test('should empty favorites array', () => {
+        afterEach(() => {
+            window.confirm = localThis.originalConfirm;
+        });
+
+        test('should empty favorites array when confirmed', () => {
             state.favorites = ['a.wav', 'b.wav', 'c.wav'];
             renderFavoritesSection();
 
             clearAllFavorites();
 
+            expect(localThis.confirmCalled).toBe(true);
             expect(state.favorites).toEqual([]);
         });
 
-        test('should save to localStorage', () => {
+        test('should not empty favorites when cancelled', () => {
+            window.confirm = () => {
+                localThis.confirmCalled = true;
+                return false;
+            };
+            state.favorites = ['a.wav', 'b.wav', 'c.wav'];
+            renderFavoritesSection();
+
+            clearAllFavorites();
+
+            expect(localThis.confirmCalled).toBe(true);
+            expect(state.favorites).toEqual(['a.wav', 'b.wav', 'c.wav']);
+        });
+
+        test('should save to localStorage when confirmed', () => {
             state.favorites = ['a.wav', 'b.wav'];
             renderFavoritesSection();
 
@@ -437,7 +465,7 @@ describe('Favorites Functions', () => {
             expect(stored).toEqual([]);
         });
 
-        test('should re-render favorites section', () => {
+        test('should re-render favorites section when confirmed', () => {
             state.favorites = ['allies_1_achnoledged.wav'];
             renderFavoritesSection();
 
@@ -448,7 +476,7 @@ describe('Favorites Functions', () => {
             expect(emptyState).not.toBeNull();
         });
 
-        test('should show toast notification', () => {
+        test('should show toast notification when confirmed', () => {
             state.favorites = ['a.wav'];
             renderFavoritesSection();
 
@@ -458,11 +486,14 @@ describe('Favorites Functions', () => {
             expect(toast).not.toBeNull();
         });
 
-        test('should handle empty favorites gracefully', () => {
+        test('should handle empty favorites gracefully without confirm', () => {
+            localThis.confirmCalled = false;
             state.favorites = [];
             renderFavoritesSection();
 
             expect(() => clearAllFavorites()).not.toThrow();
+            // Should not show confirm dialog for empty favorites
+            expect(localThis.confirmCalled).toBe(false);
         });
     });
 

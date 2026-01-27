@@ -159,6 +159,8 @@ export function playSound(button) {
     state.audioPlayer.src = `sounds/${encodedFile}`;
     state.audioPlayer.play().catch(err => {
         console.error('Playback failed:', err);
+        clearPlayingState();
+        showToast('TRANSMISSION FAILED. Check audio settings and retry.', 'error');
     });
 
     // Update state
@@ -169,8 +171,25 @@ export function playSound(button) {
     elements.nowPlayingTitle.textContent = name;
     elements.nowPlaying.classList.add('visible');
 
+    // Announce playback to screen readers
+    announcePlayback(`Playing ${name}`);
+
     // Add to recently played
     addToRecentlyPlayed(file);
+}
+
+// Announce playback status to screen readers
+function announcePlayback(message) {
+    let announcer = document.getElementById('playback-announcer');
+    if (!announcer) {
+        announcer = document.createElement('div');
+        announcer.id = 'playback-announcer';
+        announcer.setAttribute('aria-live', 'polite');
+        announcer.setAttribute('aria-atomic', 'true');
+        announcer.className = 'visually-hidden';
+        document.body.appendChild(announcer);
+    }
+    announcer.textContent = message;
 }
 
 // Stop all sounds

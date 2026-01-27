@@ -9,6 +9,10 @@ import { toggleCategory, scrollToCategory } from './navigation.js';
 import { filterSounds } from './search.js';
 import { toggleMobileMenu, closeMobileMenu } from './mobile.js';
 import { shareSound } from './ui.js';
+import { debounce } from './utils.js';
+
+// Debounced search function (200ms delay for performance)
+const debouncedFilterSounds = debounce(filterSounds, 200);
 
 // Setup event listeners
 export function setupEventListeners() {
@@ -54,13 +58,52 @@ export function setupEventListeners() {
         }
     });
 
-    // Keyboard support for category headers
+    // Keyboard support for interactive elements in content area
     elements.contentArea.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' || e.key === ' ') {
+            // Handle share button keyboard activation
+            const shareBtn = e.target.closest('.share-btn');
+            if (shareBtn) {
+                e.preventDefault();
+                e.stopPropagation();
+                const file = decodeURIComponent(shareBtn.dataset.file);
+                const name = shareBtn.dataset.name;
+                shareSound(file, name);
+                return;
+            }
+
+            // Handle favorite button keyboard activation
+            const favBtn = e.target.closest('.favorite-btn');
+            if (favBtn) {
+                e.preventDefault();
+                e.stopPropagation();
+                const file = decodeURIComponent(favBtn.dataset.file);
+                toggleFavorite(file);
+                return;
+            }
+
+            // Handle sound button keyboard activation
+            const soundBtn = e.target.closest('.sound-btn');
+            if (soundBtn) {
+                e.preventDefault();
+                playSound(soundBtn);
+                return;
+            }
+
+            // Handle category header keyboard activation
             const header = e.target.closest('.category-header');
             if (header) {
                 e.preventDefault();
                 toggleCategory(header.closest('.category-section'));
+                return;
+            }
+
+            // Handle clear favorites button keyboard activation
+            const clearFavBtn = e.target.closest('.btn-clear-favorites');
+            if (clearFavBtn) {
+                e.preventDefault();
+                clearAllFavorites();
+                return;
             }
         }
 
@@ -89,10 +132,10 @@ export function setupEventListeners() {
         }
     });
 
-    // Search input
+    // Search input (debounced for performance)
     elements.searchInput.addEventListener('input', (e) => {
         state.searchTerm = e.target.value.toLowerCase();
-        filterSounds();
+        debouncedFilterSounds();
     });
 
     // Clear search

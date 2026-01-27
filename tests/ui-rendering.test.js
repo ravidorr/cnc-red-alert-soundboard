@@ -354,7 +354,7 @@ describe('UI Rendering', () => {
 
             const toast = document.querySelector('.toast-success');
             expect(toast).not.toBeNull();
-            expect(toast.textContent).toContain('Link acquired');
+            expect(toast.textContent).toContain('LINK ACQUIRED');
         });
 
         test('should show error toast on copy failure', async () => {
@@ -414,7 +414,7 @@ describe('UI Rendering', () => {
 
             const toast = document.querySelector('.toast-success');
             expect(toast).not.toBeNull();
-            expect(toast.textContent).toContain('Intel shared');
+            expect(toast.textContent).toContain('INTEL TRANSMITTED');
         });
 
         test('should share URL when file sharing not supported', async () => {
@@ -441,7 +441,7 @@ describe('UI Rendering', () => {
 
             const toast = document.querySelector('.toast-success');
             expect(toast).not.toBeNull();
-            expect(toast.textContent).toContain('Link transmitted');
+            expect(toast.textContent).toContain('INTEL TRANSMITTED');
         });
 
         test('should use default name when soundName not provided', async () => {

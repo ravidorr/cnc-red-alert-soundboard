@@ -35,6 +35,14 @@
     --footer-height: 40px;
     --sidebar-width: 240px;
     
+    /* Spacing Scale (8px base unit) */
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 16px;
+    --spacing-lg: 24px;
+    --spacing-xl: 32px;
+    --spacing-xxl: 48px;
+    
     /* Effects */
     --glow-green: 0 0 10px rgba(0, 255, 0, 0.5), 0 0 20px rgba(0, 255, 0, 0.3);
     --glow-green-intense: 0 0 10px rgba(0, 255, 0, 0.8), 0 0 30px rgba(0, 255, 0, 0.5), 0 0 50px rgba(0, 255, 0, 0.3);

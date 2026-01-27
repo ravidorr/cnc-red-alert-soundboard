@@ -86,12 +86,16 @@ describe('Recently Played Functions', () => {
             renderCategories();
         });
 
-        test('should not render when no recently played', () => {
+        test('should render empty state when no recently played', () => {
             state.recentlyPlayed = [];
             renderRecentlyPlayedSection();
 
             const section = document.getElementById('category-recent');
-            expect(section).toBeNull();
+            expect(section).not.toBeNull();
+            // Should show empty state message
+            const emptyState = section.querySelector('.favorites-empty');
+            expect(emptyState).not.toBeNull();
+            expect(emptyState.textContent).toContain('NO RECENT ACTIVITY');
         });
 
         test('should render recently played section', () => {
@@ -120,12 +124,15 @@ describe('Recently Played Functions', () => {
             expect(buttons.length).toBe(1);
         });
 
-        test('should not render if all sounds are invalid', () => {
+        test('should render empty state if all sounds are invalid', () => {
             state.recentlyPlayed = ['nonexistent1.wav', 'nonexistent2.wav'];
             renderRecentlyPlayedSection();
 
             const section = document.getElementById('category-recent');
-            expect(section).toBeNull();
+            expect(section).not.toBeNull();
+            // Should show empty state since no valid sounds
+            const emptyState = section.querySelector('.favorites-empty');
+            expect(emptyState).not.toBeNull();
         });
 
         test('should insert after favorites section if exists', () => {

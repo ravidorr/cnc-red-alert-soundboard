@@ -50,7 +50,7 @@ export function renderCategories() {
                         data-file="${encodeURIComponent(sound.file)}" 
                         data-name="${sound.name}"
                         data-category="${categoryId}"
-                        title="File: ${sound.file}">
+                        title="Play ${sound.name}">
                     ${sound.name}
                 </button>
                 <button class="share-btn" 
@@ -135,7 +135,7 @@ export function renderFavoritesSection() {
                     data-file="${encodeURIComponent(sound.file)}" 
                     data-name="${sound.name}"
                     data-category="favorites"
-                    title="File: ${sound.file}">
+                    title="Play ${sound.name}">
                 ${sound.name}
             </button>
             <button class="share-btn" 
@@ -158,8 +158,8 @@ export function renderFavoritesSection() {
     const showDragTooltip = favoriteSounds.length >= 2 && !localStorage.getItem('dragTooltipSeen');
     const dragTooltipHtml = showDragTooltip ? `
         <div class="drag-tooltip" id="drag-tooltip">
-            <span>Tip: Drag sounds to reorder, or use arrow keys when focused</span>
-            <button class="drag-tooltip-dismiss" id="drag-tooltip-dismiss" aria-label="Dismiss tip">Got it</button>
+            <span>TIP: DRAG SOUNDS TO REORDER, OR USE ARROW KEYS WHEN FOCUSED</span>
+            <button class="drag-tooltip-dismiss" id="drag-tooltip-dismiss" aria-label="Dismiss reordering tip">ACKNOWLEDGED</button>
         </div>
     ` : '';
 
@@ -229,7 +229,7 @@ export function renderPopularSection() {
                     data-file="${encodeURIComponent(sound.file)}" 
                     data-name="${sound.name}"
                     data-category="popular"
-                    title="File: ${sound.file}">
+                    title="Play ${sound.name}">
                 ${sound.name}
             </button>
             <button class="share-btn" 
@@ -288,10 +288,19 @@ export function updateStats() {
  * @param {string} type - Type: 'info', 'success', or 'error'
  * @param {number} duration - How long to show the toast in ms (default 7s to match CSS)
  */
+const MAX_TOASTS = 3;
+
 export function showToast(message, type = 'info', duration = 7000) {
     if (!elements.toastContainer) {
         return;
     }
+
+    // Limit toast stack to MAX_TOASTS - remove oldest if at limit
+    const existingToasts = elements.toastContainer.querySelectorAll('.toast');
+    if (existingToasts.length >= MAX_TOASTS) {
+        existingToasts[0].remove();
+    }
+
     const toast = document.createElement('div');
     toast.className = `toast toast-${type}`;
     toast.setAttribute('role', 'alert');
@@ -391,7 +400,7 @@ export async function shareSound(soundFile, soundName) {
                     text: `Check out this C&C Red Alert sound: ${displayName}`,
                     files: [file],
                 });
-                showToast('Intel shared successfully', 'success');
+                showToast('INTEL TRANSMITTED', 'success');
                 return;
             }
 
@@ -401,7 +410,7 @@ export async function shareSound(soundFile, soundName) {
                 text: `Check out this C&C Red Alert sound: ${displayName}`,
                 url: pageUrl,
             });
-            showToast('Link transmitted', 'success');
+            showToast('INTEL TRANSMITTED', 'success');
             return;
         } catch (err) {
             // User cancelled or share failed - try clipboard fallback
@@ -414,7 +423,7 @@ export async function shareSound(soundFile, soundName) {
     // Fallback: copy link to clipboard
     try {
         await navigator.clipboard.writeText(pageUrl);
-        showToast('Link acquired', 'success');
+        showToast('LINK ACQUIRED', 'success');
     } catch {
         showToast('SHARE FAILED. Try again.', 'error');
     }

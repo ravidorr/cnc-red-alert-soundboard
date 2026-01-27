@@ -34,9 +34,9 @@
     border: 0;
 }
 
-/* Focus Styles for Accessibility */
+/* Focus Styles for Accessibility - 3px for better visibility */
 .sound-btn:focus {
-    outline: 2px solid var(--green-primary);
+    outline: 3px solid var(--green-primary);
     outline-offset: 2px;
 }
 
@@ -45,7 +45,7 @@
 }
 
 .sound-btn:focus-visible {
-    outline: 2px solid var(--green-primary);
+    outline: 3px solid var(--green-primary);
     outline-offset: 2px;
 }
 
@@ -56,12 +56,12 @@
 .btn-install:focus-visible,
 .btn-dismiss:focus-visible,
 .btn-icon:focus-visible {
-    outline: 2px solid var(--green-primary);
+    outline: 3px solid var(--green-primary);
     outline-offset: 2px;
 }
 
 .category-header:focus-visible {
-    outline: 2px solid var(--green-primary);
+    outline: 3px solid var(--green-primary);
     outline-offset: -2px;
 }
 

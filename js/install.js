@@ -162,14 +162,14 @@ export function cacheAllSoundsForOffline() {
         return;
     }
 
-    showToast('Downloading sounds for offline use...', 'info');
+    showToast('CACHING SOUNDS FOR OFFLINE OPERATIONS...', 'info');
 
     const messageChannel = new MessageChannel();
     messageChannel.port1.onmessage = (event) => {
         if (event.data && event.data.success) {
-            showToast('All sounds ready for offline use!', 'success');
+            showToast('ALL SOUNDS CACHED AND READY', 'success');
         } else {
-            showToast('Some sounds could not be cached', 'error');
+            showToast('CACHE INCOMPLETE. SOME SOUNDS UNAVAILABLE OFFLINE.', 'error');
         }
     };
 

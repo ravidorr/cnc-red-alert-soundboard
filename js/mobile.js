@@ -27,13 +27,23 @@ export function openMobileMenu() {
     }
     if (elements.mobileMenuOverlay) {
         elements.mobileMenuOverlay.classList.add('visible');
+        // Make overlay keyboard-accessible
+        elements.mobileMenuOverlay.setAttribute('tabindex', '0');
+        elements.mobileMenuOverlay.setAttribute('role', 'button');
+        elements.mobileMenuOverlay.setAttribute('aria-label', 'Close categories menu');
     }
     if (elements.mobileMenuToggle) {
         elements.mobileMenuToggle.setAttribute('aria-expanded', 'true');
+        elements.mobileMenuToggle.setAttribute('aria-label', 'Close categories menu');
     }
 
     // Add focus trap event listener
     document.addEventListener('keydown', handleMobileMenuKeydown);
+
+    // Add direct keyboard handler to overlay for Enter/Space
+    if (elements.mobileMenuOverlay) {
+        elements.mobileMenuOverlay.addEventListener('keydown', handleOverlayKeydown);
+    }
 
     // Focus first focusable element in sidebar
     setTimeout(() => {
@@ -44,6 +54,14 @@ export function openMobileMenu() {
     }, 100);
 }
 
+// Handle overlay keydown for Enter/Space
+function handleOverlayKeydown(e) {
+    if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        closeMobileMenu();
+    }
+}
+
 export function closeMobileMenu() {
     if (elements.sidebar) {
         elements.sidebar.classList.remove('open');
@@ -51,9 +69,16 @@ export function closeMobileMenu() {
     }
     if (elements.mobileMenuOverlay) {
         elements.mobileMenuOverlay.classList.remove('visible');
+        // Remove keyboard accessibility attributes
+        elements.mobileMenuOverlay.removeAttribute('tabindex');
+        elements.mobileMenuOverlay.removeAttribute('role');
+        elements.mobileMenuOverlay.removeAttribute('aria-label');
+        // Remove overlay keydown handler
+        elements.mobileMenuOverlay.removeEventListener('keydown', handleOverlayKeydown);
     }
     if (elements.mobileMenuToggle) {
         elements.mobileMenuToggle.setAttribute('aria-expanded', 'false');
+        elements.mobileMenuToggle.setAttribute('aria-label', 'Open categories menu');
     }
 
     // Remove focus trap event listener
