@@ -36,11 +36,16 @@ A Progressive Web App (PWA) soundboard featuring 190 classic Command & Conquer R
 - **Screen Reader Support** - ARIA landmarks, labels, and live regions
 - **Skip Link** - Jump directly to main content
 - **Reduced Motion** - Respects `prefers-reduced-motion` preference
-- **Color Contrast** - Meets WCAG AA contrast requirements
+- **Color Contrast** - Meets WCAG AA contrast requirements (5.2:1+ minimum)
+- **High Contrast Mode** - Supports Windows High Contrast Mode
+- **Touch Targets** - 44px minimum with proper spacing between targets
+- **Category Persistence** - Collapsed categories are remembered across sessions
 
 ### User Feedback
-- **Toast Notifications** - Visual feedback for actions (favorites, errors, sharing)
+- **Toast Notifications** - Dismissible notifications with keyboard support
 - **Now Playing Indicator** - Shows currently playing sound
+- **First-Time Onboarding** - Helpful tips for new users
+- **Themed Microcopy** - Military-style feedback messages matching C&C aesthetic
 
 ## Local Development
 
@@ -79,7 +84,7 @@ cnc-red-alert-soundboard/
 ├── js/
 │   └── main.js         # Application entry point (modular ES6+)
 ├── tests/
-│   ├── *.test.js       # Unit tests (390 tests, 99%+ coverage)
+│   ├── *.test.js       # Unit tests (416 tests, 97%+ coverage)
 │   └── helpers.js      # Jest test helpers
 ├── scripts/
 │   └── rename_sounds.js # Sound file normalization utility
@@ -132,7 +137,7 @@ The following checks run automatically before each commit:
 
 ### Test Coverage
 
-Current coverage: **99%+** (390 tests)
+Current coverage: **97%+** (416 tests)
 
 Coverage thresholds enforced by pre-commit hooks:
 - Statements: 90%
@@ -163,8 +168,12 @@ Coverage thresholds enforced by pre-commit hooks:
 |-----|--------|
 | `Tab` | Navigate between interactive elements |
 | `Enter` / `Space` | Activate buttons, toggle categories |
-| `Escape` | Stop all sounds, close mobile menu |
+| `Escape` | Stop all sounds, close modals/menus |
 | `Ctrl/Cmd + F` | Focus search input |
+| `Space` | Replay last played sound |
+| `1` - `9` | Play corresponding favorite sound |
+| `Arrow Up/Down` | Reorder favorites (when focused) |
+| `?` | Show keyboard shortcuts help |
 
 ### Skip Link
 

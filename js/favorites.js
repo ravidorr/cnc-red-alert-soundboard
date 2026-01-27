@@ -36,7 +36,7 @@ export function clearAllFavorites() {
     renderNavigation();
     updateFavoriteButtons();
     updateStats();
-    showToast('All favorites cleared', 'info');
+    showToast('All targets cleared', 'info');
 }
 
 // Toggle a sound as favorite
@@ -49,13 +49,13 @@ export function toggleFavorite(soundFile) {
     updateFavoriteButtons();
     updateStats();
 
-    // Show toast feedback
+    // Show toast feedback with themed copy
     const sound = SOUNDS.find(s => s.file === soundFile);
     const soundName = sound ? sound.name : 'Sound';
     if (wasAdded) {
-        showToast(`Added ${soundName} to favorites`, 'success');
+        showToast(`Target marked: ${soundName}`, 'success');
     } else {
-        showToast(`Removed ${soundName} from favorites`, 'info');
+        showToast(`Target unmarked: ${soundName}`, 'info');
     }
 }
 
@@ -161,12 +161,21 @@ export function setupFavoritesDragAndDrop() {
     const wrappers = favoritesSection.querySelectorAll('.sound-btn-wrapper[draggable="true"]');
     let draggedElement = null;
 
-    wrappers.forEach(wrapper => {
+    wrappers.forEach((wrapper) => {
+        // Add ARIA attributes for drag and drop accessibility
+        wrapper.setAttribute('aria-roledescription', 'sortable item');
+        wrapper.setAttribute('aria-describedby', 'favorites-drag-instructions');
+
         wrapper.addEventListener('dragstart', (e) => {
             draggedElement = wrapper;
             wrapper.classList.add('dragging');
             e.dataTransfer.effectAllowed = 'move';
             e.dataTransfer.setData('text/plain', wrapper.dataset.file);
+
+            // Announce drag start
+            const soundBtn = wrapper.querySelector('.sound-btn');
+            const soundName = soundBtn ? soundBtn.dataset.name : 'Sound';
+            announceDragAction(`Dragging ${soundName}. Drop on another favorite to reorder.`);
         });
 
         wrapper.addEventListener('dragend', () => {
@@ -195,7 +204,42 @@ export function setupFavoritesDragAndDrop() {
                 const draggedFile = decodeURIComponent(draggedElement.dataset.file);
                 const targetFile = decodeURIComponent(wrapper.dataset.file);
                 reorderFavorites(draggedFile, targetFile);
+
+                // Announce drop completion
+                const draggedBtn = draggedElement.querySelector('.sound-btn');
+                const draggedName = draggedBtn ? draggedBtn.dataset.name : 'Sound';
+                announceDragAction(`${draggedName} moved to new position.`);
             }
         });
     });
+
+    // Add hidden instructions element for screen readers
+    ensureDragInstructions();
+}
+
+// Ensure drag instructions element exists
+function ensureDragInstructions() {
+    if (document.getElementById('favorites-drag-instructions')) {
+        return;
+    }
+
+    const instructions = document.createElement('div');
+    instructions.id = 'favorites-drag-instructions';
+    instructions.className = 'visually-hidden';
+    instructions.textContent = 'Use arrow keys to reorder when focused, or drag and drop with mouse.';
+    document.body.appendChild(instructions);
+}
+
+// Announce drag action to screen readers
+function announceDragAction(message) {
+    let announcer = document.getElementById('drag-action-announcer');
+    if (!announcer) {
+        announcer = document.createElement('div');
+        announcer.id = 'drag-action-announcer';
+        announcer.setAttribute('aria-live', 'assertive');
+        announcer.setAttribute('aria-atomic', 'true');
+        announcer.className = 'visually-hidden';
+        document.body.appendChild(announcer);
+    }
+    announcer.textContent = message;
 }

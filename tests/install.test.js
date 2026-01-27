@@ -518,7 +518,7 @@ describe('Install Functions', () => {
             // Check that info toast was shown
             const toasts = document.querySelectorAll('.toast-info');
             expect(toasts.length).toBeGreaterThan(0);
-            expect(toasts[0].textContent).toBe('Downloading sounds for offline use...');
+            expect(toasts[0].textContent).toContain('Downloading sounds for offline use...');
         });
 
         test('should show success toast when caching completes', () => {
@@ -547,7 +547,7 @@ describe('Install Functions', () => {
 
             const successToasts = document.querySelectorAll('.toast-success');
             expect(successToasts.length).toBeGreaterThan(0);
-            expect(successToasts[0].textContent).toBe('All sounds ready for offline use!');
+            expect(successToasts[0].textContent).toContain('All sounds ready for offline use!');
 
             // Restore original MessageChannel
             global.MessageChannel = OriginalMessageChannel;
@@ -579,7 +579,7 @@ describe('Install Functions', () => {
 
             const errorToasts = document.querySelectorAll('.toast-error');
             expect(errorToasts.length).toBeGreaterThan(0);
-            expect(errorToasts[0].textContent).toBe('Some sounds could not be cached');
+            expect(errorToasts[0].textContent).toContain('Some sounds could not be cached');
 
             // Restore original MessageChannel
             global.MessageChannel = OriginalMessageChannel;

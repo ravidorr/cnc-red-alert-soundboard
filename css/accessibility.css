@@ -83,3 +83,77 @@
         animation: none;
     }
 }
+
+/* High Contrast Mode Support */
+@media (forced-colors: active) {
+    /* Ensure borders are visible */
+    .sound-btn,
+    .nav-item,
+    .category-section,
+    .toast,
+    .install-prompt-content,
+    .shortcuts-modal-content,
+    .onboarding-content {
+        border: 2px solid CanvasText;
+    }
+
+    /* Ensure focus indicators are visible */
+    .sound-btn:focus,
+    .nav-item:focus,
+    .btn-action:focus,
+    .btn-install:focus,
+    .btn-dismiss:focus,
+    .favorite-btn:focus,
+    .share-btn:focus {
+        outline: 3px solid Highlight;
+        outline-offset: 2px;
+    }
+
+    /* Playing state indicator */
+    .sound-btn.playing {
+        border: 3px solid Highlight;
+        background: Canvas;
+    }
+
+    /* Favorite indicator */
+    .favorite-btn.is-favorite {
+        color: Highlight;
+    }
+
+    /* Category headers */
+    .category-header {
+        border-bottom: 2px solid CanvasText;
+    }
+
+    /* Toast types */
+    .toast-success {
+        border-color: Highlight;
+    }
+
+    .toast-error {
+        border-color: LinkText;
+    }
+
+    /* Skip link visibility */
+    .skip-link:focus {
+        background: Highlight;
+        color: HighlightText;
+    }
+
+    /* Buttons and interactive elements */
+    .btn-action,
+    .btn-install,
+    .btn-dismiss,
+    .btn-clear-favorites,
+    .onboarding-dismiss {
+        border: 2px solid ButtonText;
+        background: ButtonFace;
+        color: ButtonText;
+    }
+
+    .btn-action:hover,
+    .btn-install:hover,
+    .btn-dismiss:hover {
+        border-color: Highlight;
+    }
+}

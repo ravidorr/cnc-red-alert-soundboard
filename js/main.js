@@ -3,12 +3,13 @@
 // ============================================
 
 import { cacheElements, renderCategories, renderFavoritesSection, renderPopularSection, updateStats } from './ui.js';
-import { renderNavigation } from './navigation.js';
+import { renderNavigation, applyCollapsedStates } from './navigation.js';
 import { renderRecentlyPlayedSection, loadRecentlyPlayed } from './recently-played.js';
 import { loadFavorites } from './favorites.js';
 import { setupAudioPlayer, checkUrlHash } from './audio.js';
 import { setupInstallPrompt, registerServiceWorker } from './install.js';
 import { setupEventListeners } from './events.js';
+import { showOnboardingTooltip } from './onboarding.js';
 
 // Initialize the application
 function init() {
@@ -22,10 +23,16 @@ function init() {
     renderRecentlyPlayedSection();
     renderPopularSection();
     renderNavigation();
+    applyCollapsedStates(); // Apply saved collapse states
     setupEventListeners();
     updateStats();
     registerServiceWorker();
     checkUrlHash();
+
+    // Show onboarding tooltip for first-time users (after a short delay)
+    setTimeout(() => {
+        showOnboardingTooltip();
+    }, 1500);
 }
 
 // Initialize when DOM is ready
@@ -48,5 +55,6 @@ export * from './search.js';
 export * from './mobile.js';
 export * from './install.js';
 export * from './events.js';
+export * from './onboarding.js';
 
 export { init };

@@ -282,10 +282,10 @@
     }
 
     .sound-btn-wrapper .sound-btn {
-        padding-right: 56px;
+        padding-right: 96px; /* 44px favorite + 4px gap + 44px share + 4px padding */
     }
 
-    /* WCAG 2.1 AA: 44px minimum touch targets for mobile action buttons */
+    /* WCAG 2.1 AA: 44px minimum touch targets for mobile action buttons with spacing */
     .share-btn,
     .favorite-btn {
         padding: 8px;
@@ -294,7 +294,7 @@
     }
 
     .share-btn {
-        right: 44px;
+        right: 48px; /* 44px favorite + 4px gap */
     }
 
     .share-btn svg {
@@ -305,11 +305,6 @@
     .favorite-btn {
         right: 0;
         font-size: 1rem;
-    }
-
-    /* Adjust sound button padding for larger action buttons */
-    .sound-btn-wrapper .sound-btn {
-        padding-right: 90px;
     }
 }
 

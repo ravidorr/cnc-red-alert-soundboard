@@ -76,7 +76,7 @@ describe('Favorites Functions', () => {
 
             const toast = document.querySelector('.toast');
             expect(toast).not.toBeNull();
-            expect(toast.textContent).toContain('Added');
+            expect(toast.textContent).toContain('Target marked');
         });
 
         test('should show toast when removing valid sound', () => {
@@ -85,7 +85,7 @@ describe('Favorites Functions', () => {
 
             const toast = document.querySelector('.toast');
             expect(toast).not.toBeNull();
-            expect(toast.textContent).toContain('Removed');
+            expect(toast.textContent).toContain('Target unmarked');
         });
 
         test('should update navigation count', () => {

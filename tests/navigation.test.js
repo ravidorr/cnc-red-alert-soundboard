@@ -11,6 +11,8 @@ import {
     scrollToCategory,
     createNavHeader,
     renderMobileCategoryChips,
+    loadCollapsedCategories,
+    applyCollapsedStates,
 } from '../js/navigation.js';
 import {
     toggleMobileMenu,
@@ -283,7 +285,7 @@ describe('Navigation Functions', () => {
             expect(elements.sidebar.classList.contains('open')).toBe(false);
         });
 
-        test('should handle Tab when sidebar has no focusable elements', () => {
+        test('should close menu on Tab when sidebar has no focusable elements', () => {
             // Clear sidebar content
             elements.sidebar.innerHTML = '';
             
@@ -293,8 +295,8 @@ describe('Navigation Functions', () => {
             const tabEvent = new KeyboardEvent('keydown', { key: 'Tab', bubbles: true });
             expect(() => document.dispatchEvent(tabEvent)).not.toThrow();
             
-            // Menu should still be open
-            expect(elements.sidebar.classList.contains('open')).toBe(true);
+            // Menu should be closed as a safety measure to prevent keyboard trap
+            expect(elements.sidebar.classList.contains('open')).toBe(false);
         });
     });
 
@@ -468,6 +470,75 @@ describe('Navigation Functions', () => {
             toggleCategory(section);
             const sameAnnouncer = document.getElementById('category-announcer');
             expect(sameAnnouncer).toBe(announcer);
+        });
+    });
+
+    describe('Category Collapse State Persistence', () => {
+        beforeEach(() => {
+            cacheElements();
+            renderCategories();
+            localStorage.clear();
+        });
+
+        test('should save collapsed state when category is collapsed', () => {
+            const section = document.querySelector('.category-section');
+            const categoryId = section.dataset.category;
+
+            toggleCategory(section);
+
+            const savedData = JSON.parse(localStorage.getItem('cnc-collapsed-categories') || '[]');
+            expect(savedData).toContain(categoryId);
+        });
+
+        test('should remove from collapsed when category is expanded', () => {
+            const section = document.querySelector('.category-section');
+            const categoryId = section.dataset.category;
+
+            // First collapse
+            toggleCategory(section);
+            // Then expand
+            toggleCategory(section);
+
+            const savedData = JSON.parse(localStorage.getItem('cnc-collapsed-categories') || '[]');
+            expect(savedData).not.toContain(categoryId);
+        });
+
+        test('loadCollapsedCategories should return empty array if nothing stored', () => {
+            const result = loadCollapsedCategories();
+            expect(Array.isArray(result)).toBe(true);
+            expect(result).toEqual([]);
+        });
+
+        test('loadCollapsedCategories should return stored categories', () => {
+            localStorage.setItem('cnc-collapsed-categories', JSON.stringify(['allies', 'soviets']));
+
+            const result = loadCollapsedCategories();
+            expect(result).toEqual(['allies', 'soviets']);
+        });
+
+        test('applyCollapsedStates should collapse stored categories', () => {
+            localStorage.setItem('cnc-collapsed-categories', JSON.stringify(['allies']));
+
+            applyCollapsedStates();
+
+            const section = document.getElementById('category-allies');
+            expect(section.classList.contains('collapsed')).toBe(true);
+        });
+
+        test('applyCollapsedStates should update aria-expanded', () => {
+            localStorage.setItem('cnc-collapsed-categories', JSON.stringify(['allies']));
+
+            applyCollapsedStates();
+
+            const section = document.getElementById('category-allies');
+            const header = section.querySelector('.category-header');
+            expect(header.getAttribute('aria-expanded')).toBe('false');
+        });
+
+        test('applyCollapsedStates should handle nonexistent categories gracefully', () => {
+            localStorage.setItem('cnc-collapsed-categories', JSON.stringify(['nonexistent']));
+
+            expect(() => applyCollapsedStates()).not.toThrow();
         });
     });
 

@@ -72,7 +72,7 @@ export function renderCategories() {
 
         return `
             <section class="category-section" id="category-${categoryId}" data-category="${categoryId}">
-                <div class="category-header" tabindex="0" role="button" aria-expanded="true">
+                <div class="category-header" tabindex="0" role="button" aria-expanded="true" aria-label="${categoryInfo.name} section, expanded, ${sounds.length} sounds">
                     <div class="category-title">
                         <h2 class="category-name">${categoryInfo.name}</h2>
                         <span class="category-count">(${sounds.length})</span>
@@ -101,7 +101,7 @@ export function renderFavoritesSection() {
     if (state.favorites.length === 0) {
         const emptyHtml = `
             <section class="category-section favorites-section" id="category-favorites" data-category="favorites">
-                <div class="category-header" tabindex="0" role="button" aria-expanded="true">
+                <div class="category-header" tabindex="0" role="button" aria-expanded="true" aria-label="Favorites section, expanded, 0 sounds">
                     <div class="category-title">
                         <h2 class="category-name"><span class="section-icon" aria-hidden="true">&#9733;</span> FAVORITES</h2>
                         <span class="category-count">(0)</span>
@@ -111,9 +111,9 @@ export function renderFavoritesSection() {
                 <div class="category-content" id="category-content-favorites">
                     <div class="favorites-empty">
                         <div class="favorites-empty-icon" aria-hidden="true">&#9734;</div>
-                        <div class="favorites-empty-title">NO FAVORITES YET</div>
+                        <div class="favorites-empty-title">AWAITING ORDERS</div>
                         <div class="favorites-empty-text">
-                            Click the star on any sound to add it here.
+                            Mark priority targets with the star icon for rapid deployment.
                         </div>
                     </div>
                 </div>
@@ -165,7 +165,7 @@ export function renderFavoritesSection() {
 
     const sectionHtml = `
         <section class="category-section favorites-section" id="category-favorites" data-category="favorites">
-            <div class="category-header" tabindex="0" role="button" aria-expanded="true">
+            <div class="category-header" tabindex="0" role="button" aria-expanded="true" aria-label="Favorites section, expanded, ${favoriteSounds.length} sounds">
                 <div class="category-title">
                     <h2 class="category-name"><span class="section-icon" aria-hidden="true">&#9733;</span> FAVORITES</h2>
                     <span class="category-count">(${favoriteSounds.length})</span>
@@ -251,7 +251,7 @@ export function renderPopularSection() {
 
     const sectionHtml = `
         <section class="category-section popular-section" id="category-popular" data-category="popular">
-            <div class="category-header" tabindex="0" role="button" aria-expanded="true">
+            <div class="category-header" tabindex="0" role="button" aria-expanded="true" aria-label="Popular Sounds section, expanded, ${popularSounds.length} sounds">
                 <div class="category-title">
                     <h2 class="category-name"><span class="section-icon" aria-hidden="true">&#128293;</span> POPULAR SOUNDS</h2>
                     <span class="category-count">(${popularSounds.length})</span>
@@ -294,13 +294,57 @@ export function showToast(message, type = 'info', duration = 7000) {
     }
     const toast = document.createElement('div');
     toast.className = `toast toast-${type}`;
-    toast.textContent = message;
+    toast.setAttribute('role', 'alert');
+    toast.setAttribute('aria-live', 'polite');
+
+    // Create message span
+    const messageSpan = document.createElement('span');
+    messageSpan.className = 'toast-message';
+    messageSpan.textContent = message;
+    toast.appendChild(messageSpan);
+
+    // Create dismiss button for keyboard accessibility
+    const dismissBtn = document.createElement('button');
+    dismissBtn.className = 'toast-dismiss';
+    dismissBtn.setAttribute('aria-label', 'Dismiss notification');
+    dismissBtn.innerHTML = '&times;';
+    dismissBtn.addEventListener('click', () => {
+        if (toast.parentNode) {
+            toast.remove();
+        }
+    });
+    toast.appendChild(dismissBtn);
+
     elements.toastContainer.appendChild(toast);
-    setTimeout(() => {
+
+    // Store timeout ID so we can cancel on hover
+    let timeoutId = setTimeout(() => {
         if (toast.parentNode) {
             toast.remove();
         }
     }, duration);
+
+    // Pause timer on hover/focus for accessibility
+    toast.addEventListener('mouseenter', () => {
+        clearTimeout(timeoutId);
+    });
+    toast.addEventListener('mouseleave', () => {
+        timeoutId = setTimeout(() => {
+            if (toast.parentNode) {
+                toast.remove();
+            }
+        }, 2000); // Give extra time after hover
+    });
+    toast.addEventListener('focusin', () => {
+        clearTimeout(timeoutId);
+    });
+    toast.addEventListener('focusout', () => {
+        timeoutId = setTimeout(() => {
+            if (toast.parentNode) {
+                toast.remove();
+            }
+        }, 2000);
+    });
 }
 
 // Show search empty state
@@ -347,7 +391,7 @@ export async function shareSound(soundFile, soundName) {
                     text: `Check out this C&C Red Alert sound: ${displayName}`,
                     files: [file],
                 });
-                showToast('Sound shared!', 'success');
+                showToast('Intel shared successfully', 'success');
                 return;
             }
 
@@ -357,7 +401,7 @@ export async function shareSound(soundFile, soundName) {
                 text: `Check out this C&C Red Alert sound: ${displayName}`,
                 url: pageUrl,
             });
-            showToast('Link shared!', 'success');
+            showToast('Link transmitted', 'success');
             return;
         } catch (err) {
             // User cancelled or share failed - try clipboard fallback
@@ -370,8 +414,8 @@ export async function shareSound(soundFile, soundName) {
     // Fallback: copy link to clipboard
     try {
         await navigator.clipboard.writeText(pageUrl);
-        showToast('Link copied to clipboard', 'success');
+        showToast('Link acquired', 'success');
     } catch {
-        showToast('Could not share sound', 'error');
+        showToast('SHARE FAILED. Try again.', 'error');
     }
 }

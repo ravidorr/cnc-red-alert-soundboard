@@ -29,7 +29,7 @@ export function setupAudioPlayer() {
     state.audioPlayer.addEventListener('error', (e) => {
         console.error('Audio error:', e);
         clearPlayingState();
-        showToast('Sound couldn\'t play. Check your connection and try again.', 'error');
+        showToast('TRANSMISSION FAILED. Check connection and retry.', 'error');
     });
 
     // Setup volume control
@@ -138,7 +138,7 @@ function updateVolumeIcon(volume) {
 export function playSound(button) {
     // Don't play if muted
     if (state.isMuted) {
-        showToast('Unmute to play sounds', 'info');
+        showToast('AUDIO OFFLINE. Unmute to proceed.', 'info');
         return;
     }
 
@@ -194,7 +194,7 @@ export function clearPlayingState() {
 export function playRandomSound() {
     // Don't play if muted
     if (state.isMuted) {
-        showToast('Unmute to play sounds', 'info');
+        showToast('AUDIO OFFLINE. Unmute to proceed.', 'info');
         return;
     }
 
@@ -211,7 +211,7 @@ export function playRandomSound() {
 export function replayLastSound() {
     // Don't play if muted
     if (state.isMuted) {
-        showToast('Unmute to play sounds', 'info');
+        showToast('AUDIO OFFLINE. Unmute to proceed.', 'info');
         return;
     }
 

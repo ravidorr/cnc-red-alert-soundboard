@@ -141,6 +141,32 @@ describe('Accessibility Features', () => {
         });
     });
 
+    describe('Category Header ARIA Labels', () => {
+        beforeEach(() => {
+            cacheElements();
+            renderCategories();
+        });
+
+        test('category headers should have aria-label with section info', () => {
+            const header = document.querySelector('.category-header');
+            const ariaLabel = header.getAttribute('aria-label');
+            expect(ariaLabel).toContain('section');
+            expect(ariaLabel).toContain('expanded');
+            expect(ariaLabel).toContain('sounds');
+        });
+
+        test('favorites section should have aria-label', () => {
+            state.favorites = ['allies_1_achnoledged.wav'];
+            renderFavoritesSection();
+
+            const favSection = document.getElementById('category-favorites');
+            const header = favSection.querySelector('.category-header');
+            const ariaLabel = header.getAttribute('aria-label');
+            expect(ariaLabel).toContain('Favorites');
+            expect(ariaLabel).toContain('expanded');
+        });
+    });
+
     describe('Descriptive ARIA Labels', () => {
         beforeEach(() => {
             cacheElements();

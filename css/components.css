@@ -323,12 +323,12 @@
 }
 
 .sound-btn-wrapper .sound-btn {
-    padding-right: 90px;
+    padding-right: 96px; /* 44px favorite + 4px gap + 44px share + 4px padding */
 }
 
 /* Shared styles for sound action buttons (share, favorite) */
 
-/* WCAG 2.1 AA: 44px minimum touch targets */
+/* WCAG 2.1 AA: 44px minimum touch targets with spacing */
 .share-btn,
 .favorite-btn {
     position: absolute;
@@ -357,9 +357,9 @@
     text-shadow: var(--glow-green);
 }
 
-/* Share button specific styles */
+/* Share button specific styles - positioned with 4px gap from favorite button */
 .share-btn {
-    right: 44px;
+    right: 48px; /* 44px favorite button + 4px gap */
     padding: 8px;
 }
 

@@ -79,6 +79,13 @@ function handleMobileMenuKeydown(e) {
         return;
     }
 
+    // Close on Enter/Space when focused on overlay (keyboard backup for overlay click)
+    if ((e.key === 'Enter' || e.key === ' ') && document.activeElement === elements.mobileMenuOverlay) {
+        e.preventDefault();
+        closeMobileMenu();
+        return;
+    }
+
     // Trap focus on Tab
     if (e.key === 'Tab') {
         const focusableElements = elements.sidebar.querySelectorAll(
@@ -86,6 +93,8 @@ function handleMobileMenuKeydown(e) {
         );
 
         if (focusableElements.length === 0) {
+            // Safety: if no focusable elements, close menu to prevent trap
+            closeMobileMenu();
             return;
         }
 

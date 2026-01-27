@@ -121,7 +121,7 @@ describe('UI Rendering', () => {
             expect(emptyState).not.toBeNull();
         });
 
-        test('favorites empty state should have user-friendly copy', () => {
+        test('favorites empty state should have themed copy', () => {
             state.favorites = [];
             renderFavoritesSection();
 
@@ -129,10 +129,10 @@ describe('UI Rendering', () => {
             const emptyTitle = favSection.querySelector('.favorites-empty-title');
             const emptyText = favSection.querySelector('.favorites-empty-text');
             
-            // Check for updated, user-friendly microcopy
-            expect(emptyTitle.textContent).toBe('NO FAVORITES YET');
-            expect(emptyText.textContent).toContain('Click the star');
-            expect(emptyText.textContent).toContain('add it here');
+            // Check for themed military-style copy
+            expect(emptyTitle.textContent).toBe('AWAITING ORDERS');
+            expect(emptyText.textContent).toContain('priority targets');
+            expect(emptyText.textContent).toContain('star icon');
         });
 
         test('should replace existing favorites section', () => {
@@ -228,7 +228,32 @@ describe('UI Rendering', () => {
 
             const toast = document.querySelector('.toast');
             expect(toast).not.toBeNull();
-            expect(toast.textContent).toBe('Test message');
+            expect(toast.textContent).toContain('Test message');
+        });
+
+        test('toast should have dismiss button', () => {
+            showToast('Test message', 'info');
+
+            const dismissBtn = document.querySelector('.toast-dismiss');
+            expect(dismissBtn).not.toBeNull();
+            expect(dismissBtn.getAttribute('aria-label')).toBe('Dismiss notification');
+        });
+
+        test('clicking dismiss button should remove toast', () => {
+            showToast('Test message', 'info');
+
+            const dismissBtn = document.querySelector('.toast-dismiss');
+            dismissBtn.click();
+
+            const toast = document.querySelector('.toast');
+            expect(toast).toBeNull();
+        });
+
+        test('toast should have role alert', () => {
+            showToast('Test message', 'info');
+
+            const toast = document.querySelector('.toast');
+            expect(toast.getAttribute('role')).toBe('alert');
         });
 
         test('should handle different toast types', () => {
@@ -329,7 +354,7 @@ describe('UI Rendering', () => {
 
             const toast = document.querySelector('.toast-success');
             expect(toast).not.toBeNull();
-            expect(toast.textContent).toContain('clipboard');
+            expect(toast.textContent).toContain('Link acquired');
         });
 
         test('should show error toast on copy failure', async () => {
@@ -389,7 +414,7 @@ describe('UI Rendering', () => {
 
             const toast = document.querySelector('.toast-success');
             expect(toast).not.toBeNull();
-            expect(toast.textContent).toContain('shared');
+            expect(toast.textContent).toContain('Intel shared');
         });
 
         test('should share URL when file sharing not supported', async () => {
@@ -416,7 +441,7 @@ describe('UI Rendering', () => {
 
             const toast = document.querySelector('.toast-success');
             expect(toast).not.toBeNull();
-            expect(toast.textContent).toContain('Link shared');
+            expect(toast.textContent).toContain('Link transmitted');
         });
 
         test('should use default name when soundName not provided', async () => {

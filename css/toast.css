@@ -17,12 +17,50 @@
     background: var(--bg-panel);
     border: 1px solid var(--green-border);
     color: var(--text-primary);
-    padding: 12px 20px;
+    padding: 12px 40px 12px 16px;
     font-family: var(--font-primary);
     font-size: 0.9rem;
     box-shadow: var(--border-glow);
     animation: toastSlideIn 0.3s ease, toastFadeOut 0.3s ease 6.7s forwards;
     pointer-events: auto;
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.toast-message {
+    flex: 1;
+}
+
+.toast-dismiss {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 4px 8px;
+    line-height: 1;
+    transition: color 0.2s ease;
+    min-width: 32px;
+    min-height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.toast-dismiss:hover,
+.toast-dismiss:focus {
+    color: var(--green-primary);
+}
+
+.toast-dismiss:focus-visible {
+    outline: 2px solid var(--green-primary);
+    outline-offset: 2px;
 }
 
 /* Pause animation on hover for accessibility */

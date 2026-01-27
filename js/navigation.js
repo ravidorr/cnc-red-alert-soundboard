@@ -6,6 +6,8 @@ import { SOUNDS, CATEGORIES } from './constants.js';
 import { state, elements } from './state.js';
 import { getSortedCategories, getSoundsByCategory, calculateScrollOffset } from './utils.js';
 
+const COLLAPSED_CATEGORIES_KEY = 'cnc-collapsed-categories';
+
 // Render navigation sidebar
 export function renderNavigation() {
     const sortedCategories = getSortedCategories(CATEGORIES);
@@ -98,17 +100,88 @@ export function toggleCategory(section) {
     section.classList.toggle('collapsed');
     const header = section.querySelector('.category-header');
     const isExpanded = !section.classList.contains('collapsed');
-    if (header) {
+    const categoryName = section.querySelector('.category-name');
+    const categoryCount = section.querySelector('.category-count');
+    const categoryId = section.dataset.category;
+
+    if (header && categoryName) {
+        const name = categoryName.textContent.trim();
+        const count = categoryCount ? categoryCount.textContent.replace(/[()]/g, '') : '0';
+        const stateText = isExpanded ? 'expanded' : 'collapsed';
         header.setAttribute('aria-expanded', isExpanded.toString());
+        header.setAttribute('aria-label', `${name} section, ${stateText}, ${count} sounds`);
+
+        // Announce state change to screen readers
+        announceToScreenReader(`${name} ${stateText}`);
     }
 
-    // Announce state change to screen readers
-    const categoryName = section.querySelector('.category-name');
-    if (categoryName) {
-        const name = categoryName.textContent;
-        const state = isExpanded ? 'expanded' : 'collapsed';
-        announceToScreenReader(`${name} ${state}`);
+    // Persist collapse state
+    if (categoryId) {
+        saveCollapseState(categoryId, !isExpanded);
     }
+}
+
+/**
+ * Load collapsed categories from localStorage
+ * @returns {string[]} Array of collapsed category IDs
+ */
+export function loadCollapsedCategories() {
+    try {
+        const stored = localStorage.getItem(COLLAPSED_CATEGORIES_KEY);
+        if (stored) {
+            return JSON.parse(stored);
+        }
+    } catch (e) {
+        console.error('Error loading collapsed categories:', e);
+    }
+    return [];
+}
+
+/**
+ * Save collapse state for a category
+ * @param {string} categoryId - Category ID
+ * @param {boolean} isCollapsed - Whether the category is collapsed
+ */
+function saveCollapseState(categoryId, isCollapsed) {
+    try {
+        const collapsed = loadCollapsedCategories();
+        const index = collapsed.indexOf(categoryId);
+
+        if (isCollapsed && index === -1) {
+            collapsed.push(categoryId);
+        } else if (!isCollapsed && index !== -1) {
+            collapsed.splice(index, 1);
+        }
+
+        localStorage.setItem(COLLAPSED_CATEGORIES_KEY, JSON.stringify(collapsed));
+    } catch (e) {
+        console.error('Error saving collapse state:', e);
+    }
+}
+
+/**
+ * Apply saved collapse states to all categories
+ */
+export function applyCollapsedStates() {
+    const collapsed = loadCollapsedCategories();
+
+    collapsed.forEach(categoryId => {
+        const section = document.getElementById(`category-${categoryId}`);
+        if (section && !section.classList.contains('collapsed')) {
+            section.classList.add('collapsed');
+            const header = section.querySelector('.category-header');
+            if (header) {
+                header.setAttribute('aria-expanded', 'false');
+                const categoryName = section.querySelector('.category-name');
+                const categoryCount = section.querySelector('.category-count');
+                if (categoryName) {
+                    const name = categoryName.textContent.trim();
+                    const count = categoryCount ? categoryCount.textContent.replace(/[()]/g, '') : '0';
+                    header.setAttribute('aria-label', `${name} section, collapsed, ${count} sounds`);
+                }
+            }
+        }
+    });
 }
 
 // Announce message to screen readers

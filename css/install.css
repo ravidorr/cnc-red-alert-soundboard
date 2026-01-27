@@ -90,3 +90,113 @@
     border-color: var(--text-secondary);
     color: var(--text-secondary);
 }
+
+/* Onboarding Tooltip */
+.onboarding-tooltip {
+    position: fixed;
+    top: calc(var(--header-height) + 20px);
+    right: 20px;
+    z-index: 1500;
+    animation: onboardingSlideIn 0.3s ease;
+}
+
+.onboarding-tooltip.hiding {
+    animation: onboardingSlideOut 0.3s ease forwards;
+}
+
+.onboarding-content {
+    background: var(--bg-panel);
+    border: 2px solid var(--green-primary);
+    box-shadow: var(--glow-green-intense);
+    padding: 20px 24px;
+    max-width: 320px;
+}
+
+.onboarding-title {
+    font-size: 1.1rem;
+    color: var(--green-primary);
+    text-shadow: var(--glow-green);
+    letter-spacing: 2px;
+    margin-bottom: 12px;
+}
+
+.onboarding-tips {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 16px;
+}
+
+.onboarding-tips li {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--green-darker);
+}
+
+.onboarding-tips li:last-child {
+    border-bottom: none;
+}
+
+.onboarding-key {
+    color: var(--green-primary);
+    font-weight: bold;
+}
+
+.onboarding-dismiss {
+    background: var(--green-dark);
+    border: 1px solid var(--green-primary);
+    color: var(--green-primary);
+    font-family: var(--font-primary);
+    font-size: 0.9rem;
+    padding: 8px 16px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    letter-spacing: 1px;
+    width: 100%;
+}
+
+.onboarding-dismiss:hover {
+    background: var(--green-primary);
+    color: var(--bg-primary);
+}
+
+.onboarding-dismiss:focus-visible {
+    outline: 2px solid var(--green-primary);
+    outline-offset: 2px;
+}
+
+@keyframes onboardingSlideIn {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes onboardingSlideOut {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+}
+
+/* Mobile positioning */
+@media (max-width: 768px) {
+    .onboarding-tooltip {
+        top: auto;
+        bottom: calc(var(--footer-height) + 20px);
+        right: 10px;
+        left: 10px;
+    }
+
+    .onboarding-content {
+        max-width: none;
+    }
+}
