@@ -65,7 +65,7 @@ export function renderCategories() {
                 <button class="favorite-btn ${isFav ? 'is-favorite' : ''}" 
                         data-file="${encodeURIComponent(sound.file)}"
                         aria-label="${favAriaLabel}"
-                        title="${isFav ? 'Remove from favorites' : 'Add to favorites'}">${isFav ? '&#9733;' : '&#9734;'}</button>
+                        title="${isFav ? 'Remove from favorites' : 'Add to favorites'}"><span aria-hidden="true">${isFav ? '&#9733;' : '&#9734;'}</span></button>
             </div>
         `;
         }).join('');
@@ -103,17 +103,17 @@ export function renderFavoritesSection() {
             <section class="category-section favorites-section" id="category-favorites" data-category="favorites">
                 <div class="category-header" tabindex="0" role="button" aria-expanded="true">
                     <div class="category-title">
-                        <h2 class="category-name">FAVORITES</h2>
+                        <h2 class="category-name"><span class="section-icon" aria-hidden="true">&#9733;</span> FAVORITES</h2>
                         <span class="category-count">(0)</span>
                     </div>
                     <span class="category-toggle" aria-hidden="true">&#9660;</span>
                 </div>
                 <div class="category-content" id="category-content-favorites">
                     <div class="favorites-empty">
-                        <div class="favorites-empty-icon">&#9734;</div>
-                        <div class="favorites-empty-title">No Favorites Yet</div>
+                        <div class="favorites-empty-icon" aria-hidden="true">&#9734;</div>
+                        <div class="favorites-empty-title">NO TARGETS MARKED</div>
                         <div class="favorites-empty-text">
-                            Click the star icon on any sound to save it here.
+                            Tap the star on any sound to add it to your arsenal.
                         </div>
                     </div>
                 </div>
@@ -150,7 +150,7 @@ export function renderFavoritesSection() {
             <button class="favorite-btn is-favorite" 
                     data-file="${encodeURIComponent(sound.file)}"
                     aria-label="Remove ${sound.name} from favorites"
-                    title="Remove from favorites">&#9733;</button>
+                    title="Remove from favorites"><span aria-hidden="true">&#9733;</span></button>
         </div>
     `).join('');
 
@@ -167,10 +167,13 @@ export function renderFavoritesSection() {
         <section class="category-section favorites-section" id="category-favorites" data-category="favorites">
             <div class="category-header" tabindex="0" role="button" aria-expanded="true">
                 <div class="category-title">
-                    <h2 class="category-name">FAVORITES</h2>
+                    <h2 class="category-name"><span class="section-icon" aria-hidden="true">&#9733;</span> FAVORITES</h2>
                     <span class="category-count">(${favoriteSounds.length})</span>
                 </div>
-                <span class="category-toggle" aria-hidden="true">&#9660;</span>
+                <div class="category-actions">
+                    <button class="btn-clear-favorites" id="btn-clear-favorites" aria-label="Clear all favorites" title="Clear all favorites">CLEAR</button>
+                    <span class="category-toggle" aria-hidden="true">&#9660;</span>
+                </div>
             </div>
             ${dragTooltipHtml}
             <div class="category-content" id="category-content-favorites">
@@ -241,7 +244,7 @@ export function renderPopularSection() {
             <button class="favorite-btn ${isFav ? 'is-favorite' : ''}" 
                     data-file="${encodeURIComponent(sound.file)}"
                     aria-label="${favAriaLabel}"
-                    title="${isFav ? 'Remove from favorites' : 'Add to favorites'}">${isFav ? '&#9733;' : '&#9734;'}</button>
+                    title="${isFav ? 'Remove from favorites' : 'Add to favorites'}"><span aria-hidden="true">${isFav ? '&#9733;' : '&#9734;'}</span></button>
         </div>
     `;
     }).join('');
@@ -250,7 +253,7 @@ export function renderPopularSection() {
         <section class="category-section popular-section" id="category-popular" data-category="popular">
             <div class="category-header" tabindex="0" role="button" aria-expanded="true">
                 <div class="category-title">
-                    <h2 class="category-name">POPULAR SOUNDS</h2>
+                    <h2 class="category-name"><span class="section-icon" aria-hidden="true">&#128293;</span> POPULAR SOUNDS</h2>
                     <span class="category-count">(${popularSounds.length})</span>
                 </div>
                 <span class="category-toggle" aria-hidden="true">&#9660;</span>
@@ -283,9 +286,9 @@ export function updateStats() {
  * Show a toast notification
  * @param {string} message - The message to display
  * @param {string} type - Type: 'info', 'success', or 'error'
- * @param {number} duration - How long to show the toast in ms
+ * @param {number} duration - How long to show the toast in ms (default 7s to match CSS)
  */
-export function showToast(message, type = 'info', duration = 5000) {
+export function showToast(message, type = 'info', duration = 7000) {
     if (!elements.toastContainer) {
         return;
     }

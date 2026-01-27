@@ -79,16 +79,17 @@
         display: none;
     }
 
+    /* WCAG 2.1 AA: 44px minimum touch targets for mobile */
     .btn-random {
         flex: 0 0 auto;
-        min-width: 32px;
-        min-height: 32px;
-        padding: 6px;
+        min-width: 44px;
+        min-height: 44px;
+        padding: 8px;
     }
 
     .btn-random .random-icon {
-        width: 18px;
-        height: 18px;
+        width: 20px;
+        height: 20px;
     }
 
     /* Hide text on install button for mobile, keep icon only */
@@ -98,14 +99,14 @@
 
     .btn-install-header {
         flex: 0 0 auto;
-        min-width: 32px;
-        min-height: 32px;
-        padding: 6px;
+        min-width: 44px;
+        min-height: 44px;
+        padding: 8px;
     }
 
     .btn-install-header .install-icon {
-        width: 18px;
-        height: 18px;
+        width: 20px;
+        height: 20px;
     }
 
     /* Hide volume slider on small mobile, show only toggle */
@@ -113,17 +114,17 @@
         display: none;
     }
 
-    /* Make volume button same size as random and install buttons */
+    /* Make volume button 44px for WCAG touch target compliance */
     .btn-volume {
         border-width: 2px;
-        min-width: 32px;
-        min-height: 32px;
-        padding: 6px;
+        min-width: 44px;
+        min-height: 44px;
+        padding: 8px;
     }
 
     .btn-volume svg {
-        width: 18px;
-        height: 18px;
+        width: 20px;
+        height: 20px;
     }
 
     .content-area {
@@ -169,7 +170,7 @@
         margin-left: 0;
     }
 
-    /* Mobile category chips */
+    /* Mobile category chips - sticky below header */
     .mobile-category-chips {
         display: flex;
         overflow-x: auto;
@@ -181,10 +182,29 @@
         scrollbar-width: none;
         width: 100%;
         flex-shrink: 0;
+        position: sticky;
+        top: var(--header-height);
+        z-index: 50;
     }
 
     .mobile-category-chips::-webkit-scrollbar {
         display: none;
+    }
+    
+    /* Scroll indicator fade for mobile chips */
+    .mobile-category-chips::after {
+        content: '';
+        position: absolute;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        width: 30px;
+        background: linear-gradient(90deg, transparent, var(--bg-panel));
+        pointer-events: none;
+    }
+    
+    .mobile-category-chips {
+        position: relative;
     }
 
     .category-chip {
@@ -237,25 +257,31 @@
         padding-right: 56px;
     }
 
+    /* WCAG 2.1 AA: 44px minimum touch targets for mobile action buttons */
     .share-btn,
     .favorite-btn {
-        padding: 6px;
-        min-width: 32px;
-        min-height: 32px;
+        padding: 8px;
+        min-width: 44px;
+        min-height: 44px;
     }
 
     .share-btn {
-        right: 30px;
+        right: 44px;
     }
 
     .share-btn svg {
-        width: 14px;
-        height: 14px;
+        width: 16px;
+        height: 16px;
     }
 
     .favorite-btn {
-        right: 2px;
-        font-size: 0.9rem;
+        right: 0;
+        font-size: 1rem;
+    }
+
+    /* Adjust sound button padding for larger action buttons */
+    .sound-btn-wrapper .sound-btn {
+        padding-right: 90px;
     }
 }
 

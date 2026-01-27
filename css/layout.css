@@ -117,6 +117,7 @@
     margin-left: var(--sidebar-width);
     padding: 20px;
     padding-bottom: 60px;
+    max-width: 1400px;
 }
 
 /* Grid Pattern Background */

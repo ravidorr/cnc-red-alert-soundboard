@@ -24,6 +24,21 @@ export function saveFavorites() {
     saveFavoritesToStorage(localStorage, state.favorites);
 }
 
+// Clear all favorites
+export function clearAllFavorites() {
+    if (state.favorites.length === 0) {
+        showToast('No favorites to clear', 'info');
+        return;
+    }
+    state.favorites = [];
+    saveFavorites();
+    renderFavoritesSection();
+    renderNavigation();
+    updateFavoriteButtons();
+    updateStats();
+    showToast('All favorites cleared', 'info');
+}
+
 // Toggle a sound as favorite
 export function toggleFavorite(soundFile) {
     const wasAdded = !state.favorites.includes(soundFile);
@@ -53,9 +68,9 @@ export function updateFavoriteButtons() {
         const sound = SOUNDS.find(s => s.file === file);
         const soundName = sound ? sound.name : 'sound';
         btn.classList.toggle('is-favorite', isFav);
-        btn.innerHTML = isFav ? '&#9733;' : '&#9734;';
+        btn.innerHTML = `<span aria-hidden="true">${isFav ? '&#9733;' : '&#9734;'}</span>`;
         btn.title = isFav ? 'Remove from favorites' : 'Add to favorites';
-        btn.setAttribute('aria-label', isFav ? `Remove ${soundName} from favorites` : `Add ${soundName} from favorites`);
+        btn.setAttribute('aria-label', isFav ? `Remove ${soundName} from favorites` : `Add ${soundName} to favorites`);
     });
 }
 

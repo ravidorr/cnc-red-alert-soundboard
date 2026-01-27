@@ -6,6 +6,7 @@ import { jest } from '@jest/globals';
 // Set up full DOM for integration tests
 export function setupFullDOM() {
     document.body.innerHTML = `
+        <h1 class="visually-hidden">C&C Red Alert Soundboard</h1>
         <div id="content-area"></div>
         <nav id="category-nav"><div class="nav-header">CATEGORIES</div></nav>
         <input id="search-input" />
@@ -21,12 +22,15 @@ export function setupFullDOM() {
         <div id="toast-container"></div>
         <button id="mobile-menu-toggle" aria-expanded="false"></button>
         <div id="mobile-menu-overlay"></div>
-        <div id="sidebar" class="sidebar"></div>
+        <div id="sidebar" class="sidebar" role="dialog" aria-label="Categories menu" aria-hidden="true"></div>
         <div id="search-empty-state" style="display: none;">
             <span id="search-empty-term"></span>
         </div>
         <button id="btn-clear-search"></button>
         <button id="random-sound"></button>
+        <button id="back-to-top" class="btn-back-to-top" style="display: none;"></button>
+        <div id="search-announcer" class="visually-hidden" aria-live="polite" aria-atomic="true"></div>
+        <div id="category-announcer" class="visually-hidden" aria-live="polite"></div>
     `;
 }
 

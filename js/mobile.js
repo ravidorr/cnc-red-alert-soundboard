@@ -23,6 +23,7 @@ export function openMobileMenu() {
 
     if (elements.sidebar) {
         elements.sidebar.classList.add('open');
+        elements.sidebar.setAttribute('aria-hidden', 'false');
     }
     if (elements.mobileMenuOverlay) {
         elements.mobileMenuOverlay.classList.add('visible');
@@ -46,6 +47,7 @@ export function openMobileMenu() {
 export function closeMobileMenu() {
     if (elements.sidebar) {
         elements.sidebar.classList.remove('open');
+        elements.sidebar.setAttribute('aria-hidden', 'true');
     }
     if (elements.mobileMenuOverlay) {
         elements.mobileMenuOverlay.classList.remove('visible');

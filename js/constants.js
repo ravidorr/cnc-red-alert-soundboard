@@ -4,12 +4,12 @@
 
 export const SOUNDS = [
     // Allies Units
-    { file: 'allies_1_achnoledged.wav', name: 'Acknowledged', category: 'allies' },
-    { file: 'allies_1_affirmative.wav', name: 'Affirmative', category: 'allies' },
-    { file: 'allies_1_reporting.wav', name: 'Reporting', category: 'allies' },
-    { file: 'allies_1_veicle_reporting.wav', name: 'Vehicle Reporting', category: 'allies' },
-    { file: 'allies_1_waiting_orders.wav', name: 'Waiting Orders', category: 'allies' },
-    { file: 'allies_1_yes_sir.wav', name: 'Yes Sir', category: 'allies' },
+    { file: 'allies_1_achnoledged.wav', name: 'Acknowledged', category: 'allies', tags: ['iconic', 'voice', 'confirmation'] },
+    { file: 'allies_1_affirmative.wav', name: 'Affirmative', category: 'allies', tags: ['iconic', 'voice', 'confirmation'] },
+    { file: 'allies_1_reporting.wav', name: 'Reporting', category: 'allies', tags: ['voice', 'select'] },
+    { file: 'allies_1_veicle_reporting.wav', name: 'Vehicle Reporting', category: 'allies', tags: ['voice', 'vehicle', 'select'] },
+    { file: 'allies_1_waiting_orders.wav', name: 'Waiting Orders', category: 'allies', tags: ['voice', 'idle'] },
+    { file: 'allies_1_yes_sir.wav', name: 'Yes Sir', category: 'allies', tags: ['voice', 'confirmation'] },
     { file: 'allies_2_achnoledged.wav', name: 'Acknowledged #2', category: 'allies' },
     { file: 'allies_2_affirmative.wav', name: 'Affirmative #2', category: 'allies' },
     { file: 'allies_2_agreed.wav', name: 'Agreed', category: 'allies' },
@@ -40,12 +40,12 @@ export const SOUNDS = [
     { file: 'allies_4_yes_sir.wav', name: 'Yes Sir! #4', category: 'allies' },
 
     // Soviet Units
-    { file: 'soviet_1_achnoledged.wav', name: 'Acknowledged', category: 'soviets' },
-    { file: 'soviet_1_affirmative.wav', name: 'Affirmative', category: 'soviets' },
-    { file: 'soviet_1_reporting.wav', name: 'Reporting', category: 'soviets' },
-    { file: 'soviet_1_veicle_reporting.wav', name: 'Vehicle Reporting', category: 'soviets' },
-    { file: 'soviet_1_waiting_orders.wav', name: 'Waiting Orders', category: 'soviets' },
-    { file: 'soviet_1_yes_sir.wav', name: 'Yes Sir', category: 'soviets' },
+    { file: 'soviet_1_achnoledged.wav', name: 'Acknowledged', category: 'soviets', tags: ['iconic', 'voice', 'confirmation', 'russian'] },
+    { file: 'soviet_1_affirmative.wav', name: 'Affirmative', category: 'soviets', tags: ['iconic', 'voice', 'confirmation', 'russian'] },
+    { file: 'soviet_1_reporting.wav', name: 'Reporting', category: 'soviets', tags: ['voice', 'select', 'russian'] },
+    { file: 'soviet_1_veicle_reporting.wav', name: 'Vehicle Reporting', category: 'soviets', tags: ['voice', 'vehicle', 'select', 'russian'] },
+    { file: 'soviet_1_waiting_orders.wav', name: 'Waiting Orders', category: 'soviets', tags: ['voice', 'idle', 'russian'] },
+    { file: 'soviet_1_yes_sir.wav', name: 'Yes Sir', category: 'soviets', tags: ['voice', 'confirmation', 'russian'] },
     { file: 'soviet_2_achnoledged.wav', name: 'Acknowledged #2', category: 'soviets' },
     { file: 'soviet_2_affirmative.wav', name: 'Affirmative #2', category: 'soviets' },
     { file: 'soviet_2_agreed.wav', name: 'Agreed', category: 'soviets' },
@@ -68,21 +68,21 @@ export const SOUNDS = [
     { file: 'soviet_4_ready_and_waiting.wav', name: 'Ready & Waiting #4', category: 'soviets' },
 
     // Tanya
-    { file: 'tanya_yeah.wav', name: 'Yeah', category: 'tanya' },
-    { file: 'tanya_yes_sir.wav', name: 'Yes Sir', category: 'tanya' },
-    { file: 'tanya_chew_on_this.wav', name: 'Chew On This', category: 'tanya' },
-    { file: 'tanya_give_it_to_me.wav', name: 'Give It To Me', category: 'tanya' },
-    { file: 'tanya_im_there.wav', name: "I'm There", category: 'tanya' },
-    { file: 'tanya_kiss_it_bye_bye.wav', name: 'Kiss It Bye Bye', category: 'tanya' },
-    { file: 'tanya_laugh.wav', name: 'Laugh', category: 'tanya' },
-    { file: 'tanya_lets_rock.wav', name: "Let's Rock", category: 'tanya' },
-    { file: 'tanya_shake_it_baby.wav', name: 'Shake It Baby', category: 'tanya' },
-    { file: 'tanya_thats_all_you_got.wav', name: "That's All You Got", category: 'tanya' },
-    { file: 'tanya_whats_up.wav', name: "What's Up", category: 'tanya' },
-    { file: 'tanya_chaching.wav', name: 'Cha-Ching', category: 'tanya' },
-    { file: 'tanya_dart.wav', name: 'Dart Shot', category: 'tanya' },
-    { file: 'tanya_death.wav', name: 'Death', category: 'tanya' },
-    { file: 'tanya_silenced_shoot.wav', name: 'Silenced Shot', category: 'tanya' },
+    { file: 'tanya_yeah.wav', name: 'Yeah', category: 'tanya', tags: ['voice', 'confirmation'] },
+    { file: 'tanya_yes_sir.wav', name: 'Yes Sir', category: 'tanya', tags: ['voice', 'confirmation'] },
+    { file: 'tanya_chew_on_this.wav', name: 'Chew On This', category: 'tanya', tags: ['iconic', 'voice', 'action', 'attack'] },
+    { file: 'tanya_give_it_to_me.wav', name: 'Give It To Me', category: 'tanya', tags: ['voice', 'action'] },
+    { file: 'tanya_im_there.wav', name: "I'm There", category: 'tanya', tags: ['voice', 'movement'] },
+    { file: 'tanya_kiss_it_bye_bye.wav', name: 'Kiss It Bye Bye', category: 'tanya', tags: ['iconic', 'voice', 'attack'] },
+    { file: 'tanya_laugh.wav', name: 'Laugh', category: 'tanya', tags: ['iconic', 'voice', 'funny', 'meme'] },
+    { file: 'tanya_lets_rock.wav', name: "Let's Rock", category: 'tanya', tags: ['iconic', 'voice', 'action'] },
+    { file: 'tanya_shake_it_baby.wav', name: 'Shake It Baby', category: 'tanya', tags: ['iconic', 'voice', 'funny', 'meme'] },
+    { file: 'tanya_thats_all_you_got.wav', name: "That's All You Got", category: 'tanya', tags: ['voice', 'taunt'] },
+    { file: 'tanya_whats_up.wav', name: "What's Up", category: 'tanya', tags: ['voice', 'greeting'] },
+    { file: 'tanya_chaching.wav', name: 'Cha-Ching', category: 'tanya', tags: ['voice', 'funny'] },
+    { file: 'tanya_dart.wav', name: 'Dart Shot', category: 'tanya', tags: ['sfx', 'weapon'] },
+    { file: 'tanya_death.wav', name: 'Death', category: 'tanya', tags: ['sfx', 'death'] },
+    { file: 'tanya_silenced_shoot.wav', name: 'Silenced Shot', category: 'tanya', tags: ['sfx', 'weapon'] },
 
     // Engineer
     { file: 'engineer_affermative.wav', name: 'Affirmative', category: 'special' },
@@ -140,9 +140,9 @@ export const SOUNDS = [
     { file: 'flame_sound_2.wav', name: 'Flame #2', category: 'combat' },
 
     // Combat - Explosives
-    { file: 'explosion.wav', name: 'Explosion', category: 'combat' },
-    { file: 'explosion2.wav', name: 'Explosion #2', category: 'combat' },
-    { file: 'water_explosion.wav', name: 'Water Explosion', category: 'combat' },
+    { file: 'explosion.wav', name: 'Explosion', category: 'combat', tags: ['iconic', 'sfx', 'destruction'] },
+    { file: 'explosion2.wav', name: 'Explosion #2', category: 'combat', tags: ['sfx', 'destruction'] },
+    { file: 'water_explosion.wav', name: 'Water Explosion', category: 'combat', tags: ['sfx', 'destruction', 'naval'] },
     { file: 'antiman_mine.wav', name: 'Anti-Personnel Mine', category: 'combat' },
     { file: 'antitank_mine.wav', name: 'Anti-Tank Mine', category: 'combat' },
     { file: 'mine_placed.wav', name: 'Mine Placed', category: 'combat' },
@@ -164,7 +164,7 @@ export const SOUNDS = [
     { file: 'paratroops.wav', name: 'Paratroops', category: 'vehicles' },
 
     // Buildings & Structures
-    { file: 'building_being_placed.wav', name: 'Building Placed', category: 'buildings' },
+    { file: 'building_being_placed.wav', name: 'Building Placed', category: 'buildings', tags: ['iconic', 'sfx', 'construction'] },
     { file: 'building_placement_sound.wav', name: 'Placement Sound', category: 'buildings' },
     { file: 'building_destroyed.wav', name: 'Building Destroyed', category: 'buildings' },
     { file: 'building_half_destroyed.wav', name: 'Building Damaged', category: 'buildings' },
@@ -177,8 +177,8 @@ export const SOUNDS = [
     { file: 'pillbox_shot.wav', name: 'Pillbox', category: 'buildings' },
     { file: 'flame_turret_up.wav', name: 'Flame Turret Up', category: 'buildings' },
     { file: 'flame_turret_down.wav', name: 'Flame Turret Down', category: 'buildings' },
-    { file: 'tesla_charge.wav', name: 'Tesla Charge', category: 'buildings' },
-    { file: 'tesla_shot.wav', name: 'Tesla Shot', category: 'buildings' },
+    { file: 'tesla_charge.wav', name: 'Tesla Charge', category: 'buildings', tags: ['iconic', 'sfx', 'electric', 'defense'] },
+    { file: 'tesla_shot.wav', name: 'Tesla Shot', category: 'buildings', tags: ['iconic', 'sfx', 'electric', 'defense'] },
 
     // Walls & Barriers
     { file: 'wall_hit.wav', name: 'Wall Hit', category: 'buildings' },
@@ -218,8 +218,8 @@ export const SOUNDS = [
     { file: 'keystroke.wav', name: 'Keystroke', category: 'ui' },
 
     // Misc / Special Effects
-    { file: 'chronosphere_sound.wav', name: 'Chronosphere', category: 'misc' },
-    { file: 'iron_curtain_sound.wav', name: 'Iron Curtain', category: 'misc' },
+    { file: 'chronosphere_sound.wav', name: 'Chronosphere', category: 'misc', tags: ['iconic', 'superweapon', 'sfx', 'allies'] },
+    { file: 'iron_curtain_sound.wav', name: 'Iron Curtain', category: 'misc', tags: ['iconic', 'superweapon', 'sfx', 'soviet'] },
     { file: 'appear_1.wav', name: 'Appear', category: 'misc' },
     { file: 'clock_1.wav', name: 'Clock', category: 'misc' },
     { file: 'country_1.wav', name: 'Country 1', category: 'misc' },
@@ -263,7 +263,7 @@ export const POPULAR_SOUNDS = [
     'iron_curtain_sound.wav',
     'tesla_shot.wav',
     'explosion.wav',
-    'Building Placed.wav',
+    'building_being_placed.wav',
 ];
 
 // Constants

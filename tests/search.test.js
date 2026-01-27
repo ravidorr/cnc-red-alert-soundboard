@@ -6,6 +6,7 @@ import { state, elements } from '../js/state.js';
 import { SOUNDS } from '../js/constants.js';
 import { cacheElements, renderCategories, showSearchEmptyState, hideSearchEmptyState } from '../js/ui.js';
 import { filterSounds } from '../js/search.js';
+import { fuzzyMatch, levenshteinDistance, filterSoundsArray } from '../js/utils.js';
 
 describe('Search Functions', () => {
     beforeEach(() => {
@@ -36,7 +37,8 @@ describe('Search Functions', () => {
             const tanyaSounds = SOUNDS.filter(s =>
                 s.name.toLowerCase().includes('tanya') || s.file.toLowerCase().includes('tanya'),
             );
-            expect(visible.length).toBe(tanyaSounds.length);
+            // With fuzzy search and tag matching, there may be more matches
+            expect(visible.length).toBeGreaterThanOrEqual(tanyaSounds.length);
         });
 
         test('should show empty state when no matches', () => {
@@ -249,6 +251,79 @@ describe('Search Functions', () => {
             const resultText = document.getElementById('search-result-text');
             expect(resultText.textContent).toContain('Showing');
             expect(resultText.textContent).toContain('sounds');
+        });
+    });
+
+    describe('Fuzzy Search', () => {
+        test('should return true for exact match', () => {
+            expect(fuzzyMatch('tanya', 'tanya')).toBe(true);
+        });
+
+        test('should return true for substring match', () => {
+            expect(fuzzyMatch('tan', 'tanya')).toBe(true);
+        });
+
+        test('should handle single character typos', () => {
+            expect(fuzzyMatch('tania', 'tanya')).toBe(true);
+        });
+
+        test('should be case insensitive', () => {
+            expect(fuzzyMatch('TANYA', 'tanya')).toBe(true);
+        });
+
+        test('should return false for completely different strings', () => {
+            expect(fuzzyMatch('xyz', 'tanya')).toBe(false);
+        });
+
+        test('should return false for empty query', () => {
+            expect(fuzzyMatch('', 'tanya')).toBe(false);
+        });
+
+        test('should return false for short queries (2 chars or less) without exact match', () => {
+            expect(fuzzyMatch('ab', 'tanya')).toBe(false);
+        });
+    });
+
+    describe('Levenshtein Distance', () => {
+        test('should return 0 for identical strings', () => {
+            expect(levenshteinDistance('test', 'test')).toBe(0);
+        });
+
+        test('should return length for empty string', () => {
+            expect(levenshteinDistance('', 'test')).toBe(4);
+            expect(levenshteinDistance('test', '')).toBe(4);
+        });
+
+        test('should calculate correct distance for single edit', () => {
+            expect(levenshteinDistance('cat', 'bat')).toBe(1);
+        });
+    });
+
+    describe('Tag Search', () => {
+        const localThis = {};
+
+        beforeEach(() => {
+            localThis.soundsWithTags = [
+                { name: 'Laugh', file: 'tanya_laugh.wav', category: 'tanya', tags: ['iconic', 'voice', 'funny'] },
+                { name: 'Affirmative', file: 'affirmative.wav', category: 'allies' },
+            ];
+        });
+
+        test('should match sounds by tag', () => {
+            const result = filterSoundsArray(localThis.soundsWithTags, 'iconic');
+            expect(result.length).toBe(1);
+            expect(result[0].name).toBe('Laugh');
+        });
+
+        test('should match partial tag strings', () => {
+            const result = filterSoundsArray(localThis.soundsWithTags, 'voice');
+            expect(result.length).toBe(1);
+        });
+
+        test('should handle sounds without tags', () => {
+            const result = filterSoundsArray(localThis.soundsWithTags, 'affirmative');
+            expect(result.length).toBe(1);
+            expect(result[0].name).toBe('Affirmative');
         });
     });
 });

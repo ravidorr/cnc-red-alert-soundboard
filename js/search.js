@@ -5,8 +5,9 @@
 import { SOUNDS } from './constants.js';
 import { state, elements } from './state.js';
 import { showSearchEmptyState, hideSearchEmptyState } from './ui.js';
+import { fuzzyMatch } from './utils.js';
 
-// Filter sounds based on search (DOM version)
+// Filter sounds based on search (DOM version) with fuzzy matching
 export function filterSounds() {
     const wrappers = document.querySelectorAll('.sound-btn-wrapper');
     let visibleCount = 0;
@@ -24,7 +25,22 @@ export function filterSounds() {
 
         const name = btn.dataset.name.toLowerCase();
         const file = decodeURIComponent(btn.dataset.file).toLowerCase();
-        const matches = name.includes(state.searchTerm) || file.includes(state.searchTerm);
+
+        // Check for matches: exact, substring, or fuzzy
+        let matches = name.includes(state.searchTerm) || file.includes(state.searchTerm);
+
+        // If no exact/substring match, try fuzzy match
+        if (!matches && state.searchTerm.length >= 3) {
+            matches = fuzzyMatch(state.searchTerm, btn.dataset.name);
+        }
+
+        // Check tags if sound has them (from SOUNDS data)
+        if (!matches) {
+            const soundData = SOUNDS.find(s => s.file === decodeURIComponent(btn.dataset.file));
+            if (soundData && soundData.tags) {
+                matches = soundData.tags.some(tag => tag.toLowerCase().includes(state.searchTerm));
+            }
+        }
 
         wrapper.style.display = matches ? '' : 'none';
         if (matches) {

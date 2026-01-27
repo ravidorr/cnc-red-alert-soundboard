@@ -23,6 +23,7 @@
 </head>
 <body>
     <a href="#content-area" class="skip-link">Skip to content</a>
+    <h1 class="visually-hidden">C&C Red Alert Soundboard</h1>
     <div class="scanlines"></div>
     
     <header class="main-header" role="banner">
@@ -47,7 +48,7 @@
                             <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
                         </svg>
                     </button>
-                    <input type="range" id="volume-slider" min="0" max="100" value="100" aria-label="Volume level">
+                    <input type="range" id="volume-slider" min="0" max="100" value="100" aria-label="Volume level" aria-valuenow="100" aria-valuetext="100 percent">
                 </div>
                 <button id="random-sound" class="btn-action btn-random" title="Play random sound">
                     <svg class="random-icon" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">
@@ -69,7 +70,7 @@
     <div class="mobile-menu-overlay" id="mobile-menu-overlay"></div>
 
     <main class="main-content" role="main">
-        <div class="sidebar" id="sidebar">
+        <div class="sidebar" id="sidebar" role="dialog" aria-label="Categories menu" aria-hidden="true">
             <nav class="category-nav" id="category-nav" aria-label="Sound categories" role="list">
                 <div class="nav-header">CATEGORIES</div>
                 <!-- Categories will be populated by JS -->
@@ -102,7 +103,7 @@
                     <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
                 </svg>
             </div>
-            <div class="empty-state-title">No sounds found</div>
+            <div class="empty-state-title">NO MATCHES FOUND</div>
             <div class="empty-state-text">No sounds match "<span id="search-empty-term"></span>". Try a character name like "Tanya" or a phrase like "affirmative".</div>
             <button class="btn-action btn-clear-search" id="btn-clear-search">Clear Search</button>
         </div>
@@ -128,8 +129,24 @@
                     <span>Focus search</span>
                 </div>
                 <div class="shortcut-item">
+                    <kbd>Escape</kbd>
+                    <span>Stop playback / Close modal</span>
+                </div>
+                <div class="shortcut-item">
+                    <kbd>Space</kbd>
+                    <span>Replay last sound</span>
+                </div>
+                <div class="shortcut-item">
+                    <kbd>1</kbd> - <kbd>9</kbd>
+                    <span>Play favorite sound</span>
+                </div>
+                <div class="shortcut-item">
                     <kbd>Arrow Up/Down</kbd>
                     <span>Reorder favorites</span>
+                </div>
+                <div class="shortcut-item">
+                    <kbd>?</kbd>
+                    <span>Show this help</span>
                 </div>
             </div>
             <button class="btn-dismiss" id="shortcuts-close">CLOSE</button>
@@ -149,17 +166,21 @@
                 </svg>
             </div>
             <div class="install-prompt-text">
-                <div class="install-prompt-title">INSTALL SOUNDBOARD</div>
-                <div class="install-prompt-subtitle">Install for offline access and quick launch</div>
+                <div class="install-prompt-title">DEPLOY SOUNDBOARD</div>
+                <div class="install-prompt-subtitle">Go offline-capable. Launch instantly. All 190 sounds cached.</div>
             </div>
             <div class="install-prompt-actions">
                 <button class="btn-install" id="btn-install">INSTALL</button>
-                <button class="btn-dismiss" id="btn-dismiss">DISMISS</button>
+                <button class="btn-dismiss" id="btn-dismiss">NOT NOW</button>
             </div>
         </div>
     </div>
 
     <audio id="audio-player" preload="auto"></audio>
+
+    <button id="back-to-top" class="btn-back-to-top" aria-label="Back to top" title="Back to top">
+        <span aria-hidden="true">&#9650;</span>
+    </button>
 
     <div class="toast-container" id="toast-container" aria-live="polite"></div>
     

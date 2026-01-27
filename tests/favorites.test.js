@@ -14,6 +14,7 @@ import {
     setupFavoritesDragAndDrop,
     moveFavoriteUp,
     moveFavoriteDown,
+    clearAllFavorites,
 } from '../js/favorites.js';
 
 describe('Favorites Functions', () => {
@@ -407,6 +408,182 @@ describe('Favorites Functions', () => {
 
                 expect(state.favorites).toEqual(['a.wav', 'b.wav']);
             });
+        });
+    });
+
+    describe('clearAllFavorites', () => {
+        beforeEach(() => {
+            cacheElements();
+            renderCategories();
+            renderNavigation();
+        });
+
+        test('should empty favorites array', () => {
+            state.favorites = ['a.wav', 'b.wav', 'c.wav'];
+            renderFavoritesSection();
+
+            clearAllFavorites();
+
+            expect(state.favorites).toEqual([]);
+        });
+
+        test('should save to localStorage', () => {
+            state.favorites = ['a.wav', 'b.wav'];
+            renderFavoritesSection();
+
+            clearAllFavorites();
+
+            const stored = JSON.parse(localStorage.getItem('cnc-favorites'));
+            expect(stored).toEqual([]);
+        });
+
+        test('should re-render favorites section', () => {
+            state.favorites = ['allies_1_achnoledged.wav'];
+            renderFavoritesSection();
+
+            clearAllFavorites();
+
+            const favSection = document.getElementById('category-favorites');
+            const emptyState = favSection.querySelector('.favorites-empty');
+            expect(emptyState).not.toBeNull();
+        });
+
+        test('should show toast notification', () => {
+            state.favorites = ['a.wav'];
+            renderFavoritesSection();
+
+            clearAllFavorites();
+
+            const toast = document.querySelector('.toast');
+            expect(toast).not.toBeNull();
+        });
+
+        test('should handle empty favorites gracefully', () => {
+            state.favorites = [];
+            renderFavoritesSection();
+
+            expect(() => clearAllFavorites()).not.toThrow();
+        });
+    });
+
+    describe('Branch Coverage - focusFavoriteItem', () => {
+        beforeEach(() => {
+            cacheElements();
+            renderCategories();
+            renderNavigation();
+        });
+
+        test('moveFavoriteUp should handle when wrapper is not found', (done) => {
+            state.favorites = ['nonexistent.wav', 'allies_1_achnoledged.wav'];
+            renderFavoritesSection();
+
+            // Try to move up a file that doesn't have a DOM element
+            // This should not throw even if wrapper is not found
+            expect(() => moveFavoriteUp('nonexistent.wav')).not.toThrow();
+
+            // Wait for setTimeout in focusFavoriteItem
+            setTimeout(() => {
+                // No crash should occur
+                done();
+            }, 100);
+        });
+
+        test('moveFavoriteDown should handle when wrapper is not found', (done) => {
+            state.favorites = ['allies_1_achnoledged.wav', 'nonexistent.wav'];
+            renderFavoritesSection();
+
+            // Try to move down a file that doesn't have a DOM element
+            expect(() => moveFavoriteDown('allies_1_achnoledged.wav')).not.toThrow();
+
+            setTimeout(() => {
+                done();
+            }, 100);
+        });
+
+        test('moveFavoriteUp should focus sound button after move', (done) => {
+            state.favorites = ['allies_1_achnoledged.wav', 'allies_1_affirmative.wav'];
+            renderFavoritesSection();
+
+            // Move the second item up
+            moveFavoriteUp('allies_1_affirmative.wav');
+
+            // Wait for focusFavoriteItem setTimeout
+            setTimeout(() => {
+                // The moved item should be focused
+                const wrapper = document.querySelector(`.favorites-section .sound-btn-wrapper[data-file="${encodeURIComponent('allies_1_affirmative.wav')}"]`);
+                if (wrapper) {
+                    const soundBtn = wrapper.querySelector('.sound-btn');
+                    expect(document.activeElement).toBe(soundBtn);
+                }
+                done();
+            }, 100);
+        });
+
+        test('moveFavoriteDown should focus sound button after move', (done) => {
+            state.favorites = ['allies_1_achnoledged.wav', 'allies_1_affirmative.wav'];
+            renderFavoritesSection();
+
+            // Move the first item down
+            moveFavoriteDown('allies_1_achnoledged.wav');
+
+            // Wait for focusFavoriteItem setTimeout
+            setTimeout(() => {
+                // The moved item should be focused
+                const wrapper = document.querySelector(`.favorites-section .sound-btn-wrapper[data-file="${encodeURIComponent('allies_1_achnoledged.wav')}"]`);
+                if (wrapper) {
+                    const soundBtn = wrapper.querySelector('.sound-btn');
+                    expect(document.activeElement).toBe(soundBtn);
+                }
+                done();
+            }, 100);
+        });
+
+        test('moveFavoriteUp should create reorder-announcer if it does not exist', () => {
+            // Ensure announcer doesn't exist
+            const existingAnnouncer = document.getElementById('reorder-announcer');
+            if (existingAnnouncer) existingAnnouncer.remove();
+
+            state.favorites = ['allies_1_achnoledged.wav', 'allies_1_affirmative.wav'];
+            renderFavoritesSection();
+
+            // Move up should create announcer
+            moveFavoriteUp('allies_1_affirmative.wav');
+
+            const announcer = document.getElementById('reorder-announcer');
+            expect(announcer).not.toBeNull();
+            expect(announcer.getAttribute('aria-live')).toBe('polite');
+        });
+
+        test('moveFavoriteUp should reuse existing reorder-announcer', () => {
+            state.favorites = ['allies_1_achnoledged.wav', 'allies_1_affirmative.wav', 'allies_1_reporting.wav'];
+            renderFavoritesSection();
+
+            // First move creates announcer
+            moveFavoriteUp('allies_1_affirmative.wav');
+            const announcer = document.getElementById('reorder-announcer');
+
+            // Second move should reuse same announcer
+            moveFavoriteUp('allies_1_reporting.wav');
+            const sameAnnouncer = document.getElementById('reorder-announcer');
+
+            expect(sameAnnouncer).toBe(announcer);
+        });
+
+        test('should handle wrapper found but soundBtn missing', (done) => {
+            state.favorites = ['allies_1_achnoledged.wav', 'allies_1_affirmative.wav'];
+            renderFavoritesSection();
+
+            // Remove the sound button from one wrapper
+            const wrapper = document.querySelector(`.favorites-section .sound-btn-wrapper[data-file="${encodeURIComponent('allies_1_affirmative.wav')}"]`);
+            if (wrapper) {
+                const soundBtn = wrapper.querySelector('.sound-btn');
+                if (soundBtn) soundBtn.remove();
+            }
+
+            // Move should not throw even without sound button
+            expect(() => moveFavoriteUp('allies_1_affirmative.wav')).not.toThrow();
+
+            setTimeout(done, 100);
         });
     });
 });

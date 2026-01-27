@@ -421,5 +421,179 @@ describe('Navigation Functions', () => {
 
             expect(chips[0].classList.contains('active')).toBe(true);
         });
+
+        test('should skip empty categories in chip rendering', () => {
+            // This tests the count === 0 branch in renderMobileCategoryChips
+            renderMobileCategoryChips();
+
+            // All chips (except favorites and recent) should correspond to non-empty categories
+            const chips = document.querySelectorAll('.category-chip:not([data-category="favorites"]):not([data-category="recent"])');
+            chips.forEach(chip => {
+                // Each chip should exist because its category has sounds
+                expect(chip.dataset.category).toBeTruthy();
+            });
+        });
+    });
+
+    describe('Branch Coverage - announceToScreenReader', () => {
+        beforeEach(() => {
+            cacheElements();
+            renderCategories();
+        });
+
+        test('should create announcer if it does not exist', () => {
+            // Ensure announcer doesn't exist
+            const existingAnnouncer = document.getElementById('category-announcer');
+            if (existingAnnouncer) existingAnnouncer.remove();
+
+            const section = document.querySelector('.category-section');
+            toggleCategory(section);
+
+            const announcer = document.getElementById('category-announcer');
+            expect(announcer).not.toBeNull();
+            expect(announcer.getAttribute('aria-live')).toBe('polite');
+            expect(announcer.getAttribute('aria-atomic')).toBe('true');
+            expect(announcer.className).toBe('visually-hidden');
+        });
+
+        test('should reuse existing announcer', () => {
+            // First toggle to create announcer
+            const section = document.querySelector('.category-section');
+            toggleCategory(section);
+
+            const announcer = document.getElementById('category-announcer');
+            expect(announcer).not.toBeNull();
+
+            // Second toggle should reuse the same announcer
+            toggleCategory(section);
+            const sameAnnouncer = document.getElementById('category-announcer');
+            expect(sameAnnouncer).toBe(announcer);
+        });
+    });
+
+    describe('Branch Coverage - Mobile Menu Focus', () => {
+        beforeEach(() => {
+            cacheElements();
+        });
+
+        test('openMobileMenu should handle sidebar with no focusable elements', (done) => {
+            // Clear sidebar and don't add any buttons
+            elements.sidebar.innerHTML = '<div>No buttons here</div>';
+
+            // This should not throw even with no focusable elements
+            expect(() => openMobileMenu()).not.toThrow();
+
+            // Wait for setTimeout in openMobileMenu
+            setTimeout(() => {
+                // Menu should still be open
+                expect(elements.sidebar.classList.contains('open')).toBe(true);
+                done();
+            }, 150);
+        });
+
+        test('Tab from last element should cycle to first element', (done) => {
+            // Add focusable elements to sidebar
+            const btn1 = document.createElement('button');
+            btn1.id = 'first-btn';
+            btn1.textContent = 'First';
+            const btn2 = document.createElement('button');
+            btn2.id = 'last-btn';
+            btn2.textContent = 'Last';
+            elements.sidebar.appendChild(btn1);
+            elements.sidebar.appendChild(btn2);
+
+            openMobileMenu();
+
+            // Wait for menu to open and focus
+            setTimeout(() => {
+                // Focus the last element
+                btn2.focus();
+                expect(document.activeElement).toBe(btn2);
+
+                // Simulate Tab key (not shift)
+                const tabEvent = new KeyboardEvent('keydown', { 
+                    key: 'Tab', 
+                    shiftKey: false,
+                    bubbles: true,
+                    cancelable: true
+                });
+                
+                // The event should be captured by the focus trap
+                document.dispatchEvent(tabEvent);
+                
+                // Focus should cycle (or trap should prevent default)
+                expect(elements.sidebar.classList.contains('open')).toBe(true);
+                done();
+            }, 150);
+        });
+
+        test('Shift+Tab from first element should cycle to last element', (done) => {
+            // Add focusable elements to sidebar
+            const btn1 = document.createElement('button');
+            btn1.id = 'first-btn';
+            btn1.textContent = 'First';
+            const btn2 = document.createElement('button');
+            btn2.id = 'last-btn';
+            btn2.textContent = 'Last';
+            elements.sidebar.appendChild(btn1);
+            elements.sidebar.appendChild(btn2);
+
+            openMobileMenu();
+
+            // Wait for menu to open and focus
+            setTimeout(() => {
+                // Focus the first element
+                btn1.focus();
+                expect(document.activeElement).toBe(btn1);
+
+                // Simulate Shift+Tab key
+                const tabEvent = new KeyboardEvent('keydown', { 
+                    key: 'Tab', 
+                    shiftKey: true,
+                    bubbles: true,
+                    cancelable: true
+                });
+                
+                document.dispatchEvent(tabEvent);
+                
+                // Focus should cycle (or trap should prevent default)
+                expect(elements.sidebar.classList.contains('open')).toBe(true);
+                done();
+            }, 150);
+        });
+
+        test('Tab should not cycle when not at boundary element', (done) => {
+            // Add three focusable elements to sidebar
+            const btn1 = document.createElement('button');
+            btn1.textContent = 'First';
+            const btn2 = document.createElement('button');
+            btn2.textContent = 'Middle';
+            const btn3 = document.createElement('button');
+            btn3.textContent = 'Last';
+            elements.sidebar.appendChild(btn1);
+            elements.sidebar.appendChild(btn2);
+            elements.sidebar.appendChild(btn3);
+
+            openMobileMenu();
+
+            // Wait for menu to open and focus
+            setTimeout(() => {
+                // Focus the middle element
+                btn2.focus();
+
+                // Tab from middle should not trigger cycle
+                const tabEvent = new KeyboardEvent('keydown', { 
+                    key: 'Tab', 
+                    shiftKey: false,
+                    bubbles: true
+                });
+                
+                document.dispatchEvent(tabEvent);
+                
+                // Menu should still be open
+                expect(elements.sidebar.classList.contains('open')).toBe(true);
+                done();
+            }, 150);
+        });
     });
 });

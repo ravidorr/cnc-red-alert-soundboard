@@ -15,7 +15,15 @@ export function setupAudioPlayer() {
     state.audioPlayer = elements.audioPlayer;
 
     state.audioPlayer.addEventListener('ended', () => {
-        clearPlayingState();
+        // Keep now playing visible for 1.5s after sound ends for better UX
+        if (state.currentlyPlaying) {
+            state.currentlyPlaying.classList.remove('playing');
+            state.currentlyPlaying = null;
+        }
+        setTimeout(() => {
+            elements.nowPlaying.classList.remove('visible');
+            elements.nowPlayingTitle.textContent = '-';
+        }, 1500);
     });
 
     state.audioPlayer.addEventListener('error', (e) => {
@@ -43,6 +51,7 @@ function setupVolumeControl() {
         volumeSlider.value = savedVolume;
         state.audioPlayer.volume = savedVolume / 100;
         updateVolumeIcon(parseInt(savedVolume, 10));
+        updateVolumeAria(volumeSlider, parseInt(savedVolume, 10));
     }
 
     // Volume slider change
@@ -51,6 +60,7 @@ function setupVolumeControl() {
         state.audioPlayer.volume = volume / 100;
         localStorage.setItem('soundboardVolume', volume);
         updateVolumeIcon(volume);
+        updateVolumeAria(volumeSlider, volume);
         if (volume > 0) {
             previousVolume = volume;
         }
@@ -66,6 +76,7 @@ function setupVolumeControl() {
             state.audioPlayer.volume = 0;
             localStorage.setItem('soundboardVolume', 0);
             updateVolumeIcon(0);
+            updateVolumeAria(volumeSlider, 0);
         } else {
             // Unmute
             const restoreVolume = previousVolume > 0 ? previousVolume : 100;
@@ -73,8 +84,18 @@ function setupVolumeControl() {
             state.audioPlayer.volume = restoreVolume / 100;
             localStorage.setItem('soundboardVolume', restoreVolume);
             updateVolumeIcon(restoreVolume);
+            updateVolumeAria(volumeSlider, restoreVolume);
         }
     });
+}
+
+// Update volume slider ARIA attributes for screen readers
+function updateVolumeAria(slider, volume) {
+    if (!slider) {
+        return;
+    }
+    slider.setAttribute('aria-valuenow', volume);
+    slider.setAttribute('aria-valuetext', `${volume} percent`);
 }
 
 // Update volume icon based on level
@@ -183,6 +204,24 @@ export function playRandomSound() {
     const btn = document.querySelector(`.sound-btn[data-file="${encodeURIComponent(sound.file)}"]`);
     if (btn) {
         playSound(btn);
+    }
+}
+
+// Replay the last played sound
+export function replayLastSound() {
+    // Don't play if muted
+    if (state.isMuted) {
+        showToast('Unmute to play sounds', 'info');
+        return;
+    }
+
+    // Check recently played from state
+    if (state.recentlyPlayed && state.recentlyPlayed.length > 0) {
+        const lastFile = state.recentlyPlayed[0];
+        const btn = document.querySelector(`.sound-btn[data-file="${encodeURIComponent(lastFile)}"]`);
+        if (btn) {
+            playSound(btn);
+        }
     }
 }
 

@@ -17,6 +17,8 @@ import {
     loadRecentlyPlayedFromStorage,
     saveRecentlyPlayedToStorage,
     addToRecentlyPlayedArray,
+    fuzzyMatch,
+    levenshteinDistance,
 } from '../js/utils.js';
 import { SOUNDS, CATEGORIES } from '../js/constants.js';
 
@@ -279,6 +281,93 @@ describe('Pure Functions', () => {
                 );
                 expect(result.length).toBe(3);
                 expect(result).toEqual(['new.wav', 'a.wav', 'b.wav']);
+            });
+        });
+    });
+
+    describe('Fuzzy Match Functions', () => {
+        describe('fuzzyMatch', () => {
+            test('should return true for exact match', () => {
+                expect(fuzzyMatch('tanya', 'tanya')).toBe(true);
+            });
+
+            test('should return true for substring match', () => {
+                expect(fuzzyMatch('tan', 'tanya')).toBe(true);
+            });
+
+            test('should handle single character typos', () => {
+                expect(fuzzyMatch('tania', 'tanya')).toBe(true);
+            });
+
+            test('should handle transposed characters', () => {
+                expect(fuzzyMatch('tayna', 'tanya')).toBe(true);
+            });
+
+            test('should return false for completely different strings', () => {
+                expect(fuzzyMatch('xyz', 'abc')).toBe(false);
+            });
+
+            test('should be case insensitive', () => {
+                expect(fuzzyMatch('TANYA', 'tanya')).toBe(true);
+                expect(fuzzyMatch('tanya', 'TANYA')).toBe(true);
+            });
+
+            test('should return false for null/empty inputs', () => {
+                expect(fuzzyMatch('', 'test')).toBe(false);
+                expect(fuzzyMatch('test', '')).toBe(false);
+                expect(fuzzyMatch(null, 'test')).toBe(false);
+            });
+        });
+
+        describe('levenshteinDistance', () => {
+            test('should return 0 for identical strings', () => {
+                expect(levenshteinDistance('test', 'test')).toBe(0);
+            });
+
+            test('should return string length for empty comparison', () => {
+                expect(levenshteinDistance('', 'test')).toBe(4);
+                expect(levenshteinDistance('test', '')).toBe(4);
+            });
+
+            test('should calculate correct distance for substitution', () => {
+                expect(levenshteinDistance('cat', 'bat')).toBe(1);
+            });
+
+            test('should calculate correct distance for insertion', () => {
+                expect(levenshteinDistance('cat', 'cart')).toBe(1);
+            });
+
+            test('should calculate correct distance for deletion', () => {
+                expect(levenshteinDistance('cart', 'cat')).toBe(1);
+            });
+        });
+
+        describe('filterSoundsArray with tags', () => {
+            const localThis = {};
+
+            beforeEach(() => {
+                localThis.soundsWithTags = [
+                    { name: 'Laugh', file: 'laugh.wav', category: 'test', tags: ['iconic', 'voice'] },
+                    { name: 'Cry', file: 'cry.wav', category: 'test' },
+                ];
+            });
+
+            test('should match by tag', () => {
+                const result = filterSoundsArray(localThis.soundsWithTags, 'iconic');
+                expect(result.length).toBe(1);
+                expect(result[0].name).toBe('Laugh');
+            });
+
+            test('should prioritize name matches over tag matches', () => {
+                const result = filterSoundsArray(localThis.soundsWithTags, 'laugh');
+                expect(result.length).toBe(1);
+                expect(result[0].name).toBe('Laugh');
+            });
+
+            test('should handle sounds without tags array', () => {
+                const result = filterSoundsArray(localThis.soundsWithTags, 'cry');
+                expect(result.length).toBe(1);
+                expect(result[0].name).toBe('Cry');
             });
         });
     });

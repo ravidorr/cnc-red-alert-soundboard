@@ -3,8 +3,8 @@
 // ============================================
 
 import { state, elements } from './state.js';
-import { playSound, playRandomSound } from './audio.js';
-import { toggleFavorite, moveFavoriteUp, moveFavoriteDown } from './favorites.js';
+import { playSound, playRandomSound, stopAllSounds, replayLastSound } from './audio.js';
+import { toggleFavorite, moveFavoriteUp, moveFavoriteDown, clearAllFavorites } from './favorites.js';
 import { toggleCategory, scrollToCategory } from './navigation.js';
 import { filterSounds } from './search.js';
 import { toggleMobileMenu, closeMobileMenu } from './mobile.js';
@@ -30,6 +30,14 @@ export function setupEventListeners() {
             e.stopPropagation();
             const file = decodeURIComponent(favBtn.dataset.file);
             toggleFavorite(file);
+            return;
+        }
+
+        // Handle clear all favorites button
+        const clearFavBtn = e.target.closest('.btn-clear-favorites');
+        if (clearFavBtn) {
+            e.stopPropagation();
+            clearAllFavorites();
             return;
         }
 
@@ -131,24 +139,62 @@ export function setupEventListeners() {
         elements.randomSoundBtn.addEventListener('click', playRandomSound);
     }
 
+    // Back to top button
+    const backToTopBtn = document.getElementById('back-to-top');
+    if (backToTopBtn) {
+        window.addEventListener('scroll', () => {
+            backToTopBtn.classList.toggle('visible', window.scrollY > 500);
+        });
+
+        backToTopBtn.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    }
+
     // Keyboard shortcuts
     document.addEventListener('keydown', (e) => {
-        // Escape to close modals
+        const isInInput = document.activeElement.tagName === 'INPUT' ||
+                          document.activeElement.tagName === 'TEXTAREA';
+
+        // Escape to close modals or stop playback
         if (e.key === 'Escape') {
             const shortcutsModal = document.getElementById('shortcuts-modal');
             if (shortcutsModal && shortcutsModal.classList.contains('visible')) {
                 hideShortcutsModal();
+            } else {
+                // Stop any playing sound
+                stopAllSounds();
             }
         }
+
         // Ctrl/Cmd + F to focus search
         if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
             e.preventDefault();
             elements.searchInput.focus();
             elements.searchInput.select();
         }
+
         // ? to show shortcuts (when not in input)
-        if (e.key === '?' && document.activeElement.tagName !== 'INPUT') {
+        if (e.key === '?' && !isInInput) {
             showShortcutsModal();
+        }
+
+        // Space to replay last sound (when not in input)
+        if (e.key === ' ' && !isInInput) {
+            e.preventDefault();
+            replayLastSound();
+        }
+
+        // Number keys 1-9 to play corresponding favorite
+        if (e.key >= '1' && e.key <= '9' && !isInInput) {
+            const index = parseInt(e.key) - 1;
+            if (state.favorites[index]) {
+                const file = state.favorites[index];
+                const btn = document.querySelector(`.sound-btn[data-file="${encodeURIComponent(file)}"]`);
+                if (btn) {
+                    playSound(btn);
+                }
+            }
         }
     });
 
@@ -183,9 +229,13 @@ function showShortcutsModal() {
     if (modal) {
         shortcutsTrigger = document.activeElement;
         modal.classList.add('visible');
+
+        // Add focus trap event listener
+        modal.addEventListener('keydown', handleShortcutsModalKeydown);
+
         const closeBtn = modal.querySelector('#shortcuts-close');
         if (closeBtn) {
-            closeBtn.focus();
+            setTimeout(() => closeBtn.focus(), 50);
         }
     }
 }
@@ -194,9 +244,53 @@ function hideShortcutsModal() {
     const modal = document.getElementById('shortcuts-modal');
     if (modal) {
         modal.classList.remove('visible');
+
+        // Remove focus trap event listener
+        modal.removeEventListener('keydown', handleShortcutsModalKeydown);
+
         if (shortcutsTrigger && shortcutsTrigger.focus) {
             shortcutsTrigger.focus();
         }
         shortcutsTrigger = null;
     }
 }
+
+// Handle keyboard events for shortcuts modal focus trap
+function handleShortcutsModalKeydown(e) {
+    const modal = document.getElementById('shortcuts-modal');
+    if (!modal || !modal.classList.contains('visible')) {
+        return;
+    }
+
+    // Close on Escape
+    if (e.key === 'Escape') {
+        e.preventDefault();
+        hideShortcutsModal();
+        return;
+    }
+
+    // Trap focus on Tab
+    if (e.key === 'Tab') {
+        const focusableElements = modal.querySelectorAll(
+            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+        );
+
+        if (focusableElements.length === 0) {
+            return;
+        }
+
+        const firstElement = focusableElements[0];
+        const lastElement = focusableElements[focusableElements.length - 1];
+
+        if (e.shiftKey && document.activeElement === firstElement) {
+            e.preventDefault();
+            lastElement.focus();
+        } else if (!e.shiftKey && document.activeElement === lastElement) {
+            e.preventDefault();
+            firstElement.focus();
+        }
+    }
+}
+
+// Export for testing
+export { showShortcutsModal, hideShortcutsModal, handleShortcutsModalKeydown };

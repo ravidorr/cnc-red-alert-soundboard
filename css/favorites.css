@@ -2,6 +2,12 @@
    Favorites - Favorites section and drag/drop
    ============================================ */
 
+/* Section Icon Badge */
+.section-icon {
+    margin-right: 6px;
+    font-style: normal;
+}
+
 /* Favorites Section */
 .category-section.favorites-section {
     border-color: var(--green-primary);
@@ -14,6 +20,33 @@
 
 .category-section.favorites-section .category-name {
     color: var(--green-accent);
+}
+
+.category-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.btn-clear-favorites {
+    background: none;
+    border: 1px solid var(--red-dim);
+    color: var(--text-dim);
+    padding: 4px 12px;
+    font-family: var(--font-primary);
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-clear-favorites:hover {
+    border-color: var(--red-alert);
+    color: var(--red-alert);
+}
+
+.btn-clear-favorites:focus-visible {
+    outline: 2px solid var(--green-primary);
+    outline-offset: 2px;
 }
 
 .favorites-empty {
@@ -65,6 +98,23 @@
 
 .category-section.popular-section .category-name {
     color: var(--green-accent);
+}
+
+/* Red accents for Soviet and Combat categories */
+.category-section[data-category="soviets"] .category-header {
+    background: linear-gradient(90deg, rgba(200, 0, 0, 0.15) 0%, var(--bg-panel) 100%);
+}
+
+.category-section[data-category="soviets"] .category-name {
+    color: var(--red-alert);
+}
+
+.category-section[data-category="combat"] .category-header {
+    background: linear-gradient(90deg, rgba(200, 0, 0, 0.1) 0%, var(--bg-panel) 100%);
+}
+
+.category-section[data-category="combat"] .category-name {
+    color: var(--red-dim);
 }
 
 /* Drag and drop for favorites */

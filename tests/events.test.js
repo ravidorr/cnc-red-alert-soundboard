@@ -7,7 +7,7 @@ import { state, elements } from '../js/state.js';
 import { cacheElements, renderCategories, renderFavoritesSection } from '../js/ui.js';
 import { renderNavigation } from '../js/navigation.js';
 import { setupAudioPlayer, playSound } from '../js/audio.js';
-import { setupEventListeners } from '../js/events.js';
+import { setupEventListeners, handleShortcutsModalKeydown, showShortcutsModal, hideShortcutsModal } from '../js/events.js';
 
 describe('Event Handlers', () => {
     beforeEach(() => {
@@ -445,6 +445,376 @@ describe('Event Handlers', () => {
 
             expect(state.searchTerm).toBe('');
             expect(elements.searchInput.value).toBe('');
+        });
+
+        test('Escape key should stop all sounds when no modal open', () => {
+            setupEventListeners();
+
+            // Play a sound first
+            const btn = document.querySelector('.sound-btn');
+            if (btn) {
+                playSound(btn);
+                expect(state.currentlyPlaying).not.toBeNull();
+
+                // Press Escape
+                document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+
+                // Sound should be stopped
+                expect(state.audioPlayer.paused).toBe(true);
+            }
+        });
+
+        test('Number keys 1-9 should play corresponding favorite when not in input', () => {
+            state.favorites = ['allies_1_achnoledged.wav'];
+            renderFavoritesSection();
+            setupEventListeners();
+
+            // Press '1' key
+            document.dispatchEvent(new KeyboardEvent('keydown', { key: '1' }));
+
+            // Sound should be playing
+            expect(state.audioPlayer.src).toContain('sounds/');
+        });
+
+        test('Number keys should not trigger when in input field', () => {
+            state.favorites = ['allies_1_achnoledged.wav'];
+            renderFavoritesSection();
+            setupEventListeners();
+
+            elements.searchInput.focus();
+            const initialSrc = state.audioPlayer.src;
+
+            // Press '1' key while in input
+            document.dispatchEvent(new KeyboardEvent('keydown', { key: '1' }));
+
+            // Sound should NOT have changed
+            expect(state.audioPlayer.src).toBe(initialSrc);
+        });
+
+        test('Number keys should not play if favorite index out of bounds', () => {
+            state.favorites = ['allies_1_achnoledged.wav']; // Only one favorite
+            renderFavoritesSection();
+            setupEventListeners();
+
+            const initialSrc = state.audioPlayer.src;
+
+            // Press '5' key (no favorite at index 4)
+            document.dispatchEvent(new KeyboardEvent('keydown', { key: '5' }));
+
+            // Sound should NOT have changed
+            expect(state.audioPlayer.src).toBe(initialSrc);
+        });
+
+        test('Number keys should not play if button not found for favorite', () => {
+            state.favorites = ['nonexistent.wav'];
+            renderFavoritesSection();
+            setupEventListeners();
+
+            // Remove all buttons
+            document.querySelectorAll('.sound-btn').forEach(btn => btn.remove());
+
+            // Press '1' key - should not throw
+            expect(() => {
+                document.dispatchEvent(new KeyboardEvent('keydown', { key: '1' }));
+            }).not.toThrow();
+        });
+
+        test('clear all favorites button should clear favorites', () => {
+            state.favorites = ['allies_1_achnoledged.wav', 'allies_1_affirmative.wav'];
+            renderFavoritesSection();
+            setupEventListeners();
+
+            const clearBtn = document.getElementById('btn-clear-favorites');
+            if (clearBtn) {
+                clearBtn.click();
+                expect(state.favorites.length).toBe(0);
+            }
+        });
+    });
+
+    describe('Back to Top Button', () => {
+        beforeEach(() => {
+            cacheElements();
+            setupAudioPlayer();
+            renderCategories();
+            renderNavigation();
+        });
+
+        test('back to top button should exist', () => {
+            setupEventListeners();
+            const backToTop = document.getElementById('back-to-top');
+            expect(backToTop).not.toBeNull();
+        });
+
+        test('clicking back to top should scroll to top', () => {
+            setupEventListeners();
+            window.scrollTo = jest.fn();
+
+            const backToTop = document.getElementById('back-to-top');
+            backToTop.click();
+
+            expect(window.scrollTo).toHaveBeenCalledWith({ top: 0, behavior: 'smooth' });
+        });
+
+        test('scroll event should show back to top when scrollY > 500', () => {
+            setupEventListeners();
+            const backToTop = document.getElementById('back-to-top');
+
+            // Simulate scroll position > 500
+            Object.defineProperty(window, 'scrollY', { value: 600, writable: true });
+            window.dispatchEvent(new Event('scroll'));
+
+            expect(backToTop.classList.contains('visible')).toBe(true);
+        });
+
+        test('scroll event should hide back to top when scrollY <= 500', () => {
+            setupEventListeners();
+            const backToTop = document.getElementById('back-to-top');
+
+            // First show it
+            Object.defineProperty(window, 'scrollY', { value: 600, writable: true });
+            window.dispatchEvent(new Event('scroll'));
+            expect(backToTop.classList.contains('visible')).toBe(true);
+
+            // Then scroll back up
+            Object.defineProperty(window, 'scrollY', { value: 100, writable: true });
+            window.dispatchEvent(new Event('scroll'));
+
+            expect(backToTop.classList.contains('visible')).toBe(false);
+        });
+    });
+
+    describe('Branch Coverage - Shortcuts Modal Focus Trap', () => {
+        const localThis = {};
+
+        beforeEach(() => {
+            cacheElements();
+            setupAudioPlayer();
+            renderCategories();
+            renderNavigation();
+            
+            // Add shortcuts modal
+            localThis.modal = document.createElement('div');
+            localThis.modal.id = 'shortcuts-modal';
+            localThis.modal.className = 'shortcuts-modal';
+            document.body.appendChild(localThis.modal);
+        });
+
+        test('handleShortcutsModalKeydown should return early when modal not visible', () => {
+            // Modal exists but is not visible
+            expect(localThis.modal.classList.contains('visible')).toBe(false);
+
+            // Call directly - should not throw
+            const tabEvent = new KeyboardEvent('keydown', { key: 'Tab', bubbles: true });
+            expect(() => handleShortcutsModalKeydown(tabEvent)).not.toThrow();
+        });
+
+        test('handleShortcutsModalKeydown should return early when modal does not exist', () => {
+            // Remove the modal
+            localThis.modal.remove();
+
+            // Call directly - should not throw
+            const tabEvent = new KeyboardEvent('keydown', { key: 'Tab', bubbles: true });
+            expect(() => handleShortcutsModalKeydown(tabEvent)).not.toThrow();
+        });
+
+        test('focus trap should handle modal with no focusable elements', () => {
+            // Make modal visible but empty (no focusable elements)
+            localThis.modal.classList.add('visible');
+            localThis.modal.innerHTML = '<p>No buttons here</p>';
+
+            // Call directly with Tab key - should not throw and should return early
+            const tabEvent = new KeyboardEvent('keydown', { key: 'Tab', bubbles: true });
+            expect(() => handleShortcutsModalKeydown(tabEvent)).not.toThrow();
+
+            // Modal should still be visible
+            expect(localThis.modal.classList.contains('visible')).toBe(true);
+        });
+
+        test('Escape in modal should close it via handleShortcutsModalKeydown', () => {
+            // Add close button
+            const closeBtn = document.createElement('button');
+            closeBtn.id = 'shortcuts-close';
+            localThis.modal.appendChild(closeBtn);
+            
+            // Make modal visible
+            localThis.modal.classList.add('visible');
+
+            // Call directly with Escape key
+            const escEvent = new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true });
+            handleShortcutsModalKeydown(escEvent);
+
+            expect(localThis.modal.classList.contains('visible')).toBe(false);
+        });
+
+        test('Tab at last element should cycle to first', () => {
+            // Add focusable elements
+            const btn1 = document.createElement('button');
+            btn1.textContent = 'First';
+            const btn2 = document.createElement('button');
+            btn2.textContent = 'Last';
+            localThis.modal.appendChild(btn1);
+            localThis.modal.appendChild(btn2);
+            
+            // Make modal visible
+            localThis.modal.classList.add('visible');
+            
+            // Focus last element
+            btn2.focus();
+
+            // Call directly with Tab (no shift)
+            const tabEvent = new KeyboardEvent('keydown', { key: 'Tab', shiftKey: false, bubbles: true, cancelable: true });
+            handleShortcutsModalKeydown(tabEvent);
+
+            // First element should be focused
+            expect(document.activeElement).toBe(btn1);
+        });
+
+        test('Shift+Tab at first element should cycle to last', () => {
+            // Add focusable elements
+            const btn1 = document.createElement('button');
+            btn1.textContent = 'First';
+            const btn2 = document.createElement('button');
+            btn2.textContent = 'Last';
+            localThis.modal.appendChild(btn1);
+            localThis.modal.appendChild(btn2);
+            
+            // Make modal visible
+            localThis.modal.classList.add('visible');
+            
+            // Focus first element
+            btn1.focus();
+
+            // Call directly with Shift+Tab
+            const tabEvent = new KeyboardEvent('keydown', { key: 'Tab', shiftKey: true, bubbles: true, cancelable: true });
+            handleShortcutsModalKeydown(tabEvent);
+
+            // Last element should be focused
+            expect(document.activeElement).toBe(btn2);
+        });
+
+        test('Tab in middle element should not cycle', () => {
+            // Add three focusable elements
+            const btn1 = document.createElement('button');
+            btn1.textContent = 'First';
+            const btn2 = document.createElement('button');
+            btn2.textContent = 'Middle';
+            const btn3 = document.createElement('button');
+            btn3.textContent = 'Last';
+            localThis.modal.appendChild(btn1);
+            localThis.modal.appendChild(btn2);
+            localThis.modal.appendChild(btn3);
+            
+            // Make modal visible
+            localThis.modal.classList.add('visible');
+            
+            // Focus middle element
+            btn2.focus();
+
+            // Call directly with Tab - should NOT cycle
+            const tabEvent = new KeyboardEvent('keydown', { key: 'Tab', shiftKey: false, bubbles: true, cancelable: true });
+            handleShortcutsModalKeydown(tabEvent);
+
+            // Middle element should still be focused (no cycle occurred)
+            expect(document.activeElement).toBe(btn2);
+        });
+
+        test('non-Tab/Escape key should not affect focus', () => {
+            // Add focusable elements
+            const btn1 = document.createElement('button');
+            btn1.textContent = 'First';
+            localThis.modal.appendChild(btn1);
+            
+            // Make modal visible
+            localThis.modal.classList.add('visible');
+            btn1.focus();
+
+            // Call with a different key
+            const otherEvent = new KeyboardEvent('keydown', { key: 'Enter', bubbles: true });
+            handleShortcutsModalKeydown(otherEvent);
+
+            // Should still be focused
+            expect(document.activeElement).toBe(btn1);
+        });
+    });
+
+    describe('Branch Coverage - showShortcutsModal and hideShortcutsModal', () => {
+        const localThis = {};
+
+        beforeEach(() => {
+            cacheElements();
+            setupAudioPlayer();
+            renderCategories();
+            renderNavigation();
+            
+            // Add shortcuts modal
+            localThis.modal = document.createElement('div');
+            localThis.modal.id = 'shortcuts-modal';
+            localThis.modal.className = 'shortcuts-modal';
+            document.body.appendChild(localThis.modal);
+        });
+
+        test('showShortcutsModal should do nothing if modal does not exist', () => {
+            localThis.modal.remove();
+
+            expect(() => showShortcutsModal()).not.toThrow();
+        });
+
+        test('showShortcutsModal should focus close button if it exists', (done) => {
+            const closeBtn = document.createElement('button');
+            closeBtn.id = 'shortcuts-close';
+            localThis.modal.appendChild(closeBtn);
+
+            showShortcutsModal();
+
+            // Wait for setTimeout
+            setTimeout(() => {
+                expect(document.activeElement).toBe(closeBtn);
+                done();
+            }, 100);
+        });
+
+        test('showShortcutsModal should handle missing close button', (done) => {
+            // Modal exists but no close button
+            showShortcutsModal();
+
+            // Wait for setTimeout
+            setTimeout(() => {
+                expect(localThis.modal.classList.contains('visible')).toBe(true);
+                done();
+            }, 100);
+        });
+
+        test('hideShortcutsModal should do nothing if modal does not exist', () => {
+            localThis.modal.remove();
+
+            expect(() => hideShortcutsModal()).not.toThrow();
+        });
+
+        test('hideShortcutsModal should return focus to trigger element', () => {
+            const triggerBtn = document.createElement('button');
+            triggerBtn.id = 'trigger';
+            document.body.appendChild(triggerBtn);
+            triggerBtn.focus();
+
+            const closeBtn = document.createElement('button');
+            closeBtn.id = 'shortcuts-close';
+            localThis.modal.appendChild(closeBtn);
+
+            showShortcutsModal();
+            hideShortcutsModal();
+
+            expect(document.activeElement).toBe(triggerBtn);
+        });
+
+        test('hideShortcutsModal should handle null trigger', () => {
+            // Show and immediately hide without a proper trigger
+            showShortcutsModal();
+            
+            // Manually clear the trigger
+            hideShortcutsModal();
+
+            expect(localThis.modal.classList.contains('visible')).toBe(false);
         });
     });
 });

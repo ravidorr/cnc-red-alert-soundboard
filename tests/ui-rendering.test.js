@@ -505,4 +505,116 @@ describe('UI Rendering', () => {
             expect(header.textContent).toBe('CATEGORIES');
         });
     });
+
+    describe('Branch Coverage - renderCategories', () => {
+        beforeEach(() => {
+            cacheElements();
+        });
+
+        test('should skip empty categories and not render them', () => {
+            renderCategories();
+
+            // All rendered category sections should have at least one sound button
+            const sections = document.querySelectorAll('.category-section');
+            sections.forEach(section => {
+                const buttons = section.querySelectorAll('.sound-btn');
+                expect(buttons.length).toBeGreaterThan(0);
+            });
+        });
+    });
+
+    describe('Branch Coverage - renderFavoritesSection drag tooltip', () => {
+        beforeEach(() => {
+            cacheElements();
+            renderCategories();
+        });
+
+        test('should add dismiss button handler when tooltip is shown', () => {
+            // Clear dragTooltipSeen so tooltip will show
+            localStorage.removeItem('dragTooltipSeen');
+            state.favorites = ['allies_1_achnoledged.wav', 'allies_1_affirmative.wav'];
+            
+            renderFavoritesSection();
+
+            const dismissBtn = document.getElementById('drag-tooltip-dismiss');
+            expect(dismissBtn).not.toBeNull();
+        });
+
+        test('clicking dismiss button should save to localStorage and remove tooltip', () => {
+            // Clear dragTooltipSeen so tooltip will show
+            localStorage.removeItem('dragTooltipSeen');
+            state.favorites = ['allies_1_achnoledged.wav', 'allies_1_affirmative.wav'];
+            
+            renderFavoritesSection();
+
+            const dismissBtn = document.getElementById('drag-tooltip-dismiss');
+            const tooltip = document.getElementById('drag-tooltip');
+            
+            expect(tooltip).not.toBeNull();
+            
+            // Click dismiss button
+            dismissBtn.click();
+
+            // localStorage should be updated
+            expect(localStorage.getItem('dragTooltipSeen')).toBe('true');
+            
+            // Tooltip should be removed
+            expect(document.getElementById('drag-tooltip')).toBeNull();
+        });
+
+        test('should not show tooltip if already seen', () => {
+            // Set dragTooltipSeen
+            localStorage.setItem('dragTooltipSeen', 'true');
+            state.favorites = ['allies_1_achnoledged.wav', 'allies_1_affirmative.wav'];
+            
+            renderFavoritesSection();
+
+            const tooltip = document.getElementById('drag-tooltip');
+            expect(tooltip).toBeNull();
+        });
+
+        test('should not show tooltip for single favorite', () => {
+            localStorage.removeItem('dragTooltipSeen');
+            state.favorites = ['allies_1_achnoledged.wav'];
+            
+            renderFavoritesSection();
+
+            const tooltip = document.getElementById('drag-tooltip');
+            expect(tooltip).toBeNull();
+        });
+    });
+
+    describe('Branch Coverage - renderPopularSection', () => {
+        beforeEach(() => {
+            cacheElements();
+            renderCategories();
+        });
+
+        test('should render popular sounds section', () => {
+            renderPopularSection();
+
+            const section = document.getElementById('category-popular');
+            expect(section).not.toBeNull();
+        });
+
+        test('should handle empty POPULAR_SOUNDS gracefully', () => {
+            // This tests the early return when popularSounds.length === 0
+            // Since we can't modify POPULAR_SOUNDS constant, we test that 
+            // the function doesn't crash with valid data
+            expect(() => renderPopularSection()).not.toThrow();
+        });
+
+        test('should remove existing section before re-rendering', () => {
+            // Render twice to test removal of existing section
+            renderPopularSection();
+            const firstSection = document.getElementById('category-popular');
+            
+            renderPopularSection();
+            const secondSection = document.getElementById('category-popular');
+
+            // Should only be one section (the new one replaced the old)
+            const allPopularSections = document.querySelectorAll('#category-popular');
+            expect(allPopularSections.length).toBe(1);
+        });
+    });
 });

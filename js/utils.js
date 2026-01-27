@@ -128,7 +128,90 @@ export function addToRecentlyPlayedArray(recentlyPlayed, soundFile, maxItems) {
 }
 
 /**
- * Filter sounds based on search term
+ * Simple fuzzy match function using Levenshtein distance
+ * Returns true if the query is "close enough" to the text
+ * @param {string} query - Search query
+ * @param {string} text - Text to match against
+ * @param {number} threshold - Max allowed edit distance (default: 2)
+ * @returns {boolean} True if fuzzy match
+ */
+export function fuzzyMatch(query, text, threshold = 2) {
+    if (!query || !text) {
+        return false;
+    }
+
+    const queryLower = query.toLowerCase();
+    const textLower = text.toLowerCase();
+
+    // Exact substring match (fastest check)
+    if (textLower.includes(queryLower)) {
+        return true;
+    }
+
+    // For very short queries, only allow exact matches
+    if (queryLower.length <= 2) {
+        return false;
+    }
+
+    // Check if query is a fuzzy match for any word in the text
+    const words = textLower.split(/[\s_-]+/);
+    for (const word of words) {
+        // Only fuzzy match if query and word are similar in length
+        if (Math.abs(word.length - queryLower.length) <= threshold) {
+            const distance = levenshteinDistance(queryLower, word);
+            if (distance <= threshold) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+/**
+ * Calculate Levenshtein distance between two strings
+ * @param {string} a - First string
+ * @param {string} b - Second string
+ * @returns {number} Edit distance
+ */
+export function levenshteinDistance(a, b) {
+    if (a.length === 0) {
+        return b.length;
+    }
+    if (b.length === 0) {
+        return a.length;
+    }
+
+    const matrix = [];
+
+    // Initialize matrix
+    for (let i = 0; i <= b.length; i++) {
+        matrix[i] = [i];
+    }
+    for (let j = 0; j <= a.length; j++) {
+        matrix[0][j] = j;
+    }
+
+    // Fill in matrix
+    for (let i = 1; i <= b.length; i++) {
+        for (let j = 1; j <= a.length; j++) {
+            if (b.charAt(i - 1) === a.charAt(j - 1)) {
+                matrix[i][j] = matrix[i - 1][j - 1];
+            } else {
+                matrix[i][j] = Math.min(
+                    matrix[i - 1][j - 1] + 1, // substitution
+                    matrix[i][j - 1] + 1,     // insertion
+                    matrix[i - 1][j] + 1,      // deletion
+                );
+            }
+        }
+    }
+
+    return matrix[b.length][a.length];
+}
+
+/**
+ * Filter sounds based on search term with fuzzy matching
  * @param {Object[]} sounds - Array of sound objects
  * @param {string} searchTerm - Search term (will be lowercased)
  * @returns {Object[]} Filtered sounds
@@ -141,7 +224,19 @@ export function filterSoundsArray(sounds, searchTerm) {
     return sounds.filter(sound => {
         const name = sound.name.toLowerCase();
         const file = sound.file.toLowerCase();
-        return name.includes(term) || file.includes(term);
+        // Exact match first
+        if (name.includes(term) || file.includes(term)) {
+            return true;
+        }
+        // Tag match (if tags exist)
+        if (sound.tags && sound.tags.some(tag => tag.toLowerCase().includes(term))) {
+            return true;
+        }
+        // Fuzzy match on name
+        if (fuzzyMatch(term, name)) {
+            return true;
+        }
+        return false;
     });
 }
 

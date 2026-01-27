@@ -75,4 +75,11 @@
         transition-duration: 0.01ms !important;
         scroll-behavior: auto !important;
     }
+    
+    /* Non-animated playing state indicator for accessibility */
+    .sound-btn.playing {
+        border-width: 2px;
+        border-style: double;
+        animation: none;
+    }
 }

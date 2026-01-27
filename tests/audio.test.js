@@ -12,6 +12,7 @@ import {
     clearPlayingState,
     playRandomSound,
     checkUrlHash,
+    replayLastSound,
 } from '../js/audio.js';
 
 describe('Audio Functions', () => {
@@ -507,6 +508,99 @@ describe('Audio Functions', () => {
                 expect(state.currentlyPlaying).toBeNull();
                 done();
             }, 600);
+        });
+    });
+
+    describe('replayLastSound', () => {
+        beforeEach(() => {
+            cacheElements();
+            setupAudioPlayer();
+            renderCategories();
+        });
+
+        test('should play most recently played sound', () => {
+            // Add a sound to recently played
+            state.recentlyPlayed = ['allies_1_achnoledged.wav'];
+            
+            replayLastSound();
+
+            expect(state.audioPlayer.src).toContain('sounds/');
+        });
+
+        test('should not throw when no recently played sounds', () => {
+            state.recentlyPlayed = [];
+
+            expect(() => replayLastSound()).not.toThrow();
+        });
+
+        test('should not play when muted', () => {
+            state.recentlyPlayed = ['allies_1_achnoledged.wav'];
+            state.isMuted = true;
+
+            replayLastSound();
+
+            // Should not play, should show toast
+            const toast = document.querySelector('.toast');
+            expect(toast).not.toBeNull();
+            expect(toast.textContent).toContain('Unmute');
+
+            state.isMuted = false;
+        });
+
+        test('should handle when button not found', () => {
+            state.recentlyPlayed = ['nonexistent.wav'];
+
+            expect(() => replayLastSound()).not.toThrow();
+        });
+    });
+
+    describe('Branch Coverage - updateVolumeAria', () => {
+        beforeEach(() => {
+            cacheElements();
+            setupAudioPlayer();
+            renderCategories();
+        });
+
+        test('should handle missing volume slider gracefully', () => {
+            // Remove the volume slider
+            const volumeSlider = document.getElementById('volume-slider');
+            if (volumeSlider) volumeSlider.remove();
+
+            // Triggering volume change should not throw even without slider
+            const volumeToggle = document.getElementById('volume-toggle');
+            if (volumeToggle) {
+                expect(() => volumeToggle.click()).not.toThrow();
+            }
+        });
+
+        test('volume slider should update aria attributes on input change', () => {
+            // Add volume toggle and slider if they don't exist
+            if (!document.getElementById('volume-toggle')) {
+                const toggle = document.createElement('button');
+                toggle.id = 'volume-toggle';
+                document.body.appendChild(toggle);
+            }
+            
+            if (!document.getElementById('volume-slider')) {
+                const slider = document.createElement('input');
+                slider.type = 'range';
+                slider.id = 'volume-slider';
+                slider.min = '0';
+                slider.max = '100';
+                slider.value = '100';
+                document.body.appendChild(slider);
+            }
+
+            // Re-setup audio player to attach event listeners
+            setupAudioPlayer();
+
+            const slider = document.getElementById('volume-slider');
+            slider.value = '50';
+            slider.dispatchEvent(new Event('input'));
+
+            // ARIA attributes should be updated
+            expect(slider.getAttribute('aria-valuenow')).toBe('50');
+            expect(slider.getAttribute('aria-valuetext')).toBe('50 percent');
         });
     });
 });
