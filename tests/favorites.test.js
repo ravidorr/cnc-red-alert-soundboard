@@ -86,6 +86,14 @@ describe('Favorites Functions', () => {
             expect(toast).not.toBeNull();
             expect(toast.textContent).toContain('Removed');
         });
+
+        test('should update navigation count', () => {
+            state.favorites = [];
+            toggleFavorite('allies_1_achnoledged.wav');
+
+            const navItem = document.querySelector('.nav-item[data-category="favorites"] .nav-item-count');
+            expect(navItem.textContent).toBe('1');
+        });
     });
 
     describe('updateFavoriteButtons', () => {

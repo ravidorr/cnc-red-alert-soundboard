@@ -103,6 +103,38 @@ describe('Event Handlers', () => {
             expect(section.classList.contains('collapsed')).toBe(true);
         });
 
+        test('pressing ArrowUp in favorites should move item up', () => {
+            state.favorites = ['allies_1_achnoledged.wav', 'allies_1_affirmative.wav'];
+            renderFavoritesSection();
+            setupEventListeners();
+
+            const wrappers = document.querySelectorAll('.favorites-section .sound-btn-wrapper');
+            const secondWrapper = wrappers[1];
+            const soundBtn = secondWrapper.querySelector('.sound-btn');
+
+            const event = new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true });
+            soundBtn.dispatchEvent(event);
+
+            // Second item should now be first
+            expect(state.favorites[0]).toBe('allies_1_affirmative.wav');
+        });
+
+        test('pressing ArrowDown in favorites should move item down', () => {
+            state.favorites = ['allies_1_achnoledged.wav', 'allies_1_affirmative.wav'];
+            renderFavoritesSection();
+            setupEventListeners();
+
+            const wrappers = document.querySelectorAll('.favorites-section .sound-btn-wrapper');
+            const firstWrapper = wrappers[0];
+            const soundBtn = firstWrapper.querySelector('.sound-btn');
+
+            const event = new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true });
+            soundBtn.dispatchEvent(event);
+
+            // First item should now be second
+            expect(state.favorites[1]).toBe('allies_1_achnoledged.wav');
+        });
+
         test('clicking nav item should scroll to category', () => {
             setupEventListeners();
             window.scrollTo = jest.fn();

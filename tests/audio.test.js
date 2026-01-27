@@ -189,6 +189,86 @@ describe('Audio Functions', () => {
 
             expect(() => setupAudioPlayer()).not.toThrow();
         });
+
+        test('should handle missing volume icon element', () => {
+            const localThis = {};
+            localThis.volumeSlider = document.createElement('input');
+            localThis.volumeSlider.type = 'range';
+            localThis.volumeSlider.id = 'volume-slider';
+            localThis.volumeSlider.value = '50';
+            document.body.appendChild(localThis.volumeSlider);
+
+            localThis.volumeToggle = document.createElement('button');
+            localThis.volumeToggle.id = 'volume-toggle';
+            document.body.appendChild(localThis.volumeToggle);
+            // Note: NOT adding volume-icon element
+
+            cacheElements();
+            setupAudioPlayer();
+
+            // Change volume - should not throw even without icon
+            localThis.volumeSlider.value = '30';
+            expect(() => {
+                localThis.volumeSlider.dispatchEvent(new Event('input'));
+            }).not.toThrow();
+        });
+
+        test('should show medium volume icon when volume is below 50', () => {
+            const localThis = {};
+            // Add volume control elements
+            localThis.volumeSlider = document.createElement('input');
+            localThis.volumeSlider.type = 'range';
+            localThis.volumeSlider.id = 'volume-slider';
+            localThis.volumeSlider.value = '30';
+            document.body.appendChild(localThis.volumeSlider);
+
+            localThis.volumeToggle = document.createElement('button');
+            localThis.volumeToggle.id = 'volume-toggle';
+            document.body.appendChild(localThis.volumeToggle);
+
+            localThis.volumeIcon = document.createElement('svg');
+            localThis.volumeIcon.id = 'volume-icon';
+            localThis.volumeToggle.appendChild(localThis.volumeIcon);
+
+            cacheElements();
+            setupAudioPlayer();
+
+            // Set volume to 30 (below 50)
+            localThis.volumeSlider.value = '30';
+            localThis.volumeSlider.dispatchEvent(new Event('input'));
+
+            expect(state.audioPlayer.volume).toBe(0.3);
+            // Should not have muted class
+            expect(localThis.volumeToggle.classList.contains('muted')).toBe(false);
+        });
+
+        test('should handle volume set to zero via slider', () => {
+            const localThis = {};
+            // Add volume control elements
+            localThis.volumeSlider = document.createElement('input');
+            localThis.volumeSlider.type = 'range';
+            localThis.volumeSlider.id = 'volume-slider';
+            localThis.volumeSlider.value = '50';
+            document.body.appendChild(localThis.volumeSlider);
+
+            localThis.volumeToggle = document.createElement('button');
+            localThis.volumeToggle.id = 'volume-toggle';
+            document.body.appendChild(localThis.volumeToggle);
+
+            localThis.volumeIcon = document.createElement('svg');
+            localThis.volumeIcon.id = 'volume-icon';
+            localThis.volumeToggle.appendChild(localThis.volumeIcon);
+
+            cacheElements();
+            setupAudioPlayer();
+
+            // Set volume to 0 via slider (this should NOT update previousVolume)
+            localThis.volumeSlider.value = '0';
+            localThis.volumeSlider.dispatchEvent(new Event('input'));
+
+            expect(state.audioPlayer.volume).toBe(0);
+            expect(state.isMuted).toBe(true);
+        });
     });
 
     describe('playSound', () => {

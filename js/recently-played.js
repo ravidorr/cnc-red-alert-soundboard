@@ -10,6 +10,7 @@ import {
     addToRecentlyPlayedArray,
     isFavorite,
 } from './utils.js';
+import { renderNavigation } from './navigation.js';
 
 // Load recently played from localStorage (wrapper for DOM context)
 export function loadRecentlyPlayed() {
@@ -26,6 +27,7 @@ export function addToRecentlyPlayed(soundFile) {
     state.recentlyPlayed = addToRecentlyPlayedArray(state.recentlyPlayed, soundFile, MAX_RECENTLY_PLAYED);
     saveRecentlyPlayed();
     renderRecentlyPlayedSection();
+    renderNavigation(); // Update nav item count
 }
 
 // Render the recently played section

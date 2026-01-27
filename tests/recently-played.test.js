@@ -70,6 +70,14 @@ describe('Recently Played Functions', () => {
             const stored = JSON.parse(localStorage.getItem('cnc-recently-played'));
             expect(stored).toContain('test.wav');
         });
+
+        test('should update navigation count', () => {
+            state.recentlyPlayed = [];
+            addToRecentlyPlayed('allies_1_achnoledged.wav');
+
+            const navItem = document.querySelector('.nav-item[data-category="recent"] .nav-item-count');
+            expect(navItem.textContent).toBe('1');
+        });
     });
 
     describe('renderRecentlyPlayedSection', () => {

@@ -81,8 +81,9 @@
 
     .btn-random {
         flex: 0 0 auto;
-        min-width: 36px;
-        padding: 8px;
+        min-width: 32px;
+        min-height: 32px;
+        padding: 6px;
     }
 
     .btn-random .random-icon {
@@ -90,9 +91,39 @@
         height: 18px;
     }
 
+    /* Hide text on install button for mobile, keep icon only */
+    .btn-install-header .install-text {
+        display: none;
+    }
+
+    .btn-install-header {
+        flex: 0 0 auto;
+        min-width: 32px;
+        min-height: 32px;
+        padding: 6px;
+    }
+
+    .btn-install-header .install-icon {
+        width: 18px;
+        height: 18px;
+    }
+
     /* Hide volume slider on small mobile, show only toggle */
     .volume-container #volume-slider {
         display: none;
+    }
+
+    /* Make volume button same size as random and install buttons */
+    .btn-volume {
+        border-width: 2px;
+        min-width: 32px;
+        min-height: 32px;
+        padding: 6px;
+    }
+
+    .btn-volume svg {
+        width: 18px;
+        height: 18px;
     }
 
     .content-area {
@@ -174,7 +205,39 @@
 /* Intermediate breakpoint */
 @media (max-width: 600px) {
     .category-content {
-        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    }
+
+    /* Adjust sound buttons for narrower layout */
+    .sound-btn {
+        font-size: 0.85rem;
+        padding: 10px 8px;
+        word-break: normal;
+        overflow-wrap: anywhere;
+    }
+
+    .sound-btn-wrapper .sound-btn {
+        padding-right: 60px;
+    }
+
+    .share-btn {
+        right: 34px;
+        padding: 6px;
+        min-width: 32px;
+        min-height: 32px;
+    }
+
+    .share-btn svg {
+        width: 14px;
+        height: 14px;
+    }
+
+    .favorite-btn {
+        right: 4px;
+        padding: 6px;
+        min-width: 32px;
+        min-height: 32px;
+        font-size: 0.9rem;
     }
 }
 
@@ -186,11 +249,6 @@
     .sound-btn {
         font-size: 0.8rem;
         padding: 8px;
-        min-height: 44px;
-    }
-
-    .favorite-btn {
-        min-width: 44px;
         min-height: 44px;
     }
     

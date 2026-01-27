@@ -13,7 +13,6 @@ export function cacheElements() {
     elements.categoryNav = document.getElementById('category-nav');
     elements.searchInput = document.getElementById('search-input');
     elements.clearSearch = document.getElementById('clear-search');
-    elements.totalFavorites = document.getElementById('total-favorites');
     elements.visibleSounds = document.getElementById('visible-sounds');
     elements.nowPlaying = document.getElementById('now-playing');
     elements.nowPlayingTitle = document.getElementById('now-playing-title');
@@ -277,7 +276,6 @@ export function renderPopularSection() {
 
 // Update statistics
 export function updateStats() {
-    elements.totalFavorites.textContent = state.favorites.length;
     elements.visibleSounds.textContent = SOUNDS.length;
 }
 

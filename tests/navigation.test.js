@@ -273,6 +273,29 @@ describe('Navigation Functions', () => {
             // Focus trap should prevent default and cycle
             expect(elements.sidebar.classList.contains('open')).toBe(true);
         });
+
+        test('should ignore keydown when menu is closed', () => {
+            // Don't open the menu, just dispatch keydown
+            const escEvent = new KeyboardEvent('keydown', { key: 'Escape' });
+            
+            // This should not throw and should not affect sidebar
+            expect(() => document.dispatchEvent(escEvent)).not.toThrow();
+            expect(elements.sidebar.classList.contains('open')).toBe(false);
+        });
+
+        test('should handle Tab when sidebar has no focusable elements', () => {
+            // Clear sidebar content
+            elements.sidebar.innerHTML = '';
+            
+            openMobileMenu();
+
+            // Tab should not throw when no focusable elements
+            const tabEvent = new KeyboardEvent('keydown', { key: 'Tab', bubbles: true });
+            expect(() => document.dispatchEvent(tabEvent)).not.toThrow();
+            
+            // Menu should still be open
+            expect(elements.sidebar.classList.contains('open')).toBe(true);
+        });
     });
 
     describe('createNavHeader', () => {

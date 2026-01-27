@@ -56,10 +56,10 @@
                     <span class="random-text">RANDOM</span>
                 </button>
                 <button id="install-btn" class="btn-action btn-install-header" title="Install App">
-                    <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                    <svg class="install-icon" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">
                         <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
                     </svg>
-                    INSTALL
+                    <span class="install-text">INSTALL</span>
                 </button>
             </div>
         </div>
@@ -75,10 +75,6 @@
                 <!-- Categories will be populated by JS -->
             </nav>
             <div class="stats-panel">
-                <div class="stat">
-                    <span class="stat-label">FAVORITES</span>
-                    <span class="stat-value" id="total-favorites">0</span>
-                </div>
                 <div class="stat">
                     <span class="stat-label">VISIBLE</span>
                     <span class="stat-value" id="visible-sounds">0</span>
@@ -117,7 +113,7 @@
             <span class="footer-text">ESTABLISHING BATTLEFIELD CONTROL... STAND BY.</span>
             <div class="footer-actions">
                 <button id="help-btn" class="btn-help" aria-label="Keyboard shortcuts" title="Keyboard shortcuts">?</button>
-                <span class="footer-version">v1.4.0</span>
+                <span class="footer-version">v1.5.0</span>
             </div>
         </div>
     </footer>

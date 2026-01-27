@@ -196,13 +196,6 @@ describe('UI Rendering', () => {
             cacheElements();
         });
 
-        test('should update favorites count', () => {
-            state.favorites = ['a.wav', 'b.wav'];
-            updateStats();
-
-            expect(document.getElementById('total-favorites').textContent).toBe('2');
-        });
-
         test('should update visible sounds count', () => {
             updateStats();
 
@@ -470,6 +463,36 @@ describe('UI Rendering', () => {
 
             expect(shareMock.mock.calls[0][0].text).toContain('Affirmative');
             expect(shareMock.mock.calls[0][0].title).toBe('Affirmative');
+        });
+
+        test('should not show toast when user cancels share', async () => {
+            const localThis = {};
+            localThis.abortError = new Error('Share cancelled');
+            localThis.abortError.name = 'AbortError';
+
+            const clipboardMock = jest.fn().mockResolvedValue();
+            const mockBlob = new Blob(['audio data'], { type: 'audio/wav' });
+
+            global.fetch = jest.fn().mockResolvedValue({
+                blob: () => Promise.resolve(mockBlob),
+            });
+
+            Object.assign(navigator, {
+                share: jest.fn().mockRejectedValue(localThis.abortError),
+                canShare: jest.fn().mockReturnValue(false),
+                clipboard: { writeText: clipboardMock },
+            });
+
+            // Clear any existing toasts
+            document.querySelectorAll('.toast').forEach(t => t.remove());
+
+            await shareSound('test.wav', 'Test Sound');
+
+            // Wait for promise
+            await new Promise(resolve => setTimeout(resolve, 10));
+
+            // Should NOT fall back to clipboard when user cancels
+            expect(clipboardMock).not.toHaveBeenCalled();
         });
     });
 

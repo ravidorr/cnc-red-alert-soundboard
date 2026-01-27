@@ -99,6 +99,13 @@ describe('Search Functions', () => {
             const visible = document.querySelectorAll('.sound-btn-wrapper:not([style*="display: none"])');
             expect(visible.length).toBeGreaterThan(0);
         });
+
+        test('should handle null contentArea gracefully', () => {
+            elements.contentArea = null;
+            state.searchTerm = 'test';
+
+            expect(() => filterSounds()).not.toThrow();
+        });
     });
 
     describe('Search Empty State', () => {
@@ -173,6 +180,10 @@ describe('Search Functions', () => {
         beforeEach(() => {
             cacheElements();
             renderCategories();
+            // Add announcer element (required for updateSearchResultIndicator to be called)
+            const announcer = document.createElement('div');
+            announcer.id = 'search-announcer';
+            document.body.appendChild(announcer);
             // Add result indicator elements to content-area
             const contentArea = document.getElementById('content-area');
             const indicator = document.createElement('div');
@@ -221,6 +232,23 @@ describe('Search Functions', () => {
 
             state.searchTerm = 'tanya';
             expect(() => filterSounds()).not.toThrow();
+        });
+
+        test('should show indicator when search has results', () => {
+            state.searchTerm = 'tanya';
+            filterSounds();
+
+            const indicator = document.getElementById('search-result-indicator');
+            expect(indicator.style.display).toBe('flex');
+        });
+
+        test('should display result count in indicator', () => {
+            state.searchTerm = 'tanya';
+            filterSounds();
+
+            const resultText = document.getElementById('search-result-text');
+            expect(resultText.textContent).toContain('Showing');
+            expect(resultText.textContent).toContain('sounds');
         });
     });
 });

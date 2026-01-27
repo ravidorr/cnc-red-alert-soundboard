@@ -328,6 +328,62 @@ describe('Install Functions', () => {
                 elements.installPrompt.dispatchEvent(tabEvent);
             }).not.toThrow();
         });
+
+        test('Tab on last element should cycle to first', () => {
+            const localThis = {};
+            // Add focusable buttons to install prompt
+            localThis.firstBtn = document.createElement('button');
+            localThis.firstBtn.id = 'first-btn';
+            localThis.lastBtn = document.createElement('button');
+            localThis.lastBtn.id = 'last-btn';
+            elements.installPrompt.appendChild(localThis.firstBtn);
+            elements.installPrompt.appendChild(localThis.lastBtn);
+
+            showInstallPrompt();
+            localThis.lastBtn.focus();
+
+            const tabEvent = new KeyboardEvent('keydown', { key: 'Tab', bubbles: true });
+            elements.installPrompt.dispatchEvent(tabEvent);
+
+            // Modal should still be visible (focus trap working)
+            expect(elements.installPrompt.classList.contains('visible')).toBe(true);
+        });
+
+        test('Shift+Tab on first element should cycle to last', () => {
+            const localThis = {};
+            // Add focusable buttons to install prompt
+            localThis.firstBtn = document.createElement('button');
+            localThis.firstBtn.id = 'first-btn-shift';
+            localThis.lastBtn = document.createElement('button');
+            localThis.lastBtn.id = 'last-btn-shift';
+            elements.installPrompt.appendChild(localThis.firstBtn);
+            elements.installPrompt.appendChild(localThis.lastBtn);
+
+            showInstallPrompt();
+            localThis.firstBtn.focus();
+
+            const tabEvent = new KeyboardEvent('keydown', { key: 'Tab', shiftKey: true, bubbles: true });
+            elements.installPrompt.dispatchEvent(tabEvent);
+
+            // Modal should still be visible (focus trap working)
+            expect(elements.installPrompt.classList.contains('visible')).toBe(true);
+        });
+
+        test('showInstallPrompt should focus first button when available', (done) => {
+            const localThis = {};
+            // Add a button to focus
+            localThis.firstBtn = document.createElement('button');
+            localThis.firstBtn.id = 'focus-test-btn';
+            elements.installPrompt.appendChild(localThis.firstBtn);
+
+            showInstallPrompt();
+
+            // Wait for setTimeout in showInstallPrompt
+            setTimeout(() => {
+                expect(document.activeElement).toBe(localThis.firstBtn);
+                done();
+            }, 100);
+        });
     });
 
     describe('registerServiceWorker', () => {
