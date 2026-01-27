@@ -10,7 +10,6 @@ import {
     renderCategories,
     renderFavoritesSection,
     renderPopularSection,
-    updateStats,
     showToast,
     showSearchEmptyState,
     hideSearchEmptyState,
@@ -205,19 +204,6 @@ describe('UI Rendering', () => {
         });
     });
 
-    describe('updateStats', () => {
-        beforeEach(() => {
-            cacheElements();
-        });
-
-        test('should update visible sounds count', () => {
-            updateStats();
-
-            expect(document.getElementById('visible-sounds').textContent)
-                .toBe(SOUNDS.length.toString());
-        });
-    });
-
     describe('showToast', () => {
         beforeEach(() => {
             cacheElements();
@@ -277,6 +263,69 @@ describe('UI Rendering', () => {
                 expect(toast).toBeNull();
                 done();
             }, 150);
+        });
+
+        test('should pause timer on mouseenter and resume on mouseleave', (done) => {
+            showToast('Test message', 'info', 100);
+
+            const toast = document.querySelector('.toast');
+            
+            // Trigger mouseenter to pause timer
+            toast.dispatchEvent(new Event('mouseenter'));
+            
+            // Wait past original timeout
+            setTimeout(() => {
+                // Toast should still exist because timer was paused
+                expect(document.querySelector('.toast')).not.toBeNull();
+                
+                // Trigger mouseleave to resume timer with 2000ms
+                toast.dispatchEvent(new Event('mouseleave'));
+                
+                // Toast should eventually be removed
+                setTimeout(() => {
+                    expect(document.querySelector('.toast')).toBeNull();
+                    done();
+                }, 2100);
+            }, 150);
+        });
+
+        test('should pause timer on focusin and resume on focusout', (done) => {
+            showToast('Test message', 'info', 100);
+
+            const toast = document.querySelector('.toast');
+            
+            // Trigger focusin to pause timer
+            toast.dispatchEvent(new Event('focusin'));
+            
+            // Wait past original timeout
+            setTimeout(() => {
+                // Toast should still exist because timer was paused
+                expect(document.querySelector('.toast')).not.toBeNull();
+                
+                // Trigger focusout to resume timer with 2000ms
+                toast.dispatchEvent(new Event('focusout'));
+                
+                // Toast should eventually be removed
+                setTimeout(() => {
+                    expect(document.querySelector('.toast')).toBeNull();
+                    done();
+                }, 2100);
+            }, 150);
+        });
+
+        test('should handle mouseleave when toast already removed', () => {
+            showToast('Test message', 'info', 100);
+
+            const toast = document.querySelector('.toast');
+            
+            // Trigger mouseenter then manually remove toast
+            toast.dispatchEvent(new Event('mouseenter'));
+            toast.remove();
+            
+            // Trigger mouseleave - should not throw
+            expect(() => {
+                toast.dispatchEvent(new Event('mouseleave'));
+            }).not.toThrow();
         });
     });
 

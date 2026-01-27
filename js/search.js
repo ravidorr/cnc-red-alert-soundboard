@@ -66,9 +66,6 @@ export function filterSounds() {
         hideSearchEmptyState();
     }
 
-    // Update visible count
-    elements.visibleSounds.textContent = visibleCount;
-
     // Clear aria-busy
     if (elements.contentArea) {
         elements.contentArea.setAttribute('aria-busy', 'false');

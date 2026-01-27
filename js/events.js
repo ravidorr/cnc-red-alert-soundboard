@@ -11,6 +11,7 @@ import { toggleMobileMenu, closeMobileMenu } from './mobile.js';
 import { shareSound } from './ui.js';
 import { debounce } from './utils.js';
 import { showOnboardingTooltipForced } from './onboarding.js';
+import { showContactModal, hideContactModal } from './contact-modal.js';
 
 // Debounced search function (200ms delay for performance)
 const debouncedFilterSounds = debounce(filterSounds, 200);
@@ -203,8 +204,11 @@ export function setupEventListeners() {
         // Escape to close modals or stop playback
         if (e.key === 'Escape') {
             const shortcutsModal = document.getElementById('shortcuts-modal');
+            const contactModal = document.getElementById('contact-modal');
             if (shortcutsModal && shortcutsModal.classList.contains('visible')) {
                 hideShortcutsModal();
+            } else if (contactModal && contactModal.classList.contains('visible')) {
+                hideContactModal();
             } else {
                 // Stop any playing sound
                 stopAllSounds();
@@ -270,6 +274,28 @@ export function setupEventListeners() {
         showTipsBtn.addEventListener('click', () => {
             hideShortcutsModal();
             showOnboardingTooltipForced();
+        });
+    }
+
+    // Contact button
+    const contactBtn = document.getElementById('contact-btn');
+    if (contactBtn) {
+        contactBtn.addEventListener('click', showContactModal);
+    }
+
+    // Contact modal close
+    const contactClose = document.getElementById('contact-close');
+    if (contactClose) {
+        contactClose.addEventListener('click', hideContactModal);
+    }
+
+    // Close contact modal on backdrop click
+    const contactModal = document.getElementById('contact-modal');
+    if (contactModal) {
+        contactModal.addEventListener('click', (e) => {
+            if (e.target === contactModal) {
+                hideContactModal();
+            }
         });
     }
 }
@@ -346,4 +372,4 @@ function handleShortcutsModalKeydown(e) {
 }
 
 // Export for testing
-export { showShortcutsModal, hideShortcutsModal, handleShortcutsModalKeydown };
+export { showShortcutsModal, hideShortcutsModal, handleShortcutsModalKeydown, showContactModal, hideContactModal };

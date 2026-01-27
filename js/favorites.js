@@ -11,7 +11,7 @@ import {
     isFavorite,
     reorderFavoritesArray,
 } from './utils.js';
-import { showToast, renderFavoritesSection, updateStats } from './ui.js';
+import { showToast, renderFavoritesSection } from './ui.js';
 import { renderNavigation } from './navigation.js';
 import { showConfirmModal } from './confirm-modal.js';
 
@@ -51,7 +51,6 @@ export async function clearAllFavorites() {
     renderFavoritesSection();
     renderNavigation();
     updateFavoriteButtons();
-    updateStats();
     showToast('ALL TARGETS CLEARED', 'info');
 }
 
@@ -63,7 +62,6 @@ export function toggleFavorite(soundFile) {
     renderFavoritesSection();
     renderNavigation();
     updateFavoriteButtons();
-    updateStats();
 
     // Show toast feedback with themed copy
     const sound = SOUNDS.find(s => s.file === soundFile);

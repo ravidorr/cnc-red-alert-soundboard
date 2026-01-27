@@ -12,7 +12,6 @@ export function setupFullDOM() {
         <input id="search-input" />
         <button id="clear-search"></button>
         <button id="install-btn" class="btn-install-header"></button>
-        <span id="visible-sounds">0</span>
         <div id="now-playing"></div>
         <span id="now-playing-title">-</span>
         <audio id="audio-player"></audio>
@@ -67,7 +66,6 @@ export function resetElements(elements) {
     elements.categoryNav = null;
     elements.searchInput = null;
     elements.clearSearch = null;
-    elements.visibleSounds = null;
     elements.nowPlaying = null;
     elements.nowPlayingTitle = null;
     elements.audioPlayer = null;

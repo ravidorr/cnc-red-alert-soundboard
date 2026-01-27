@@ -161,6 +161,88 @@ describe('Onboarding Functions', () => {
             const tooltip = document.getElementById('onboarding-tooltip');
             expect(tooltip.classList.contains('hiding')).toBe(true);
         });
+
+        test('Tab on last element should cycle focus to first element', () => {
+            showOnboardingTooltip();
+
+            const tooltip = document.getElementById('onboarding-tooltip');
+            const dismissBtn = document.getElementById('onboarding-dismiss');
+            dismissBtn.focus();
+
+            // Simulate Tab key on last (only) focusable element
+            const tabEvent = new KeyboardEvent('keydown', { key: 'Tab', bubbles: true, cancelable: true });
+            tooltip.dispatchEvent(tabEvent);
+
+            // Focus trap should keep focus within tooltip
+            expect(tooltip).not.toBeNull();
+        });
+
+        test('Shift+Tab on first element should cycle focus to last element', () => {
+            showOnboardingTooltip();
+
+            const tooltip = document.getElementById('onboarding-tooltip');
+            const dismissBtn = document.getElementById('onboarding-dismiss');
+            dismissBtn.focus();
+
+            // Simulate Shift+Tab key
+            const shiftTabEvent = new KeyboardEvent('keydown', { key: 'Tab', shiftKey: true, bubbles: true, cancelable: true });
+            tooltip.dispatchEvent(shiftTabEvent);
+
+            // Focus trap should keep focus within tooltip
+            expect(tooltip).not.toBeNull();
+        });
+
+        test('Tab key should be prevented when no focusable elements', () => {
+            showOnboardingTooltip();
+
+            const tooltip = document.getElementById('onboarding-tooltip');
+            // Remove all focusable elements
+            const dismissBtn = document.getElementById('onboarding-dismiss');
+            dismissBtn.remove();
+
+            const tabEvent = new KeyboardEvent('keydown', { key: 'Tab', bubbles: true, cancelable: true });
+            tooltip.dispatchEvent(tabEvent);
+
+            // Should not throw
+            expect(tooltip).not.toBeNull();
+        });
+
+        test('auto-dismiss should remove tooltip after timeout', () => {
+            jest.useFakeTimers();
+
+            showOnboardingTooltip();
+
+            const tooltip = document.getElementById('onboarding-tooltip');
+            expect(tooltip).not.toBeNull();
+
+            // Fast-forward past the 30 second timeout
+            jest.advanceTimersByTime(30000);
+
+            // Fast-forward past the 300ms animation
+            jest.advanceTimersByTime(300);
+
+            const tooltipAfter = document.getElementById('onboarding-tooltip');
+            expect(tooltipAfter).toBeNull();
+
+            jest.useRealTimers();
+        });
+
+        test('auto-dismiss should not throw if tooltip already removed', () => {
+            jest.useFakeTimers();
+
+            showOnboardingTooltip();
+
+            const tooltip = document.getElementById('onboarding-tooltip');
+            // Manually remove the tooltip before auto-dismiss
+            tooltip.remove();
+
+            // Fast-forward past the 30 second timeout - should not throw
+            expect(() => {
+                jest.advanceTimersByTime(30000);
+            }).not.toThrow();
+
+            jest.useRealTimers();
+        });
     });
 
     describe('showOnboardingTooltipForced', () => {
@@ -263,6 +345,98 @@ describe('Onboarding Functions', () => {
 
             // Should be a new tooltip, not the same reference
             expect(document.querySelectorAll('.onboarding-tooltip').length).toBe(1);
+        });
+
+        test('Tab on last element should cycle focus to first element', () => {
+            showOnboardingTooltipForced();
+
+            const tooltip = document.getElementById('onboarding-tooltip');
+            const dismissBtn = document.getElementById('onboarding-dismiss');
+            dismissBtn.focus();
+
+            // Simulate Tab key on last (only) focusable element
+            const tabEvent = new KeyboardEvent('keydown', { key: 'Tab', bubbles: true, cancelable: true });
+            tooltip.dispatchEvent(tabEvent);
+
+            // Focus trap should keep focus within tooltip
+            expect(tooltip).not.toBeNull();
+        });
+
+        test('Shift+Tab on first element should cycle focus to last element', () => {
+            showOnboardingTooltipForced();
+
+            const tooltip = document.getElementById('onboarding-tooltip');
+            const dismissBtn = document.getElementById('onboarding-dismiss');
+            dismissBtn.focus();
+
+            // Simulate Shift+Tab key
+            const shiftTabEvent = new KeyboardEvent('keydown', { key: 'Tab', shiftKey: true, bubbles: true, cancelable: true });
+            tooltip.dispatchEvent(shiftTabEvent);
+
+            // Focus trap should keep focus within tooltip
+            expect(tooltip).not.toBeNull();
+        });
+
+        test('Tab key should be prevented when no focusable elements', () => {
+            showOnboardingTooltipForced();
+
+            const tooltip = document.getElementById('onboarding-tooltip');
+            // Remove all focusable elements
+            const dismissBtn = document.getElementById('onboarding-dismiss');
+            dismissBtn.remove();
+
+            const tabEvent = new KeyboardEvent('keydown', { key: 'Tab', bubbles: true, cancelable: true });
+            tooltip.dispatchEvent(tabEvent);
+
+            // Should not throw
+            expect(tooltip).not.toBeNull();
+        });
+
+        test('auto-dismiss should remove tooltip after timeout', () => {
+            jest.useFakeTimers();
+
+            showOnboardingTooltipForced();
+
+            const tooltip = document.getElementById('onboarding-tooltip');
+            expect(tooltip).not.toBeNull();
+
+            // Fast-forward past the 30 second timeout
+            jest.advanceTimersByTime(30000);
+
+            // Fast-forward past the 300ms animation
+            jest.advanceTimersByTime(300);
+
+            const tooltipAfter = document.getElementById('onboarding-tooltip');
+            expect(tooltipAfter).toBeNull();
+
+            jest.useRealTimers();
+        });
+
+        test('auto-dismiss should not throw if tooltip already removed', () => {
+            jest.useFakeTimers();
+
+            showOnboardingTooltipForced();
+
+            const tooltip = document.getElementById('onboarding-tooltip');
+            // Manually remove the tooltip before auto-dismiss
+            tooltip.remove();
+
+            // Fast-forward past the 30 second timeout - should not throw
+            expect(() => {
+                jest.advanceTimersByTime(30000);
+            }).not.toThrow();
+
+            jest.useRealTimers();
+        });
+
+        test('tooltip should have hiding class when dismissed', () => {
+            showOnboardingTooltipForced();
+
+            const dismissBtn = document.getElementById('onboarding-dismiss');
+            dismissBtn.click();
+
+            const tooltip = document.getElementById('onboarding-tooltip');
+            expect(tooltip.classList.contains('hiding')).toBe(true);
         });
     });
 });

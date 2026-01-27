@@ -2,7 +2,7 @@
 // Main - Application entry point
 // ============================================
 
-import { cacheElements, renderCategories, renderFavoritesSection, renderPopularSection, updateStats } from './ui.js';
+import { cacheElements, renderCategories, renderFavoritesSection, renderPopularSection } from './ui.js';
 import { renderNavigation, applyCollapsedStates } from './navigation.js';
 import { renderRecentlyPlayedSection, loadRecentlyPlayed } from './recently-played.js';
 import { loadFavorites } from './favorites.js';
@@ -26,7 +26,6 @@ function init() {
     renderNavigation();
     applyCollapsedStates(); // Apply saved collapse states
     setupEventListeners();
-    updateStats();
     registerServiceWorker();
     checkUrlHash();
 
@@ -62,5 +61,6 @@ export * from './install.js';
 export * from './events.js';
 export * from './onboarding.js';
 export * from './confirm-modal.js';
+export * from './contact-modal.js';
 
 export { init };

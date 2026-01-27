@@ -19,7 +19,6 @@ export const elements = {
     categoryNav: null,
     searchInput: null,
     clearSearch: null,
-    visibleSounds: null,
     nowPlaying: null,
     nowPlayingTitle: null,
     audioPlayer: null,

@@ -7,7 +7,7 @@ import { state, elements } from '../js/state.js';
 import { cacheElements, renderCategories, renderFavoritesSection } from '../js/ui.js';
 import { renderNavigation } from '../js/navigation.js';
 import { setupAudioPlayer, playSound } from '../js/audio.js';
-import { setupEventListeners, handleShortcutsModalKeydown, showShortcutsModal, hideShortcutsModal } from '../js/events.js';
+import { setupEventListeners, handleShortcutsModalKeydown, showShortcutsModal, hideShortcutsModal, showContactModal, hideContactModal } from '../js/events.js';
 
 describe('Event Handlers', () => {
     beforeEach(() => {
@@ -49,6 +49,26 @@ describe('Event Handlers', () => {
             expect(state.favorites.length).toBe(1);
         });
 
+        test('pressing Enter on favorite button should toggle favorite', () => {
+            setupEventListeners();
+
+            const favBtn = document.querySelector('.favorite-btn');
+            const event = new KeyboardEvent('keydown', { key: 'Enter', bubbles: true });
+            favBtn.dispatchEvent(event);
+
+            expect(state.favorites.length).toBe(1);
+        });
+
+        test('pressing Space on favorite button should toggle favorite', () => {
+            setupEventListeners();
+
+            const favBtn = document.querySelector('.favorite-btn');
+            const event = new KeyboardEvent('keydown', { key: ' ', bubbles: true });
+            favBtn.dispatchEvent(event);
+
+            expect(state.favorites.length).toBe(1);
+        });
+
         test('clicking share button should call shareSound', async () => {
             setupEventListeners();
 
@@ -60,6 +80,44 @@ describe('Event Handlers', () => {
 
             const shareBtn = document.querySelector('.share-btn');
             shareBtn.click();
+
+            // Wait for async operation
+            await new Promise(resolve => setTimeout(resolve, 50));
+
+            expect(writeTextMock).toHaveBeenCalled();
+        });
+
+        test('pressing Enter on share button should call shareSound', async () => {
+            setupEventListeners();
+
+            // Mock clipboard API
+            const writeTextMock = jest.fn().mockResolvedValue();
+            Object.assign(navigator, {
+                clipboard: { writeText: writeTextMock },
+            });
+
+            const shareBtn = document.querySelector('.share-btn');
+            const event = new KeyboardEvent('keydown', { key: 'Enter', bubbles: true });
+            shareBtn.dispatchEvent(event);
+
+            // Wait for async operation
+            await new Promise(resolve => setTimeout(resolve, 50));
+
+            expect(writeTextMock).toHaveBeenCalled();
+        });
+
+        test('pressing Space on share button should call shareSound', async () => {
+            setupEventListeners();
+
+            // Mock clipboard API
+            const writeTextMock = jest.fn().mockResolvedValue();
+            Object.assign(navigator, {
+                clipboard: { writeText: writeTextMock },
+            });
+
+            const shareBtn = document.querySelector('.share-btn');
+            const event = new KeyboardEvent('keydown', { key: ' ', bubbles: true });
+            shareBtn.dispatchEvent(event);
 
             // Wait for async operation
             await new Promise(resolve => setTimeout(resolve, 50));
@@ -553,6 +611,72 @@ describe('Event Handlers', () => {
             // Cleanup
             confirmModal.remove();
         });
+
+        test('pressing Enter on clear favorites button should trigger clear', async () => {
+            // Setup confirm modal in DOM for testing
+            const confirmModal = document.createElement('div');
+            confirmModal.id = 'confirm-modal';
+            confirmModal.className = 'confirm-modal';
+            confirmModal.innerHTML = `
+                <h2 id="confirm-title"></h2>
+                <p id="confirm-message"></p>
+                <button id="confirm-execute">EXECUTE</button>
+                <button id="confirm-abort">ABORT</button>
+            `;
+            document.body.appendChild(confirmModal);
+
+            state.favorites = ['allies_1_achnoledged.wav', 'allies_1_affirmative.wav'];
+            renderFavoritesSection();
+            setupEventListeners();
+
+            const clearBtn = document.getElementById('btn-clear-favorites');
+            if (clearBtn) {
+                const event = new KeyboardEvent('keydown', { key: 'Enter', bubbles: true });
+                clearBtn.dispatchEvent(event);
+
+                // Wait for modal to appear, then click execute
+                await new Promise(resolve => setTimeout(resolve, 50));
+                const executeBtn = document.getElementById('confirm-execute');
+                executeBtn.click();
+
+                // Wait for async operation to complete
+                await new Promise(resolve => setTimeout(resolve, 50));
+                expect(state.favorites.length).toBe(0);
+            }
+
+            // Cleanup
+            confirmModal.remove();
+        });
+
+        test('show tips button should close shortcuts modal and show onboarding', () => {
+            // Add shortcuts modal with show tips button
+            const modal = document.createElement('div');
+            modal.id = 'shortcuts-modal';
+            modal.className = 'shortcuts-modal visible';
+            const closeBtn = document.createElement('button');
+            closeBtn.id = 'shortcuts-close';
+            const showTipsBtn = document.createElement('button');
+            showTipsBtn.id = 'show-tips-btn';
+            modal.appendChild(closeBtn);
+            modal.appendChild(showTipsBtn);
+            document.body.appendChild(modal);
+
+            setupEventListeners();
+
+            // Click show tips button
+            showTipsBtn.click();
+
+            // Shortcuts modal should be closed
+            expect(modal.classList.contains('visible')).toBe(false);
+
+            // Onboarding tooltip should be created
+            const onboardingTooltip = document.getElementById('onboarding-tooltip');
+            expect(onboardingTooltip).not.toBeNull();
+
+            // Cleanup
+            modal.remove();
+            if (onboardingTooltip) onboardingTooltip.remove();
+        });
     });
 
     describe('Back to Top Button', () => {
@@ -838,6 +962,113 @@ describe('Event Handlers', () => {
             hideShortcutsModal();
 
             expect(localThis.modal.classList.contains('visible')).toBe(false);
+        });
+    });
+
+    describe('Contact Modal Integration', () => {
+        const localThis = {};
+
+        beforeEach(() => {
+            cacheElements();
+            setupAudioPlayer();
+            renderCategories();
+            renderNavigation();
+
+            // Add contact modal
+            localThis.modal = document.createElement('div');
+            localThis.modal.id = 'contact-modal';
+            localThis.modal.className = 'contact-modal';
+            localThis.modal.innerHTML = `
+                <div class="contact-modal-content">
+                    <a href="mailto:test@test.com" class="contact-item">Email</a>
+                    <button id="contact-close" class="btn-dismiss">CLOSE</button>
+                </div>
+            `;
+            document.body.appendChild(localThis.modal);
+
+            // Add contact button
+            localThis.contactBtn = document.createElement('button');
+            localThis.contactBtn.id = 'contact-btn';
+            document.body.appendChild(localThis.contactBtn);
+        });
+
+        test('contact button should show contact modal', () => {
+            setupEventListeners();
+
+            localThis.contactBtn.click();
+
+            expect(localThis.modal.classList.contains('visible')).toBe(true);
+        });
+
+        test('contact close button should hide modal', () => {
+            setupEventListeners();
+            localThis.modal.classList.add('visible');
+
+            const closeBtn = document.getElementById('contact-close');
+            closeBtn.click();
+
+            expect(localThis.modal.classList.contains('visible')).toBe(false);
+        });
+
+        test('clicking contact modal backdrop should close it', () => {
+            setupEventListeners();
+            localThis.modal.classList.add('visible');
+
+            // Click on the modal backdrop (not content)
+            const clickEvent = new MouseEvent('click', { bubbles: true });
+            Object.defineProperty(clickEvent, 'target', { value: localThis.modal });
+            localThis.modal.dispatchEvent(clickEvent);
+
+            expect(localThis.modal.classList.contains('visible')).toBe(false);
+        });
+
+        test('Escape should close contact modal if open', () => {
+            setupEventListeners();
+            showContactModal();
+
+            expect(localThis.modal.classList.contains('visible')).toBe(true);
+
+            document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+
+            expect(localThis.modal.classList.contains('visible')).toBe(false);
+        });
+
+        test('Escape should close contact modal before shortcuts modal', () => {
+            // Add shortcuts modal too
+            const shortcutsModal = document.createElement('div');
+            shortcutsModal.id = 'shortcuts-modal';
+            shortcutsModal.className = 'shortcuts-modal';
+            document.body.appendChild(shortcutsModal);
+
+            setupEventListeners();
+
+            // Open contact modal
+            showContactModal();
+            expect(localThis.modal.classList.contains('visible')).toBe(true);
+
+            // Press Escape should close contact modal, not shortcuts
+            document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+
+            expect(localThis.modal.classList.contains('visible')).toBe(false);
+            expect(shortcutsModal.classList.contains('visible')).toBe(false);
+        });
+
+        test('should handle missing contact button gracefully', () => {
+            localThis.contactBtn.remove();
+
+            expect(() => setupEventListeners()).not.toThrow();
+        });
+
+        test('should handle missing contact close button gracefully', () => {
+            document.getElementById('contact-close').remove();
+
+            expect(() => setupEventListeners()).not.toThrow();
+        });
+
+        test('should handle missing contact modal gracefully', () => {
+            localThis.modal.remove();
+
+            expect(() => setupEventListeners()).not.toThrow();
         });
     });
 });

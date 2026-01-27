@@ -13,7 +13,6 @@ export function cacheElements() {
     elements.categoryNav = document.getElementById('category-nav');
     elements.searchInput = document.getElementById('search-input');
     elements.clearSearch = document.getElementById('clear-search');
-    elements.visibleSounds = document.getElementById('visible-sounds');
     elements.nowPlaying = document.getElementById('now-playing');
     elements.nowPlayingTitle = document.getElementById('now-playing-title');
     elements.audioPlayer = document.getElementById('audio-player');
@@ -275,11 +274,6 @@ export function renderPopularSection() {
     } else {
         elements.contentArea.insertAdjacentHTML('afterbegin', sectionHtml);
     }
-}
-
-// Update statistics
-export function updateStats() {
-    elements.visibleSounds.textContent = SOUNDS.length;
 }
 
 /**

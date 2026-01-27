@@ -74,15 +74,6 @@ describe('Search Functions', () => {
             });
         });
 
-        test('should update visible sounds count', () => {
-            state.searchTerm = 'tanya';
-            filterSounds();
-
-            const visibleCount = parseInt(elements.visibleSounds.textContent);
-            expect(visibleCount).toBeGreaterThan(0);
-            expect(visibleCount).toBeLessThan(SOUNDS.length);
-        });
-
         test('should handle wrapper without button', () => {
             // Add a wrapper without a button
             const contentArea = document.getElementById('content-area');
