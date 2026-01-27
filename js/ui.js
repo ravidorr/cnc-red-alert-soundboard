@@ -13,7 +13,6 @@ export function cacheElements() {
     elements.categoryNav = document.getElementById('category-nav');
     elements.searchInput = document.getElementById('search-input');
     elements.clearSearch = document.getElementById('clear-search');
-    elements.totalSounds = document.getElementById('total-sounds');
     elements.totalFavorites = document.getElementById('total-favorites');
     elements.visibleSounds = document.getElementById('visible-sounds');
     elements.nowPlaying = document.getElementById('now-playing');
@@ -278,7 +277,6 @@ export function renderPopularSection() {
 
 // Update statistics
 export function updateStats() {
-    elements.totalSounds.textContent = SOUNDS.length;
     elements.totalFavorites.textContent = state.favorites.length;
     elements.visibleSounds.textContent = SOUNDS.length;
 }
@@ -341,10 +339,11 @@ export async function shareSound(soundFile, soundName) {
             const file = new File([blob], soundFile, { type: 'audio/wav' });
 
             // Check if file sharing is supported
+            const displayName = soundName || 'C&C Sound';
             if (navigator.canShare && navigator.canShare({ files: [file] })) {
                 await navigator.share({
-                    title: soundName || 'C&C Sound',
-                    text: `Check out this C&C Red Alert sound: ${soundName}`,
+                    title: displayName,
+                    text: `Check out this C&C Red Alert sound: ${displayName}`,
                     files: [file],
                 });
                 showToast('Sound shared!', 'success');
@@ -353,8 +352,8 @@ export async function shareSound(soundFile, soundName) {
 
             // Fallback: share URL only (no file support)
             await navigator.share({
-                title: soundName || 'C&C Sound',
-                text: `Check out this C&C Red Alert sound: ${soundName}`,
+                title: displayName,
+                text: `Check out this C&C Red Alert sound: ${displayName}`,
                 url: pageUrl,
             });
             showToast('Link shared!', 'success');

@@ -74,6 +74,22 @@
         font-size: 0.9rem;
     }
 
+    /* Hide text on random button for mobile, keep icon only */
+    .btn-random .random-text {
+        display: none;
+    }
+
+    .btn-random {
+        flex: 0 0 auto;
+        min-width: 36px;
+        padding: 8px;
+    }
+
+    .btn-random .random-icon {
+        width: 18px;
+        height: 18px;
+    }
+
     /* Hide volume slider on small mobile, show only toggle */
     .volume-container #volume-slider {
         display: none;

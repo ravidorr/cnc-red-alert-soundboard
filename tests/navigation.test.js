@@ -41,11 +41,11 @@ describe('Navigation Functions', () => {
             expect(newHeader).not.toBeNull();
         });
 
-        test('should not render empty categories', () => {
+        test('should not render empty categories (except favorites and recent)', () => {
             renderNavigation();
 
-            // All nav items should have counts > 0
-            const navItems = document.querySelectorAll('.nav-item');
+            // All category nav items (excluding favorites and recent) should have counts > 0
+            const navItems = document.querySelectorAll('.nav-item:not(.favorites-nav):not(.recent-nav)');
             navItems.forEach(item => {
                 const count = item.querySelector('.nav-item-count');
                 expect(parseInt(count.textContent)).toBeGreaterThan(0);
@@ -337,8 +337,8 @@ describe('Navigation Functions', () => {
             // First scroll to allies
             scrollToCategory('allies');
 
-            // Then scroll to a different category
-            const navItems = document.querySelectorAll('.nav-item');
+            // Then scroll to a different category (skip favorites and recent which may not have sections)
+            const navItems = document.querySelectorAll('.nav-item:not(.favorites-nav):not(.recent-nav)');
             const secondCategory = navItems[1]?.dataset.category;
 
             if (secondCategory) {
@@ -375,12 +375,12 @@ describe('Navigation Functions', () => {
             expect(favoritesChip).not.toBeNull();
         });
 
-        test('should not render favorites chip when no favorites', () => {
+        test('should always render favorites chip even with no favorites', () => {
             state.favorites = [];
             renderMobileCategoryChips();
 
             const favoritesChip = document.querySelector('.category-chip[data-category="favorites"]');
-            expect(favoritesChip).toBeNull();
+            expect(favoritesChip).not.toBeNull();
         });
 
         test('should handle missing container gracefully', () => {

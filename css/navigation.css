@@ -69,6 +69,18 @@
     border-color: var(--green-border);
 }
 
+/* Nav item for recently played */
+.nav-item.recent-nav {
+    border-color: var(--green-dark);
+    background: rgba(0, 255, 0, 0.03);
+}
+
+.nav-item.recent-nav:hover,
+.nav-item.recent-nav.active {
+    background: var(--green-darker);
+    border-color: var(--green-border);
+}
+
 /* Mobile Menu Toggle */
 .mobile-menu-toggle {
     display: none;

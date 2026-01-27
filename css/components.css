@@ -142,12 +142,27 @@
 .btn-random {
     border-color: var(--green-primary);
     color: var(--green-primary);
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
 
-.btn-random:hover {
+.btn-random:hover:not(.disabled) {
     background: var(--green-dark);
     color: var(--bg-primary);
     box-shadow: var(--border-glow);
+}
+
+.btn-random.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    border-color: var(--text-dim);
+    color: var(--text-dim);
+}
+
+.btn-random .random-icon {
+    display: block;
+    flex-shrink: 0;
 }
 
 /* Install button in header */
@@ -306,13 +321,13 @@
 }
 
 .sound-btn-wrapper .sound-btn {
-    padding-right: 70px;
+    padding-right: 80px;
 }
 
 .share-btn {
     position: absolute;
     top: 50%;
-    right: 40px;
+    right: 50px;
     transform: translateY(-50%);
     background: none;
     border: none;

@@ -1,6 +1,6 @@
 {
   "name": "cnc-red-alert-soundboard",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "Command & Conquer Red Alert Soundboard PWA",
   "type": "module",
   "main": "js/main.js",

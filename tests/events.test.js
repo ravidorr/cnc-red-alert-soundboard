@@ -107,7 +107,8 @@ describe('Event Handlers', () => {
             setupEventListeners();
             window.scrollTo = jest.fn();
 
-            const navItem = document.querySelector('.nav-item');
+            // Click on a category nav item (not favorites or recent) that has a corresponding section
+            const navItem = document.querySelector('.nav-item:not(.favorites-nav):not(.recent-nav)');
             navItem.click();
 
             expect(window.scrollTo).toHaveBeenCalled();

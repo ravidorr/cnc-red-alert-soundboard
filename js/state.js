@@ -10,6 +10,7 @@ export const state = {
     deferredInstallPrompt: null,
     favorites: [],
     recentlyPlayed: [],
+    isMuted: false,
 };
 
 // DOM Elements
@@ -18,7 +19,6 @@ export const elements = {
     categoryNav: null,
     searchInput: null,
     clearSearch: null,
-    totalSounds: null,
     totalFavorites: null,
     visibleSounds: null,
     nowPlaying: null,

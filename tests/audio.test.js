@@ -146,6 +146,44 @@ describe('Audio Functions', () => {
             expect(parseInt(volumeSlider.value)).toBeGreaterThan(0);
         });
 
+        test('should disable random button when muted', () => {
+            // Add volume control elements
+            const volumeSlider = document.createElement('input');
+            volumeSlider.type = 'range';
+            volumeSlider.id = 'volume-slider';
+            volumeSlider.value = '80';
+            document.body.appendChild(volumeSlider);
+
+            const volumeToggle = document.createElement('button');
+            volumeToggle.id = 'volume-toggle';
+            document.body.appendChild(volumeToggle);
+
+            const volumeIcon = document.createElement('svg');
+            volumeIcon.id = 'volume-icon';
+            volumeToggle.appendChild(volumeIcon);
+
+            // Use the existing random button from setupFullDOM
+            const randomBtn = document.getElementById('random-sound');
+
+            cacheElements();
+            setupAudioPlayer();
+
+            // Click to mute
+            volumeToggle.click();
+
+            expect(state.isMuted).toBe(true);
+            expect(randomBtn.disabled).toBe(true);
+            expect(randomBtn.classList.contains('disabled')).toBe(true);
+            expect(randomBtn.getAttribute('aria-disabled')).toBe('true');
+
+            // Click to unmute
+            volumeToggle.click();
+
+            expect(state.isMuted).toBe(false);
+            expect(randomBtn.disabled).toBe(false);
+            expect(randomBtn.classList.contains('disabled')).toBe(false);
+        });
+
         test('should handle missing volume controls gracefully', () => {
             cacheElements();
 
@@ -220,6 +258,24 @@ describe('Audio Functions', () => {
 
             expect(consoleSpy).toHaveBeenCalledWith('Playback failed:', expect.any(Error));
             consoleSpy.mockRestore();
+        });
+
+        test('should not play when muted', () => {
+            state.isMuted = true;
+
+            const btn = document.querySelector('.sound-btn');
+            playSound(btn);
+
+            // Should not play
+            expect(state.currentlyPlaying).toBeNull();
+            expect(btn.classList.contains('playing')).toBe(false);
+
+            // Should show toast
+            const toast = document.querySelector('.toast');
+            expect(toast).not.toBeNull();
+            expect(toast.textContent).toContain('Unmute');
+
+            state.isMuted = false;
         });
     });
 
@@ -300,6 +356,22 @@ describe('Audio Functions', () => {
             document.querySelectorAll('.sound-btn').forEach(btn => btn.remove());
 
             expect(() => playRandomSound()).not.toThrow();
+        });
+
+        test('should not play when muted', () => {
+            state.isMuted = true;
+
+            playRandomSound();
+
+            // Should not play
+            expect(state.currentlyPlaying).toBeNull();
+
+            // Should show toast
+            const toast = document.querySelector('.toast');
+            expect(toast).not.toBeNull();
+            expect(toast.textContent).toContain('Unmute');
+
+            state.isMuted = false;
         });
     });
 

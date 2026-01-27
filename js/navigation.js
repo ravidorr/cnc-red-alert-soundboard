@@ -10,16 +10,20 @@ import { getSortedCategories, getSoundsByCategory, calculateScrollOffset } from 
 export function renderNavigation() {
     const sortedCategories = getSortedCategories(CATEGORIES);
 
-    // Add favorites nav item if there are favorites
-    let favoritesNavHtml = '';
-    if (state.favorites.length > 0) {
-        favoritesNavHtml = `
-            <button class="nav-item favorites-nav" data-category="favorites" type="button">
-                <span>FAVORITES</span>
-                <span class="nav-item-count">${state.favorites.length}</span>
-            </button>
-        `;
-    }
+    // Always show favorites and recently played nav items at the top
+    const favoritesNavHtml = `
+        <button class="nav-item favorites-nav" data-category="favorites" type="button">
+            <span>FAVORITES</span>
+            <span class="nav-item-count">${state.favorites.length}</span>
+        </button>
+    `;
+
+    const recentNavHtml = `
+        <button class="nav-item recent-nav" data-category="recent" type="button">
+            <span>RECENTLY PLAYED</span>
+            <span class="nav-item-count">${state.recentlyPlayed.length}</span>
+        </button>
+    `;
 
     const navHtml = sortedCategories.map(([categoryId, categoryInfo]) => {
         const count = getSoundsByCategory(SOUNDS, categoryId).length;
@@ -38,7 +42,7 @@ export function renderNavigation() {
     const navHeader = elements.categoryNav.querySelector('.nav-header');
     elements.categoryNav.innerHTML = '';
     elements.categoryNav.appendChild(navHeader || createNavHeader());
-    elements.categoryNav.insertAdjacentHTML('beforeend', favoritesNavHtml + navHtml);
+    elements.categoryNav.insertAdjacentHTML('beforeend', favoritesNavHtml + recentNavHtml + navHtml);
 
     // Also render mobile category chips
     renderMobileCategoryChips();
@@ -53,11 +57,9 @@ export function renderMobileCategoryChips() {
 
     const sortedCategories = getSortedCategories(CATEGORIES);
 
-    // Add favorites chip if there are favorites
-    let chipsHtml = '';
-    if (state.favorites.length > 0) {
-        chipsHtml += '<button class="category-chip" data-category="favorites" type="button">FAVORITES</button>';
-    }
+    // Always show favorites and recently played chips at the start
+    let chipsHtml = '<button class="category-chip" data-category="favorites" type="button">FAVORITES</button>';
+    chipsHtml += '<button class="category-chip" data-category="recent" type="button">RECENT</button>';
 
     chipsHtml += sortedCategories.map(([categoryId, categoryInfo]) => {
         const count = getSoundsByCategory(SOUNDS, categoryId).length;

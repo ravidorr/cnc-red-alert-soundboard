@@ -81,13 +81,24 @@ function setupVolumeControl() {
 function updateVolumeIcon(volume) {
     const volumeIcon = document.getElementById('volume-icon');
     const volumeToggle = document.getElementById('volume-toggle');
+    const randomBtn = document.getElementById('random-sound');
     if (!volumeIcon || !volumeToggle) {
         return;
     }
 
-    volumeToggle.classList.toggle('muted', volume === 0);
+    const isMuted = volume === 0;
+    state.isMuted = isMuted;
+    volumeToggle.classList.toggle('muted', isMuted);
 
-    if (volume === 0) {
+    // Update random button disabled state
+    if (randomBtn) {
+        randomBtn.disabled = isMuted;
+        randomBtn.classList.toggle('disabled', isMuted);
+        randomBtn.setAttribute('aria-disabled', isMuted);
+        randomBtn.title = isMuted ? 'Unmute to play sounds' : 'Play random sound';
+    }
+
+    if (isMuted) {
         volumeIcon.innerHTML = '<path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>';
         volumeToggle.setAttribute('aria-label', 'Unmute');
         volumeToggle.title = 'Unmute';
@@ -104,6 +115,12 @@ function updateVolumeIcon(volume) {
 
 // Play a sound
 export function playSound(button) {
+    // Don't play if muted
+    if (state.isMuted) {
+        showToast('Unmute to play sounds', 'info');
+        return;
+    }
+
     const file = decodeURIComponent(button.dataset.file);
     const name = button.dataset.name;
 
@@ -154,6 +171,12 @@ export function clearPlayingState() {
 
 // Play a random sound
 export function playRandomSound() {
+    // Don't play if muted
+    if (state.isMuted) {
+        showToast('Unmute to play sounds', 'info');
+        return;
+    }
+
     const randomIndex = Math.floor(Math.random() * SOUNDS.length);
     const sound = SOUNDS[randomIndex];
     // Find the button for this sound and simulate click
@@ -175,7 +198,7 @@ export function checkUrlHash() {
                 if (btn) {
                     // Scroll to the button
                     btn.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    // Play the sound
+                    // Play the sound (will show toast if muted)
                     playSound(btn);
                 }
             }, 500);

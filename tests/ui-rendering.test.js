@@ -81,15 +81,16 @@ describe('UI Rendering', () => {
             cacheElements();
         });
 
-        test('should render navigation items for all categories', () => {
+        test('should render navigation items for all categories plus favorites and recent', () => {
             renderNavigation();
 
             const navItems = document.querySelectorAll('.nav-item');
-            expect(navItems.length).toBe(12);
+            // 12 categories + 1 favorites + 1 recently played
+            expect(navItems.length).toBe(14);
         });
 
-        test('should show favorites nav item when favorites exist', () => {
-            state.favorites = ['allies_1_achnoledged.wav'];
+        test('should always show favorites nav item', () => {
+            state.favorites = [];
             renderNavigation();
 
             const favNav = document.querySelector('.favorites-nav');
@@ -193,13 +194,6 @@ describe('UI Rendering', () => {
     describe('updateStats', () => {
         beforeEach(() => {
             cacheElements();
-        });
-
-        test('should update total sounds count', () => {
-            updateStats();
-
-            expect(document.getElementById('total-sounds').textContent)
-                .toBe(SOUNDS.length.toString());
         });
 
         test('should update favorites count', () => {
