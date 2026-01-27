@@ -253,7 +253,7 @@ export function renderPopularSection() {
         <section class="category-section popular-section" id="category-popular" data-category="popular">
             <button type="button" class="category-header" aria-expanded="true" aria-controls="category-content-popular">
                 <span class="category-title">
-                    <span class="category-name"><span class="section-icon" aria-hidden="true">&#128293;</span> POPULAR SOUNDS</span>
+                    <span class="category-name"><span class="section-icon" aria-hidden="true">&#9650;</span> POPULAR SOUNDS</span>
                     <span class="category-count">(${popularSounds.length})</span>
                 </span>
                 <span class="category-toggle" aria-hidden="true">&#9660;</span>

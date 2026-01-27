@@ -48,7 +48,7 @@ export function renderRecentlyPlayedSection() {
     if (recentSounds.length === 0) {
         contentHtml = `
             <div class="favorites-empty">
-                <div class="favorites-empty-icon" aria-hidden="true">&#128337;</div>
+                <div class="favorites-empty-icon" aria-hidden="true">&#9654;</div>
                 <div class="favorites-empty-title">NO RECENT ACTIVITY</div>
                 <div class="favorites-empty-text">Play any sound to populate your recent history.</div>
             </div>
@@ -88,7 +88,7 @@ export function renderRecentlyPlayedSection() {
         <section class="category-section recent-section" id="category-recent" data-category="recent">
             <button type="button" class="category-header" aria-expanded="true" aria-controls="category-content-recent">
                 <span class="category-title">
-                    <span class="category-name"><span class="section-icon" aria-hidden="true">&#128337;</span> RECENTLY PLAYED</span>
+                    <span class="category-name"><span class="section-icon" aria-hidden="true">&#9654;</span> RECENTLY PLAYED</span>
                     <span class="category-count">(${recentSounds.length})</span>
                 </span>
                 <span class="category-toggle" aria-hidden="true">&#9660;</span>
