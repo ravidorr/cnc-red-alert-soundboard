@@ -14,6 +14,10 @@
         --header-height: 120px;
     }
 
+    .main-content {
+        flex-direction: column;
+    }
+
     .mobile-menu-toggle {
         display: flex;
     }
@@ -78,6 +82,8 @@
     .content-area {
         margin-left: 0;
         padding: 10px;
+        flex: 1;
+        width: 100%;
     }
 
     .category-content {
@@ -96,6 +102,11 @@
         font-size: 0.75rem;
     }
 
+    /* Hide keyboard shortcuts help on mobile - not useful without physical keyboard */
+    .btn-help {
+        display: none;
+    }
+
     .search-empty-state {
         margin-left: 0;
     }
@@ -110,6 +121,8 @@
         border-bottom: 1px solid var(--green-darker);
         -webkit-overflow-scrolling: touch;
         scrollbar-width: none;
+        width: 100%;
+        flex-shrink: 0;
     }
 
     .mobile-category-chips::-webkit-scrollbar {

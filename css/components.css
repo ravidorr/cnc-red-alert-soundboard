@@ -139,16 +139,6 @@
     box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
 }
 
-.btn-stop {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.btn-stop svg {
-    flex-shrink: 0;
-}
-
 .btn-random {
     border-color: var(--green-primary);
     color: var(--green-primary);

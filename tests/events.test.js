@@ -40,17 +40,6 @@ describe('Event Handlers', () => {
             expect(state.audioPlayer.src).toContain('sounds/');
         });
 
-        test('Escape key should stop all sounds', () => {
-            setupEventListeners();
-
-            const btn = document.querySelector('.sound-btn');
-            playSound(btn);
-
-            document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
-
-            expect(state.audioPlayer.paused).toBe(true);
-        });
-
         test('clicking favorite button should toggle favorite', () => {
             setupEventListeners();
 
@@ -126,17 +115,6 @@ describe('Event Handlers', () => {
 
             expect(state.searchTerm).toBe('');
             expect(elements.searchInput.value).toBe('');
-        });
-
-        test('stop all button should stop sounds', () => {
-            setupEventListeners();
-
-            const btn = document.querySelector('.sound-btn');
-            playSound(btn);
-
-            elements.stopAllBtn.click();
-
-            expect(state.audioPlayer.paused).toBe(true);
         });
 
         test('mobile menu toggle should toggle menu', () => {

@@ -3,7 +3,7 @@
 // ============================================
 
 import { state, elements } from './state.js';
-import { playSound, stopAllSounds, playRandomSound } from './audio.js';
+import { playSound, playRandomSound } from './audio.js';
 import { toggleFavorite, moveFavoriteUp, moveFavoriteDown } from './favorites.js';
 import { toggleCategory, scrollToCategory } from './navigation.js';
 import { filterSounds } from './search.js';
@@ -84,9 +84,6 @@ export function setupEventListeners() {
         elements.searchInput.focus();
     });
 
-    // Stop all button
-    elements.stopAllBtn.addEventListener('click', stopAllSounds);
-
     // Mobile menu toggle
     if (elements.mobileMenuToggle) {
         elements.mobileMenuToggle.addEventListener('click', toggleMobileMenu);
@@ -125,13 +122,11 @@ export function setupEventListeners() {
 
     // Keyboard shortcuts
     document.addEventListener('keydown', (e) => {
-        // Escape to stop sounds (unless modal is open)
+        // Escape to close modals
         if (e.key === 'Escape') {
             const shortcutsModal = document.getElementById('shortcuts-modal');
             if (shortcutsModal && shortcutsModal.classList.contains('visible')) {
                 hideShortcutsModal();
-            } else {
-                stopAllSounds();
             }
         }
         // Ctrl/Cmd + F to focus search

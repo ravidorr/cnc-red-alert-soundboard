@@ -13,7 +13,6 @@ export function cacheElements() {
     elements.categoryNav = document.getElementById('category-nav');
     elements.searchInput = document.getElementById('search-input');
     elements.clearSearch = document.getElementById('clear-search');
-    elements.stopAllBtn = document.getElementById('stop-all');
     elements.totalSounds = document.getElementById('total-sounds');
     elements.totalFavorites = document.getElementById('total-favorites');
     elements.visibleSounds = document.getElementById('visible-sounds');

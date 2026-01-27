@@ -18,7 +18,6 @@ export const elements = {
     categoryNav: null,
     searchInput: null,
     clearSearch: null,
-    stopAllBtn: null,
     totalSounds: null,
     totalFavorites: null,
     visibleSounds: null,
