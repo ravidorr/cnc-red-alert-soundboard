@@ -8,6 +8,7 @@ import { cacheElements, renderCategories, renderFavoritesSection } from '../js/u
 import { setupEventListeners, showShortcutsModal, hideShortcutsModal, handleShortcutsModalKeydown } from '../js/events.js';
 import { setupAudioPlayer } from '../js/audio.js';
 import { openMobileMenu, closeMobileMenu } from '../js/mobile.js';
+import { renderNavigation } from '../js/navigation.js';
 
 describe('Accessibility Features', () => {
     beforeEach(() => {
@@ -137,6 +138,59 @@ describe('Accessibility Features', () => {
             const announcer = document.getElementById('search-announcer');
             expect(announcer).not.toBeNull();
             expect(announcer.getAttribute('aria-live')).toBe('polite');
+        });
+    });
+
+    describe('Descriptive ARIA Labels', () => {
+        beforeEach(() => {
+            cacheElements();
+        });
+
+        test('category nav items should have descriptive aria-labels with sound counts', () => {
+            renderNavigation();
+
+            const navItems = document.querySelectorAll('.nav-item[data-category]');
+            navItems.forEach(item => {
+                const ariaLabel = item.getAttribute('aria-label');
+                // All nav items except favorites and recent should have "sounds" in aria-label
+                if (item.dataset.category !== 'favorites' && item.dataset.category !== 'recent') {
+                    expect(ariaLabel).toContain('section');
+                    expect(ariaLabel).toContain('sounds');
+                }
+            });
+        });
+
+        test('favorites nav should have descriptive aria-label', () => {
+            state.favorites = ['allies_1_achnoledged.wav', 'allies_1_affirmative.wav'];
+            renderNavigation();
+
+            const favNav = document.querySelector('.favorites-nav');
+            const ariaLabel = favNav.getAttribute('aria-label');
+            expect(ariaLabel).toContain('Favorites');
+            expect(ariaLabel).toContain('2');
+            expect(ariaLabel).toContain('sounds');
+        });
+
+        test('recently played nav should have descriptive aria-label', () => {
+            state.recentlyPlayed = ['allies_1_achnoledged.wav'];
+            renderNavigation();
+
+            const recentNav = document.querySelector('.recent-nav');
+            const ariaLabel = recentNav.getAttribute('aria-label');
+            expect(ariaLabel).toContain('Recently played');
+            expect(ariaLabel).toContain('1');
+            expect(ariaLabel).toContain('sound');
+        });
+
+        test('aria-label should use singular "sound" for count of 1', () => {
+            state.favorites = ['allies_1_achnoledged.wav'];
+            renderNavigation();
+
+            const favNav = document.querySelector('.favorites-nav');
+            const ariaLabel = favNav.getAttribute('aria-label');
+            // Check that it says "1 sound" and NOT "1 sounds"
+            expect(ariaLabel).toContain('1 sound');
+            expect(ariaLabel).not.toContain('1 sounds');
         });
     });
 });

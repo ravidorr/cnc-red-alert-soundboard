@@ -191,20 +191,48 @@
         display: none;
     }
     
-    /* Scroll indicator fade for mobile chips */
-    .mobile-category-chips::after {
+    /* Scroll indicator fade for mobile chips - enhanced visibility */
+    .mobile-category-chips::before {
         content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 20px;
+        background: linear-gradient(90deg, var(--bg-panel), transparent);
+        pointer-events: none;
+        z-index: 1;
+        opacity: 0;
+        transition: opacity 0.2s ease;
+    }
+    
+    .mobile-category-chips::after {
+        content: '\203A';
         position: absolute;
         right: 0;
         top: 0;
         bottom: 0;
-        width: 30px;
-        background: linear-gradient(90deg, transparent, var(--bg-panel));
+        width: 32px;
+        background: linear-gradient(90deg, transparent, var(--bg-panel) 50%);
         pointer-events: none;
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        padding-right: 6px;
+        color: var(--text-dim);
+        font-size: 1.2rem;
+        animation: scrollHint 1.5s ease-in-out infinite;
+    }
+    
+    @keyframes scrollHint {
+        0%, 100% { opacity: 0.6; }
+        50% { opacity: 1; }
     }
     
     .mobile-category-chips {
         position: relative;
+        padding-right: 32px;
     }
 
     .category-chip {

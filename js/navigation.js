@@ -11,17 +11,19 @@ export function renderNavigation() {
     const sortedCategories = getSortedCategories(CATEGORIES);
 
     // Always show favorites and recently played nav items at the top
+    const favoritesCount = state.favorites.length;
     const favoritesNavHtml = `
-        <button class="nav-item favorites-nav" data-category="favorites" type="button">
+        <button class="nav-item favorites-nav" data-category="favorites" type="button" aria-label="Favorites section, ${favoritesCount} ${favoritesCount === 1 ? 'sound' : 'sounds'}">
             <span>FAVORITES</span>
-            <span class="nav-item-count">${state.favorites.length}</span>
+            <span class="nav-item-count">${favoritesCount}</span>
         </button>
     `;
 
+    const recentCount = state.recentlyPlayed.length;
     const recentNavHtml = `
-        <button class="nav-item recent-nav" data-category="recent" type="button">
+        <button class="nav-item recent-nav" data-category="recent" type="button" aria-label="Recently played section, ${recentCount} ${recentCount === 1 ? 'sound' : 'sounds'}">
             <span>RECENTLY PLAYED</span>
-            <span class="nav-item-count">${state.recentlyPlayed.length}</span>
+            <span class="nav-item-count">${recentCount}</span>
         </button>
     `;
 
@@ -32,7 +34,7 @@ export function renderNavigation() {
         }
 
         return `
-            <button class="nav-item" data-category="${categoryId}" type="button" role="listitem">
+            <button class="nav-item" data-category="${categoryId}" type="button" aria-label="${categoryInfo.name} section, ${count} sounds">
                 <span>${categoryInfo.name}</span>
                 <span class="nav-item-count">${count}</span>
             </button>
@@ -58,8 +60,8 @@ export function renderMobileCategoryChips() {
     const sortedCategories = getSortedCategories(CATEGORIES);
 
     // Always show favorites and recently played chips at the start
-    let chipsHtml = '<button class="category-chip" data-category="favorites" type="button">FAVORITES</button>';
-    chipsHtml += '<button class="category-chip" data-category="recent" type="button">RECENT</button>';
+    let chipsHtml = '<button class="category-chip" data-category="favorites" type="button" aria-label="Jump to Favorites section">FAVORITES</button>';
+    chipsHtml += '<button class="category-chip" data-category="recent" type="button" aria-label="Jump to Recently Played section">RECENT</button>';
 
     chipsHtml += sortedCategories.map(([categoryId, categoryInfo]) => {
         const count = getSoundsByCategory(SOUNDS, categoryId).length;
@@ -68,7 +70,7 @@ export function renderMobileCategoryChips() {
         }
         // Use shorter names for mobile chips
         const shortName = categoryInfo.name.replace('BUILDINGS & DEFENSES', 'BUILDINGS').replace('MISCELLANEOUS', 'MISC');
-        return `<button class="category-chip" data-category="${categoryId}" type="button">${shortName}</button>`;
+        return `<button class="category-chip" data-category="${categoryId}" type="button" aria-label="Jump to ${categoryInfo.name} section, ${count} sounds">${shortName}</button>`;
     }).join('');
 
     mobileChips.innerHTML = chipsHtml;

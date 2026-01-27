@@ -70,8 +70,8 @@
     <div class="mobile-menu-overlay" id="mobile-menu-overlay"></div>
 
     <main class="main-content" role="main">
-        <div class="sidebar" id="sidebar" role="dialog" aria-label="Categories menu" aria-hidden="true">
-            <nav class="category-nav" id="category-nav" aria-label="Sound categories" role="list">
+        <aside class="sidebar" id="sidebar" aria-label="Categories menu" aria-hidden="true">
+            <nav class="category-nav" id="category-nav" aria-label="Sound categories">
                 <div class="nav-header">CATEGORIES</div>
                 <!-- Categories will be populated by JS -->
             </nav>
@@ -81,7 +81,7 @@
                     <span class="stat-value" id="visible-sounds">0</span>
                 </div>
             </div>
-        </div>
+        </aside>
 
         <!-- Mobile category chips - shown only on mobile -->
         <nav class="mobile-category-chips" id="mobile-category-chips" aria-label="Quick category navigation">
@@ -104,7 +104,7 @@
                 </svg>
             </div>
             <div class="empty-state-title">NO MATCHES FOUND</div>
-            <div class="empty-state-text">No sounds match "<span id="search-empty-term"></span>". Try a character name like "Tanya" or a phrase like "affirmative".</div>
+            <div class="empty-state-text">No sounds match "<span id="search-empty-term"></span>". Try "explosion", "laugh", or a unit name like "Tanya".</div>
             <button class="btn-action btn-clear-search" id="btn-clear-search">Clear Search</button>
         </div>
     </main>
@@ -114,15 +114,16 @@
             <span class="footer-text">ESTABLISHING BATTLEFIELD CONTROL... STAND BY.</span>
             <div class="footer-actions">
                 <button id="help-btn" class="btn-help" aria-label="Keyboard shortcuts" title="Keyboard shortcuts">?</button>
-                <span class="footer-version">v1.5.1</span>
+                <span class="footer-version">v1.6.0</span>
             </div>
         </div>
     </footer>
 
     <!-- Keyboard shortcuts modal -->
-    <div class="shortcuts-modal" id="shortcuts-modal" role="dialog" aria-labelledby="shortcuts-title" aria-modal="true">
+    <div class="shortcuts-modal" id="shortcuts-modal" role="dialog" aria-labelledby="shortcuts-title" aria-describedby="shortcuts-intro" aria-modal="true">
         <div class="shortcuts-modal-content">
             <h2 id="shortcuts-title" class="shortcuts-title">KEYBOARD SHORTCUTS</h2>
+            <p id="shortcuts-intro" class="shortcuts-intro">Use these shortcuts to control the soundboard faster.</p>
             <div class="shortcuts-list">
                 <div class="shortcut-item">
                     <kbd>Ctrl</kbd> + <kbd>F</kbd>

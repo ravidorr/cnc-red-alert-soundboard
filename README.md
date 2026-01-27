@@ -74,12 +74,12 @@ cnc-red-alert-soundboard/
 ├── manifest.json       # PWA manifest
 ├── service-worker.js   # Offline caching
 ├── css/
-│   └── styles.css      # Red Alert 1 themed styles
+│   └── styles.css      # Red Alert 1 themed styles (modular CSS imports)
 ├── js/
-│   └── app.js          # Application logic (1500+ lines)
+│   └── main.js         # Application entry point (modular ES6+)
 ├── tests/
-│   ├── app.test.js     # Unit tests (168 tests)
-│   └── setup.js        # Jest setup with JSDOM
+│   ├── *.test.js       # Unit tests (384 tests, 99%+ coverage)
+│   └── helpers.js      # Jest test helpers
 ├── scripts/
 │   └── rename_sounds.js # Sound file normalization utility
 ├── assets/
@@ -131,11 +131,11 @@ The following checks run automatically before each commit:
 
 ### Test Coverage
 
-Current coverage: **93%+** (168 tests)
+Current coverage: **99%+** (384 tests)
 
 Coverage thresholds enforced by pre-commit hooks:
 - Statements: 90%
-- Branches: 80%
+- Branches: 85%
 - Functions: 90%
 - Lines: 90%
 
@@ -143,14 +143,14 @@ Coverage thresholds enforced by pre-commit hooks:
 
 | Category | Count | Description |
 |----------|-------|-------------|
-| Allied Forces | 31 | Allied unit voice responses |
+| Allied Forces | 34 | Allied unit voice responses |
 | Soviet Forces | 26 | Soviet unit voice responses |
 | Tanya | 15 | Tanya's iconic voice lines |
-| Special Units | 20 | Engineer, Medic, Spy, Thief, Einstein |
+| Special Units | 22 | Engineer, Medic, Spy, Thief, Einstein |
 | Civilians | 4 | Civilian voice lines |
 | Combat | 18 | Weapons and explosions |
 | Vehicles | 7 | Tanks, ships, aircraft |
-| Buildings & Defenses | 17 | Construction and turrets |
+| Buildings & Defenses | 18 | Construction and turrets |
 | Attack Dogs | 6 | Dog sounds |
 | Casualties | 10 | Death sounds |
 | UI & Map | 16 | Interface and map sounds |

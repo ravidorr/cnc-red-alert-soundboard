@@ -305,8 +305,10 @@
 .sound-btn.playing {
     background: var(--green-dark);
     border-color: var(--green-primary);
+    border-width: 2px;
     color: var(--green-primary);
-    animation: playingPulse 0.5s ease-in-out infinite;
+    box-shadow: var(--glow-green-intense);
+    animation: playingPulse 0.6s ease-in-out infinite;
 }
 
 .sound-btn.hidden {
@@ -334,7 +336,7 @@
     transform: translateY(-50%);
     background: none;
     border: none;
-    color: var(--text-dim);
+    color: var(--text-secondary);
     cursor: pointer;
     min-width: 44px;
     min-height: 44px;
@@ -345,14 +347,14 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    opacity: 0.8;
+    opacity: 1;
 }
 
 .share-btn:hover,
 .favorite-btn:hover {
-    opacity: 1;
     color: var(--green-primary);
-    transform: translateY(-50%) scale(1.1);
+    transform: translateY(-50%) scale(1.15);
+    text-shadow: var(--glow-green);
 }
 
 /* Share button specific styles */

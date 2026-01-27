@@ -111,9 +111,9 @@ export function renderFavoritesSection() {
                 <div class="category-content" id="category-content-favorites">
                     <div class="favorites-empty">
                         <div class="favorites-empty-icon" aria-hidden="true">&#9734;</div>
-                        <div class="favorites-empty-title">NO TARGETS MARKED</div>
+                        <div class="favorites-empty-title">NO FAVORITES YET</div>
                         <div class="favorites-empty-text">
-                            Tap the star on any sound to add it to your arsenal.
+                            Click the star on any sound to add it here.
                         </div>
                     </div>
                 </div>

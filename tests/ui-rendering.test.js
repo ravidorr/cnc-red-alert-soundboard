@@ -121,6 +121,20 @@ describe('UI Rendering', () => {
             expect(emptyState).not.toBeNull();
         });
 
+        test('favorites empty state should have user-friendly copy', () => {
+            state.favorites = [];
+            renderFavoritesSection();
+
+            const favSection = document.getElementById('category-favorites');
+            const emptyTitle = favSection.querySelector('.favorites-empty-title');
+            const emptyText = favSection.querySelector('.favorites-empty-text');
+            
+            // Check for updated, user-friendly microcopy
+            expect(emptyTitle.textContent).toBe('NO FAVORITES YET');
+            expect(emptyText.textContent).toContain('Click the star');
+            expect(emptyText.textContent).toContain('add it here');
+        });
+
         test('should replace existing favorites section', () => {
             state.favorites = ['allies_1_achnoledged.wav'];
             renderFavoritesSection();
