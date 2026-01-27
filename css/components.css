@@ -321,35 +321,42 @@
 }
 
 .sound-btn-wrapper .sound-btn {
-    padding-right: 80px;
+    padding-right: 72px;
 }
 
-.share-btn {
+/* Shared styles for sound action buttons (share, favorite) */
+.share-btn,
+.favorite-btn {
     position: absolute;
     top: 50%;
-    right: 50px;
     transform: translateY(-50%);
     background: none;
     border: none;
     color: var(--text-dim);
     cursor: pointer;
-    padding: 10px;
-    min-width: 44px;
-    min-height: 44px;
-    font-size: 1rem;
+    min-width: 36px;
+    min-height: 36px;
     line-height: 1;
-    opacity: 0.6;
     transition: all 0.15s ease;
+    font-size: 1rem;
     z-index: 1;
     display: flex;
     align-items: center;
     justify-content: center;
+    opacity: 0.8;
 }
 
-.share-btn:hover {
+.share-btn:hover,
+.favorite-btn:hover {
     opacity: 1;
     color: var(--green-primary);
     transform: translateY(-50%) scale(1.1);
+}
+
+/* Share button specific styles */
+.share-btn {
+    right: 36px;
+    padding: 6px;
 }
 
 .share-btn svg {
@@ -357,32 +364,10 @@
     height: 16px;
 }
 
+/* Favorite button specific styles */
 .favorite-btn {
-    position: absolute;
-    top: 50%;
-    right: 6px;
-    transform: translateY(-50%);
-    background: none;
-    border: none;
-    color: var(--text-dim);
-    cursor: pointer;
-    padding: 10px;
-    min-width: 44px;
-    min-height: 44px;
-    font-size: 1.1rem;
-    line-height: 1;
-    opacity: 0.8;
-    transition: all 0.15s ease;
-    z-index: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.favorite-btn:hover {
-    opacity: 1;
-    color: var(--green-primary);
-    transform: translateY(-50%) scale(1.1);
+    right: 0;
+    padding: 5px;
 }
 
 .favorite-btn.is-favorite {
