@@ -363,52 +363,62 @@ button.category-header:focus-visible {
     display: none;
 }
 
-/* Sound Button with Favorite */
+/* Sound Button with Favorite - Using flexbox layout instead of absolute positioning */
 .sound-btn-wrapper {
     position: relative;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    align-items: stretch;
+    background: var(--bg-button);
+    border: 1px solid var(--green-dark);
+    transition: all 0.15s ease;
+}
+
+.sound-btn-wrapper:hover {
+    border-color: var(--green-border);
+    box-shadow: var(--border-glow);
 }
 
 .sound-btn-wrapper .sound-btn {
-    padding-right: 96px; /* 44px favorite + 4px gap + 44px share + 4px padding */
+    flex: 1;
+    min-width: 0; /* Allow text truncation */
+    border: none;
+    background: transparent;
 }
 
 /* Shared styles for sound action buttons (share, favorite) */
-
-/* WCAG 2.1 AA: 44px minimum touch targets with spacing */
 .share-btn,
 .favorite-btn {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    background: none;
+    background: transparent;
     border: none;
-    color: var(--text-secondary);
+    border-left: 1px solid var(--green-darker);
+    color: var(--text-dim);
     cursor: pointer;
-    min-width: 44px;
-    min-height: 44px;
+    min-width: 36px;
     line-height: 1;
     transition: all 0.15s ease;
-    font-size: 1rem;
-    z-index: 1;
+    font-size: 0.9rem;
     display: flex;
     align-items: center;
     justify-content: center;
-    opacity: 1;
+    flex-shrink: 0;
 }
 
 .share-btn:hover,
 .favorite-btn:hover {
     color: var(--green-primary);
-    transform: translateY(-50%) scale(1.15);
-    text-shadow: var(--glow-green);
+    background: var(--bg-button-hover);
 }
 
-/* Share button specific styles - positioned with 4px gap from favorite button */
+.share-btn:focus-visible,
+.favorite-btn:focus-visible {
+    outline: 2px solid var(--green-primary);
+    outline-offset: -2px;
+}
+
+/* Share button specific styles */
 .share-btn {
-    right: 48px; /* 44px favorite button + 4px gap */
-    padding: 8px;
+    padding: 6px 8px;
 }
 
 .share-btn svg {
@@ -418,19 +428,17 @@ button.category-header:focus-visible {
 
 /* Favorite button specific styles */
 .favorite-btn {
-    right: 0;
-    padding: 8px;
+    padding: 6px 8px;
 }
 
 .favorite-btn.is-favorite {
-    opacity: 1;
     color: var(--green-primary);
-    text-shadow: var(--glow-green);
+    background: var(--green-darker);
 }
 
 .favorite-btn.is-favorite:hover {
     color: var(--red-alert);
-    text-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+    background: rgba(255, 0, 0, 0.1);
 }
 
 /* Empty State */

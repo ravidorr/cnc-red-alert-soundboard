@@ -281,30 +281,17 @@
         word-break: break-word;
     }
 
-    .sound-btn-wrapper .sound-btn {
-        padding-right: 96px; /* 44px favorite + 4px gap + 44px share + 4px padding */
-    }
-
-    /* WCAG 2.1 AA: 44px minimum touch targets for mobile action buttons with spacing */
+    /* Smaller buttons at this breakpoint */
     .share-btn,
     .favorite-btn {
-        padding: 8px;
-        min-width: 44px;
-        min-height: 44px;
-    }
-
-    .share-btn {
-        right: 48px; /* 44px favorite + 4px gap */
+        min-width: 32px;
+        font-size: 0.85rem;
+        padding: 4px 6px;
     }
 
     .share-btn svg {
-        width: 16px;
-        height: 16px;
-    }
-
-    .favorite-btn {
-        right: 0;
-        font-size: 1rem;
+        width: 14px;
+        height: 14px;
     }
 }
 
@@ -324,6 +311,19 @@
         overflow: hidden;
         text-overflow: ellipsis;
     }
+
+    /* Smaller buttons on narrow screens */
+    .share-btn,
+    .favorite-btn {
+        min-width: 28px;
+        font-size: 0.8rem;
+        padding: 4px;
+    }
+
+    .share-btn svg {
+        width: 12px;
+        height: 12px;
+    }
     
     /* Category chips with WCAG compliant touch targets (44px min) */
     .category-chip {
@@ -333,5 +333,12 @@
         display: flex;
         align-items: center;
         justify-content: center;
+    }
+}
+
+/* Very narrow screens - hide share button to save space */
+@media (max-width: 360px) {
+    .share-btn {
+        display: none;
     }
 }
