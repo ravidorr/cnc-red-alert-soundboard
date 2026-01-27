@@ -31,6 +31,71 @@ describe('Confirm Modal Functions', () => {
         document.body.innerHTML = '';
     });
 
+    describe('handleKeydown edge cases', () => {
+        test('should do nothing when modal is not visible', async () => {
+            // First show the modal to attach the keydown listener
+            const promise = showConfirmModal({ message: 'Test' });
+            
+            // Manually remove visible class to simulate edge case
+            localThis.modal.classList.remove('visible');
+
+            const escEvent = new KeyboardEvent('keydown', { key: 'Escape', bubbles: true });
+            document.dispatchEvent(escEvent);
+
+            // Modal should remain in its current state (not visible)
+            expect(localThis.modal.classList.contains('visible')).toBe(false);
+            
+            // Add visible class back and click abort to cleanup
+            localThis.modal.classList.add('visible');
+            localThis.abortBtn.click();
+            await promise;
+        });
+
+        test('should do nothing when modal element is missing', () => {
+            // Remove the modal entirely
+            localThis.modal.remove();
+
+            const escEvent = new KeyboardEvent('keydown', { key: 'Escape', bubbles: true });
+            
+            // Should not throw
+            expect(() => document.dispatchEvent(escEvent)).not.toThrow();
+        });
+
+        test('should handle Tab when execute button is missing', async () => {
+            const promise = showConfirmModal({ message: 'Test' });
+
+            // Remove execute button
+            localThis.executeBtn.remove();
+
+            const tabEvent = new KeyboardEvent('keydown', { key: 'Tab', bubbles: true });
+            document.dispatchEvent(tabEvent);
+
+            // Modal should still be visible, no crash
+            expect(localThis.modal.classList.contains('visible')).toBe(true);
+
+            // Cleanup - click abort (which still exists)
+            localThis.abortBtn.click();
+            await promise;
+        });
+
+        test('should handle Tab when abort button is missing', async () => {
+            const promise = showConfirmModal({ message: 'Test' });
+
+            // Remove abort button
+            localThis.abortBtn.remove();
+
+            const tabEvent = new KeyboardEvent('keydown', { key: 'Tab', bubbles: true });
+            document.dispatchEvent(tabEvent);
+
+            // Modal should still be visible, no crash
+            expect(localThis.modal.classList.contains('visible')).toBe(true);
+
+            // Cleanup - click execute (which still exists)
+            localThis.executeBtn.click();
+            await promise;
+        });
+    });
+
     describe('showConfirmModal', () => {
         test('should show modal with default options', async () => {
             const promise = showConfirmModal({ message: 'Test message' });
@@ -107,26 +172,80 @@ describe('Confirm Modal Functions', () => {
             expect(result).toBe(false);
         });
 
-        test('should trap focus with Tab key', async () => {
+        test('should trap focus with Tab key from abort to execute', async () => {
             const promise = showConfirmModal({ message: 'Test' });
 
-            // Focus on abort button, press Tab should go to execute button
-            localThis.abortBtn.focus();
-            const tabEvent = new KeyboardEvent('keydown', { key: 'Tab', bubbles: true });
+            // Mock activeElement to be abort button (last element)
+            Object.defineProperty(document, 'activeElement', {
+                value: localThis.abortBtn,
+                writable: true,
+                configurable: true,
+            });
+
+            // Press Tab on abort button should cycle to execute button
+            const tabEvent = new KeyboardEvent('keydown', { key: 'Tab', bubbles: true, cancelable: true });
             document.dispatchEvent(tabEvent);
+
+            // Restore activeElement
+            Object.defineProperty(document, 'activeElement', {
+                value: document.body,
+                writable: true,
+                configurable: true,
+            });
 
             // Focus should be trapped
             localThis.abortBtn.click();
             await promise;
         });
 
-        test('should trap focus with Shift+Tab key', async () => {
+        test('should trap focus with Shift+Tab key from execute to abort', async () => {
             const promise = showConfirmModal({ message: 'Test' });
 
-            // Focus on execute button, press Shift+Tab should go to abort button
-            localThis.executeBtn.focus();
-            const shiftTabEvent = new KeyboardEvent('keydown', { key: 'Tab', shiftKey: true, bubbles: true });
+            // Mock activeElement to be execute button (first element)
+            Object.defineProperty(document, 'activeElement', {
+                value: localThis.executeBtn,
+                writable: true,
+                configurable: true,
+            });
+
+            // Press Shift+Tab on execute button should cycle to abort button
+            const shiftTabEvent = new KeyboardEvent('keydown', { key: 'Tab', shiftKey: true, bubbles: true, cancelable: true });
             document.dispatchEvent(shiftTabEvent);
+
+            // Restore activeElement
+            Object.defineProperty(document, 'activeElement', {
+                value: document.body,
+                writable: true,
+                configurable: true,
+            });
+
+            localThis.abortBtn.click();
+            await promise;
+        });
+
+        test('should not cycle focus when Tab pressed on middle element', async () => {
+            const promise = showConfirmModal({ message: 'Test' });
+
+            // Mock activeElement to be something other than first/last
+            const middleElement = document.createElement('button');
+            localThis.modal.appendChild(middleElement);
+            
+            Object.defineProperty(document, 'activeElement', {
+                value: middleElement,
+                writable: true,
+                configurable: true,
+            });
+
+            // Press Tab should not cycle (not at boundary)
+            const tabEvent = new KeyboardEvent('keydown', { key: 'Tab', bubbles: true, cancelable: true });
+            document.dispatchEvent(tabEvent);
+
+            // Restore activeElement
+            Object.defineProperty(document, 'activeElement', {
+                value: document.body,
+                writable: true,
+                configurable: true,
+            });
 
             localThis.abortBtn.click();
             await promise;

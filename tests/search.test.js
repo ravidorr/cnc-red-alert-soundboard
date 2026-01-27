@@ -167,6 +167,16 @@ describe('Search Functions', () => {
             // After filtering completes, aria-busy should be false
             expect(elements.contentArea.getAttribute('aria-busy')).toBe('false');
         });
+
+        test('should handle missing announcer element gracefully', () => {
+            // Remove ALL announcer elements (there might be multiple from DOM setup)
+            document.querySelectorAll('#search-announcer').forEach(el => el.remove());
+
+            state.searchTerm = 'tanya';
+            
+            // Should not throw
+            expect(() => filterSounds()).not.toThrow();
+        });
     });
 
     describe('Search Result Indicator', () => {

@@ -169,12 +169,26 @@ describe('Onboarding Functions', () => {
             const dismissBtn = document.getElementById('onboarding-dismiss');
             dismissBtn.focus();
 
-            // Simulate Tab key on last (only) focusable element
-            const tabEvent = new KeyboardEvent('keydown', { key: 'Tab', bubbles: true, cancelable: true });
+            // Mock activeElement to be the last element (dismissBtn)
+            Object.defineProperty(document, 'activeElement', {
+                value: dismissBtn,
+                writable: true,
+                configurable: true,
+            });
+
+            // Simulate Tab key (without shiftKey) on last focusable element
+            const tabEvent = new KeyboardEvent('keydown', { key: 'Tab', shiftKey: false, bubbles: true, cancelable: true });
             tooltip.dispatchEvent(tabEvent);
 
             // Focus trap should keep focus within tooltip
             expect(tooltip).not.toBeNull();
+
+            // Restore activeElement
+            Object.defineProperty(document, 'activeElement', {
+                value: document.body,
+                writable: true,
+                configurable: true,
+            });
         });
 
         test('Shift+Tab on first element should cycle focus to last element', () => {
@@ -184,12 +198,26 @@ describe('Onboarding Functions', () => {
             const dismissBtn = document.getElementById('onboarding-dismiss');
             dismissBtn.focus();
 
+            // Mock activeElement to be the first element (which is also dismissBtn in this case)
+            Object.defineProperty(document, 'activeElement', {
+                value: dismissBtn,
+                writable: true,
+                configurable: true,
+            });
+
             // Simulate Shift+Tab key
             const shiftTabEvent = new KeyboardEvent('keydown', { key: 'Tab', shiftKey: true, bubbles: true, cancelable: true });
             tooltip.dispatchEvent(shiftTabEvent);
 
             // Focus trap should keep focus within tooltip
             expect(tooltip).not.toBeNull();
+
+            // Restore activeElement
+            Object.defineProperty(document, 'activeElement', {
+                value: document.body,
+                writable: true,
+                configurable: true,
+            });
         });
 
         test('Tab key should be prevented when no focusable elements', () => {
@@ -205,6 +233,72 @@ describe('Onboarding Functions', () => {
 
             // Should not throw
             expect(tooltip).not.toBeNull();
+        });
+
+        test('Tab should cycle from last to first with multiple focusable elements', () => {
+            showOnboardingTooltip();
+
+            const tooltip = document.getElementById('onboarding-tooltip');
+            const dismissBtn = document.getElementById('onboarding-dismiss');
+            
+            // Add another focusable element
+            const extraLink = document.createElement('a');
+            extraLink.href = '#';
+            extraLink.textContent = 'Extra Link';
+            tooltip.querySelector('.onboarding-content').insertBefore(extraLink, dismissBtn);
+
+            // Mock activeElement to be the last element (dismissBtn)
+            Object.defineProperty(document, 'activeElement', {
+                value: dismissBtn,
+                writable: true,
+                configurable: true,
+            });
+
+            // Tab (without shift) from last element
+            const tabEvent = new KeyboardEvent('keydown', { key: 'Tab', shiftKey: false, bubbles: true, cancelable: true });
+            tooltip.dispatchEvent(tabEvent);
+
+            expect(tooltip).not.toBeNull();
+
+            // Restore activeElement
+            Object.defineProperty(document, 'activeElement', {
+                value: document.body,
+                writable: true,
+                configurable: true,
+            });
+        });
+
+        test('Shift+Tab should cycle from first to last with multiple focusable elements', () => {
+            showOnboardingTooltip();
+
+            const tooltip = document.getElementById('onboarding-tooltip');
+            const dismissBtn = document.getElementById('onboarding-dismiss');
+            
+            // Add another focusable element at the beginning
+            const extraLink = document.createElement('a');
+            extraLink.href = '#';
+            extraLink.textContent = 'Extra Link';
+            tooltip.querySelector('.onboarding-content').insertBefore(extraLink, tooltip.querySelector('.onboarding-content').firstChild);
+
+            // Mock activeElement to be the first element (extraLink)
+            Object.defineProperty(document, 'activeElement', {
+                value: extraLink,
+                writable: true,
+                configurable: true,
+            });
+
+            // Shift+Tab from first element
+            const shiftTabEvent = new KeyboardEvent('keydown', { key: 'Tab', shiftKey: true, bubbles: true, cancelable: true });
+            tooltip.dispatchEvent(shiftTabEvent);
+
+            expect(tooltip).not.toBeNull();
+
+            // Restore activeElement
+            Object.defineProperty(document, 'activeElement', {
+                value: document.body,
+                writable: true,
+                configurable: true,
+            });
         });
 
         test('auto-dismiss should remove tooltip after timeout', () => {
@@ -354,12 +448,26 @@ describe('Onboarding Functions', () => {
             const dismissBtn = document.getElementById('onboarding-dismiss');
             dismissBtn.focus();
 
-            // Simulate Tab key on last (only) focusable element
-            const tabEvent = new KeyboardEvent('keydown', { key: 'Tab', bubbles: true, cancelable: true });
+            // Mock activeElement to be the last element (dismissBtn)
+            Object.defineProperty(document, 'activeElement', {
+                value: dismissBtn,
+                writable: true,
+                configurable: true,
+            });
+
+            // Simulate Tab key (without shiftKey) on last focusable element
+            const tabEvent = new KeyboardEvent('keydown', { key: 'Tab', shiftKey: false, bubbles: true, cancelable: true });
             tooltip.dispatchEvent(tabEvent);
 
             // Focus trap should keep focus within tooltip
             expect(tooltip).not.toBeNull();
+
+            // Restore activeElement
+            Object.defineProperty(document, 'activeElement', {
+                value: document.body,
+                writable: true,
+                configurable: true,
+            });
         });
 
         test('Shift+Tab on first element should cycle focus to last element', () => {
@@ -369,12 +477,26 @@ describe('Onboarding Functions', () => {
             const dismissBtn = document.getElementById('onboarding-dismiss');
             dismissBtn.focus();
 
+            // Mock activeElement to be the first element
+            Object.defineProperty(document, 'activeElement', {
+                value: dismissBtn,
+                writable: true,
+                configurable: true,
+            });
+
             // Simulate Shift+Tab key
             const shiftTabEvent = new KeyboardEvent('keydown', { key: 'Tab', shiftKey: true, bubbles: true, cancelable: true });
             tooltip.dispatchEvent(shiftTabEvent);
 
             // Focus trap should keep focus within tooltip
             expect(tooltip).not.toBeNull();
+
+            // Restore activeElement
+            Object.defineProperty(document, 'activeElement', {
+                value: document.body,
+                writable: true,
+                configurable: true,
+            });
         });
 
         test('Tab key should be prevented when no focusable elements', () => {
@@ -390,6 +512,72 @@ describe('Onboarding Functions', () => {
 
             // Should not throw
             expect(tooltip).not.toBeNull();
+        });
+
+        test('Tab should cycle from last to first with multiple focusable elements', () => {
+            showOnboardingTooltipForced();
+
+            const tooltip = document.getElementById('onboarding-tooltip');
+            const dismissBtn = document.getElementById('onboarding-dismiss');
+            
+            // Add another focusable element
+            const extraLink = document.createElement('a');
+            extraLink.href = '#';
+            extraLink.textContent = 'Extra Link';
+            tooltip.querySelector('.onboarding-content').insertBefore(extraLink, dismissBtn);
+
+            // Mock activeElement to be the last element (dismissBtn)
+            Object.defineProperty(document, 'activeElement', {
+                value: dismissBtn,
+                writable: true,
+                configurable: true,
+            });
+
+            // Tab (without shift) from last element
+            const tabEvent = new KeyboardEvent('keydown', { key: 'Tab', shiftKey: false, bubbles: true, cancelable: true });
+            tooltip.dispatchEvent(tabEvent);
+
+            expect(tooltip).not.toBeNull();
+
+            // Restore activeElement
+            Object.defineProperty(document, 'activeElement', {
+                value: document.body,
+                writable: true,
+                configurable: true,
+            });
+        });
+
+        test('Shift+Tab should cycle from first to last with multiple focusable elements', () => {
+            showOnboardingTooltipForced();
+
+            const tooltip = document.getElementById('onboarding-tooltip');
+            const dismissBtn = document.getElementById('onboarding-dismiss');
+            
+            // Add another focusable element at the beginning
+            const extraLink = document.createElement('a');
+            extraLink.href = '#';
+            extraLink.textContent = 'Extra Link';
+            tooltip.querySelector('.onboarding-content').insertBefore(extraLink, tooltip.querySelector('.onboarding-content').firstChild);
+
+            // Mock activeElement to be the first element (extraLink)
+            Object.defineProperty(document, 'activeElement', {
+                value: extraLink,
+                writable: true,
+                configurable: true,
+            });
+
+            // Shift+Tab from first element
+            const shiftTabEvent = new KeyboardEvent('keydown', { key: 'Tab', shiftKey: true, bubbles: true, cancelable: true });
+            tooltip.dispatchEvent(shiftTabEvent);
+
+            expect(tooltip).not.toBeNull();
+
+            // Restore activeElement
+            Object.defineProperty(document, 'activeElement', {
+                value: document.body,
+                writable: true,
+                configurable: true,
+            });
         });
 
         test('auto-dismiss should remove tooltip after timeout', () => {

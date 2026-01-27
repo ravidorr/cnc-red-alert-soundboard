@@ -2,12 +2,6 @@
    Favorites - Favorites section and drag/drop
    ============================================ */
 
-/* Section Icon Badge */
-.section-icon {
-    margin-right: 6px;
-    font-style: normal;
-}
-
 /* Favorites Section */
 .category-section.favorites-section {
     border-color: var(--green-primary);

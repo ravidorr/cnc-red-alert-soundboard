@@ -242,6 +242,46 @@ describe('Mobile Functions', () => {
             // No change expected - sidebar should maintain state
             expect(elements.sidebar).not.toBeNull();
         });
+
+        test('should handle null sidebar when resizing to desktop', () => {
+            // Start on mobile
+            Object.defineProperty(window, 'innerWidth', {
+                value: 375,
+                writable: true,
+            });
+            setupViewportListener();
+
+            // Set sidebar to null
+            elements.sidebar = null;
+
+            // Resize to desktop - should not throw
+            Object.defineProperty(window, 'innerWidth', {
+                value: 1024,
+                writable: true,
+            });
+
+            expect(() => window.dispatchEvent(new Event('resize'))).not.toThrow();
+        });
+
+        test('should handle null mobileMenuOverlay when resizing to desktop', () => {
+            // Start on mobile
+            Object.defineProperty(window, 'innerWidth', {
+                value: 375,
+                writable: true,
+            });
+            setupViewportListener();
+
+            // Set overlay to null
+            elements.mobileMenuOverlay = null;
+
+            // Resize to desktop - should not throw
+            Object.defineProperty(window, 'innerWidth', {
+                value: 1024,
+                writable: true,
+            });
+
+            expect(() => window.dispatchEvent(new Event('resize'))).not.toThrow();
+        });
     });
 
     describe('Mobile Menu Keyboard Navigation', () => {
@@ -272,6 +312,17 @@ describe('Mobile Functions', () => {
             elements.mobileMenuOverlay.dispatchEvent(spaceEvent);
 
             expect(elements.sidebar.classList.contains('open')).toBe(false);
+        });
+
+        test('should not close menu when other key is pressed on overlay', () => {
+            openMobileMenu();
+
+            // Dispatch keydown with a different key
+            const otherEvent = new KeyboardEvent('keydown', { key: 'a', bubbles: true, cancelable: true });
+            elements.mobileMenuOverlay.dispatchEvent(otherEvent);
+
+            // Menu should still be open
+            expect(elements.sidebar.classList.contains('open')).toBe(true);
         });
 
         test('should close menu when Enter pressed with overlay focused via document handler', () => {

@@ -128,6 +128,24 @@ describe('Contact Modal Functions', () => {
             expect(localThis.modal.classList.contains('visible')).toBe(false);
         });
 
+        test('should stop propagation on Escape to prevent stopAllSounds', () => {
+            showContactModal();
+            
+            let propagationStopped = false;
+            const escEvent = new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true });
+            
+            // Override stopPropagation to track if it was called
+            const originalStopPropagation = escEvent.stopPropagation.bind(escEvent);
+            escEvent.stopPropagation = () => {
+                propagationStopped = true;
+                originalStopPropagation();
+            };
+            
+            handleContactModalKeydown(escEvent);
+            
+            expect(propagationStopped).toBe(true);
+        });
+
         test('should trap focus with Tab key - cycling from last to first', () => {
             showContactModal();
             localThis.closeBtn.focus();

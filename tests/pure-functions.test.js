@@ -369,6 +369,24 @@ describe('Pure Functions', () => {
                 expect(result.length).toBe(1);
                 expect(result[0].name).toBe('Cry');
             });
+
+            test('should find sounds via fuzzy matching (typo correction)', () => {
+                // 'lauhg' is a typo of 'laugh' - not a substring, but close enough for fuzzy matching
+                const result = filterSoundsArray(localThis.soundsWithTags, 'lauhg');
+                expect(result.length).toBe(1);
+                expect(result[0].name).toBe('Laugh');
+            });
+
+            test('should find sounds via fuzzy matching with character transposition', () => {
+                // 'laugH' (casing) is handled differently - let's use a real typo
+                const soundsWithLongerName = [
+                    { name: 'Acknowledged', file: 'ack.wav', category: 'test' },
+                ];
+                // 'acknolwedged' is a typo (transposed 'w' and 'l')
+                const result = filterSoundsArray(soundsWithLongerName, 'acknolwedged');
+                expect(result.length).toBe(1);
+                expect(result[0].name).toBe('Acknowledged');
+            });
         });
     });
 });

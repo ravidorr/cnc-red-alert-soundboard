@@ -228,6 +228,31 @@ describe('Install Functions', () => {
             expect(elements.installPrompt.classList.contains('visible')).toBe(false);
         });
 
+        test('should trap focus with Tab key when install prompt is visible', () => {
+            window.matchMedia = jest.fn().mockReturnValue({ matches: false });
+            setupInstallPrompt();
+            showInstallPrompt();
+
+            // Simulate Tab key when prompt is visible
+            const tabEvent = new KeyboardEvent('keydown', { key: 'Tab', bubbles: true, cancelable: true });
+            elements.installPrompt.dispatchEvent(tabEvent);
+
+            // Prompt should still be visible (focus trapped)
+            expect(elements.installPrompt.classList.contains('visible')).toBe(true);
+        });
+
+        test('should not trap focus when install prompt is not visible', () => {
+            window.matchMedia = jest.fn().mockReturnValue({ matches: false });
+            setupInstallPrompt();
+            // Don't show the prompt
+
+            // Simulate Tab key when prompt is NOT visible
+            const tabEvent = new KeyboardEvent('keydown', { key: 'Tab', bubbles: true, cancelable: true });
+            
+            // Should not throw
+            expect(() => elements.installPrompt.dispatchEvent(tabEvent)).not.toThrow();
+        });
+
         test('should handle appinstalled event', () => {
             const localThis = {};
             window.matchMedia = jest.fn().mockReturnValue({ matches: false });

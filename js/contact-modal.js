@@ -74,6 +74,7 @@ export function handleContactModalKeydown(e) {
     // Close on Escape
     if (e.key === 'Escape') {
         e.preventDefault();
+        e.stopPropagation();
         hideContactModal();
         return;
     }

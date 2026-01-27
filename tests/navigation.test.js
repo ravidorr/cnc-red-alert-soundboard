@@ -516,6 +516,42 @@ describe('Navigation Functions', () => {
             expect(result).toEqual(['allies', 'soviets']);
         });
 
+        test('loadCollapsedCategories should handle invalid JSON gracefully', () => {
+            // Store invalid JSON
+            localStorage.setItem('cnc-collapsed-categories', 'not valid json {{{');
+
+            // Mock console.error to verify error is logged
+            const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+
+            const result = loadCollapsedCategories();
+
+            // Should return empty array on error
+            expect(result).toEqual([]);
+            expect(consoleSpy).toHaveBeenCalled();
+
+            consoleSpy.mockRestore();
+        });
+
+        test('saveCollapseState should handle localStorage errors gracefully', () => {
+            // Mock localStorage.setItem to throw an error
+            const originalSetItem = localStorage.setItem;
+            localStorage.setItem = jest.fn(() => {
+                throw new Error('Storage quota exceeded');
+            });
+
+            const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+
+            const section = document.querySelector('.category-section');
+            
+            // This should not throw even when localStorage fails
+            expect(() => toggleCategory(section)).not.toThrow();
+            expect(consoleSpy).toHaveBeenCalled();
+
+            // Restore
+            localStorage.setItem = originalSetItem;
+            consoleSpy.mockRestore();
+        });
+
         test('applyCollapsedStates should collapse stored categories', () => {
             localStorage.setItem('cnc-collapsed-categories', JSON.stringify(['allies']));
 

@@ -102,7 +102,7 @@ export function renderFavoritesSection() {
             <section class="category-section favorites-section" id="category-favorites" data-category="favorites">
                 <button type="button" class="category-header" aria-expanded="true" aria-controls="category-content-favorites">
                     <span class="category-title">
-                        <span class="category-name"><span class="section-icon" aria-hidden="true">&#9733;</span> FAVORITES</span>
+                        <span class="category-name">FAVORITES</span>
                         <span class="category-count">(0)</span>
                     </span>
                     <span class="category-toggle" aria-hidden="true">&#9660;</span>
@@ -167,7 +167,7 @@ export function renderFavoritesSection() {
             <div class="category-header-wrapper">
                 <button type="button" class="category-header" aria-expanded="true" aria-controls="category-content-favorites">
                     <span class="category-title">
-                        <span class="category-name"><span class="section-icon" aria-hidden="true">&#9733;</span> FAVORITES</span>
+                        <span class="category-name">FAVORITES</span>
                         <span class="category-count">(${favoriteSounds.length})</span>
                     </span>
                     <span class="category-toggle" aria-hidden="true">&#9660;</span>
@@ -252,7 +252,7 @@ export function renderPopularSection() {
         <section class="category-section popular-section" id="category-popular" data-category="popular">
             <button type="button" class="category-header" aria-expanded="true" aria-controls="category-content-popular">
                 <span class="category-title">
-                    <span class="category-name"><span class="section-icon" aria-hidden="true">&#9650;</span> POPULAR SOUNDS</span>
+                    <span class="category-name">POPULAR SOUNDS</span>
                     <span class="category-count">(${popularSounds.length})</span>
                 </span>
                 <span class="category-toggle" aria-hidden="true">&#9660;</span>

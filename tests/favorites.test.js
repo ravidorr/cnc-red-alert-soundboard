@@ -324,6 +324,49 @@ describe('Favorites Functions', () => {
             // Order should not change
             expect(state.favorites).toEqual(originalOrder);
         });
+
+        test('should handle dragstart with missing sound button', () => {
+            state.favorites = ['allies_1_achnoledged.wav', 'allies_1_affirmative.wav'];
+            renderFavoritesSection();
+
+            const wrapper = document.querySelector('#category-favorites .sound-btn-wrapper');
+            
+            // Remove the sound button to test edge case
+            const soundBtn = wrapper.querySelector('.sound-btn');
+            soundBtn.remove();
+
+            // Simulate dragstart - should use fallback name "Sound"
+            const dragStartEvent = new Event('dragstart', { bubbles: true });
+            dragStartEvent.dataTransfer = { effectAllowed: '', setData: () => {} };
+            
+            // Should not throw
+            expect(() => wrapper.dispatchEvent(dragStartEvent)).not.toThrow();
+        });
+
+        test('should handle drop with missing sound button on dragged element', () => {
+            state.favorites = ['allies_1_achnoledged.wav', 'allies_1_affirmative.wav'];
+            renderFavoritesSection();
+
+            const wrappers = document.querySelectorAll('#category-favorites .sound-btn-wrapper');
+            const firstWrapper = wrappers[0];
+            const secondWrapper = wrappers[1];
+
+            // Start dragging first wrapper
+            const dragStartEvent = new Event('dragstart', { bubbles: true });
+            dragStartEvent.dataTransfer = { effectAllowed: '', setData: () => {} };
+            firstWrapper.dispatchEvent(dragStartEvent);
+
+            // Remove the sound button from the dragged element to test edge case
+            const soundBtn = firstWrapper.querySelector('.sound-btn');
+            soundBtn.remove();
+
+            // Simulate drop on second wrapper
+            const dropEvent = new Event('drop', { bubbles: true, cancelable: true });
+            dropEvent.dataTransfer = { dropEffect: '' };
+            
+            // Should not throw and should use fallback name
+            expect(() => secondWrapper.dispatchEvent(dropEvent)).not.toThrow();
+        });
     });
 
     describe('Keyboard Reordering', () => {
@@ -349,6 +392,23 @@ describe('Favorites Functions', () => {
                 moveFavoriteUp('a.wav');
 
                 expect(state.favorites).toEqual(['a.wav', 'b.wav', 'c.wav']);
+            });
+
+            test('should handle focus when soundBtn is missing in wrapper', async () => {
+                state.favorites = ['allies_1_achnoledged.wav', 'allies_1_affirmative.wav'];
+                renderFavoritesSection();
+
+                // Get second wrapper and remove its sound button
+                const wrappers = document.querySelectorAll('#category-favorites .sound-btn-wrapper');
+                const secondWrapper = wrappers[1];
+                const soundBtn = secondWrapper.querySelector('.sound-btn');
+                soundBtn.remove();
+
+                // Move should complete without throwing
+                expect(() => moveFavoriteUp('allies_1_affirmative.wav')).not.toThrow();
+
+                // Wait for focus timeout
+                await new Promise(resolve => setTimeout(resolve, 100));
             });
 
             test('should save to localStorage after move', () => {

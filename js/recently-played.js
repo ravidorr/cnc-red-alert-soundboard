@@ -88,7 +88,7 @@ export function renderRecentlyPlayedSection() {
         <section class="category-section recent-section" id="category-recent" data-category="recent">
             <button type="button" class="category-header" aria-expanded="true" aria-controls="category-content-recent">
                 <span class="category-title">
-                    <span class="category-name"><span class="section-icon" aria-hidden="true">&#9654;</span> RECENTLY PLAYED</span>
+                    <span class="category-name">RECENTLY PLAYED</span>
                     <span class="category-count">(${recentSounds.length})</span>
                 </span>
                 <span class="category-toggle" aria-hidden="true">&#9660;</span>

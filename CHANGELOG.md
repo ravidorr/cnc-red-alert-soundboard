@@ -5,6 +5,16 @@ All notable changes to the C&C Red Alert Soundboard will be documented in this f
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.1] - 2026-01-27
+
+### Fixed
+- **Contact Modal Escape Key**: Fixed Escape key in contact modal incorrectly stopping all sounds due to event propagation
+- **Section Icons Removed**: Removed decorative icons from Favorites, Recently Played, and Popular section headers for cleaner UI
+
+### Improved
+- **Test Coverage**: Increased branch coverage from 93% to 95.04% with 22 new edge case tests
+- **Focus Trap Tests**: Improved test accuracy by properly mocking `document.activeElement`
+
 ## [2.0.0] - 2026-01-27
 
 ### Added
