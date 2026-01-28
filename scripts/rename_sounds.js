@@ -11,10 +11,12 @@ const SOUNDS_DIR = path.join(process.env.HOME, 'Desktop/sounds/sounds');
 
 // Helper to normalize a filename
 function normalizeFilename(filename) {
-    if (!filename.endsWith('.wav')) return null;
-    
+    if (!filename.endsWith('.wav')) {
+        return null;
+    }
+
     const baseName = filename.slice(0, -4); // Remove .wav
-    
+
     let normalized = baseName
         .toLowerCase()
         // Replace special patterns first
@@ -28,7 +30,7 @@ function normalizeFilename(filename) {
         .replace(/\s+/g, '_')               // Replace spaces with underscores
         .replace(/_+/g, '_')                 // Collapse multiple underscores
         .replace(/^_|_$/g, '');              // Remove leading/trailing underscores
-    
+
     return normalized + '.wav';
 }
 
@@ -41,7 +43,7 @@ const usedNames = new Set();
 
 files.forEach(oldName => {
     let newName = normalizeFilename(oldName);
-    
+
     // Ensure uniqueness
     if (usedNames.has(newName)) {
         let counter = 2;
@@ -51,7 +53,7 @@ files.forEach(oldName => {
         }
         newName = `${base}_v${counter}.wav`;
     }
-    
+
     usedNames.add(newName);
     mapping[oldName] = newName;
 });
@@ -87,13 +89,13 @@ console.log(`\nMapping saved to: ${mappingPath}`);
 // Ask for confirmation before renaming
 if (process.argv.includes('--execute')) {
     console.log('\n=== EXECUTING RENAMES ===\n');
-    
+
     Object.entries(mapping)
         .filter(([old, newN]) => old !== newN)
         .forEach(([oldName, newName]) => {
             const oldPath = path.join(SOUNDS_DIR, oldName);
             const newPath = path.join(SOUNDS_DIR, newName);
-            
+
             try {
                 fs.renameSync(oldPath, newPath);
                 console.log(`Renamed: ${oldName} -> ${newName}`);
@@ -101,7 +103,7 @@ if (process.argv.includes('--execute')) {
                 console.error(`Failed to rename ${oldName}: ${err.message}`);
             }
         });
-    
+
     console.log('\nRename complete!');
 } else {
     console.log('\nRun with --execute to perform the actual renames.');

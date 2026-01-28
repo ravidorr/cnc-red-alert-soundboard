@@ -5,7 +5,12 @@ echo "Running pre-commit checks..."
 # Sync version from package.json to js/version.js
 echo "Syncing version..."
 node scripts/sync-version.js
-git add js/version.js
+git add js/version.js sitemap.xml index.html
+
+# Build CSS bundle
+echo "Building CSS bundle..."
+npm run build:css
+git add dist/css/bundle.css
 
 # Run JS linter
 echo "Checking JavaScript..."

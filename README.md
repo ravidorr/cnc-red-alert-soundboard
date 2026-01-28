@@ -85,13 +85,17 @@ cnc-red-alert-soundboard/
 ├── manifest.json       # PWA manifest
 ├── service-worker.js   # Offline caching
 ├── css/
-│   └── styles.css      # Red Alert 1 themed styles (modular CSS imports)
+│   └── *.css           # Modular CSS source files
+├── dist/
+│   └── css/bundle.css  # Production CSS bundle (auto-generated)
 ├── js/
 │   └── main.js         # Application entry point (modular ES6+)
 ├── tests/
-│   ├── *.test.js       # Unit tests (452 tests, 95%+ coverage)
+│   ├── *.test.js       # Unit tests (557 tests, 95%+ coverage)
 │   └── helpers.js      # Jest test helpers
 ├── scripts/
+│   ├── sync-version.js # Auto-syncs version to version.js, sitemap, schema
+│   ├── build-css.js    # Concatenates CSS files into bundle.css
 │   └── rename_sounds.js # Sound file normalization utility
 ├── assets/
 │   └── icons/          # PWA icons (72-512px)
@@ -122,6 +126,10 @@ npm install
 | `npm run lint:css` | Run Stylelint |
 | `npm run lint:html` | Run HTMLHint |
 | `npm run lint:fix` | Auto-fix linting issues |
+| `npm run build:css` | Build CSS bundle from modular files |
+| `npm version patch` | Bump patch version (auto-updates version.js, sitemap, schema) |
+| `npm version minor` | Bump minor version |
+| `npm version major` | Bump major version |
 
 ### Code Quality
 

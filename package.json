@@ -16,7 +16,8 @@
     "lint:fix": "npm run lint:js -- --fix && npm run lint:css -- --fix",
     "precommit": "npm run lint && npm run test:coverage:check",
     "prepare": "husky",
-    "version": "node scripts/sync-version.js && git add js/version.js"
+    "version": "node scripts/sync-version.js && git add js/version.js sitemap.xml index.html",
+    "build:css": "node scripts/build-css.js"
   },
   "keywords": [
     "command-and-conquer",

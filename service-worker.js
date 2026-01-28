@@ -1,5 +1,5 @@
 // C&C Red Alert Soundboard - Service Worker
-const CACHE_NAME = 'cnc-soundboard-v7';
+const CACHE_NAME = 'cnc-soundboard-v8';
 
 // Core assets to cache immediately
 const CORE_ASSETS = [
@@ -8,19 +8,8 @@ const CORE_ASSETS = [
     '/manifest.json',
     '/assets/icons/icon-192.png',
     '/assets/icons/icon-512.png',
-    // CSS files
-    '/css/styles.css',
-    '/css/variables.css',
-    '/css/base.css',
-    '/css/accessibility.css',
-    '/css/layout.css',
-    '/css/components.css',
-    '/css/navigation.css',
-    '/css/favorites.css',
-    '/css/toast.css',
-    '/css/install.css',
-    '/css/effects.css',
-    '/css/responsive.css',
+    // CSS bundle (replaces individual CSS files for better performance)
+    '/dist/css/bundle.css',
     // JS modules
     '/js/main.js',
     '/js/version.js',
