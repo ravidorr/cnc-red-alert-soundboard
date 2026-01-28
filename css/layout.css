@@ -101,6 +101,43 @@
     margin-right: auto; /* Center on wide screens */
 }
 
+/* SEO Intro Section */
+.seo-intro {
+    background: var(--bg-panel);
+    border: 1px solid var(--green-dark);
+    padding: 16px 20px;
+    margin-bottom: 20px;
+}
+
+.seo-intro h2 {
+    font-size: 1.1rem;
+    color: var(--green-primary);
+    text-shadow: var(--glow-green);
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+    font-weight: normal;
+}
+
+.seo-intro p {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    line-height: 1.6;
+    margin-bottom: 8px;
+}
+
+.seo-intro p:last-child {
+    margin-bottom: 0;
+}
+
+.seo-intro strong {
+    color: var(--green-primary);
+}
+
+/* Hide SEO intro when sounds are loaded (JS adds this class) */
+.sounds-loaded .seo-intro {
+    display: none;
+}
+
 /* Grid Pattern Background */
 .content-area::before {
     content: '';

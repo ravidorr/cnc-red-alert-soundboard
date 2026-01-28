@@ -30,6 +30,8 @@ function init() {
     setupAudioPlayer();
     setupInstallPrompt();
     renderCategories();
+    // Hide SEO intro once sounds are loaded (keeps it visible for search engines)
+    document.getElementById('content-area')?.classList.add('sounds-loaded');
     renderFavoritesSection();
     renderRecentlyPlayedSection();
     renderPopularSection();

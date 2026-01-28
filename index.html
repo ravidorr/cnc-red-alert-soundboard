@@ -3,13 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Command & Conquer Red Alert Soundboard - Play classic C&C sound effects">
+    <meta name="description" content="Play 70+ iconic Command & Conquer Red Alert sound effects. Tanya quotes, Allied & Soviet unit voices, explosions, and classic game sounds. Free online soundboard with favorites, search, and offline support.">
     <meta name="theme-color" content="#003300">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="C&C Sounds">
     
-    <title>C&C Red Alert Soundboard</title>
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://ravidorr.github.io/cnc-red-alert-soundboard/">
+    <meta property="og:title" content="C&C Red Alert Soundboard - 70+ Classic Sound Effects">
+    <meta property="og:description" content="Play iconic Command & Conquer Red Alert sounds. Tanya quotes, Allied & Soviet voices, explosions & more. Free online soundboard - works offline.">
+    <meta property="og:image" content="https://ravidorr.github.io/cnc-red-alert-soundboard/assets/icons/icon-512.png">
+    
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://ravidorr.github.io/cnc-red-alert-soundboard/">
+    <meta name="twitter:title" content="C&C Red Alert Soundboard - 70+ Classic Sound Effects">
+    <meta name="twitter:description" content="Play iconic Command & Conquer Red Alert sounds. Tanya quotes, Allied & Soviet voices, explosions & more. Free online soundboard - works offline.">
+    <meta name="twitter:image" content="https://ravidorr.github.io/cnc-red-alert-soundboard/assets/icons/icon-512.png">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://ravidorr.github.io/cnc-red-alert-soundboard/">
+    
+    <title>C&C Red Alert Soundboard - Classic Command & Conquer Sound Effects</title>
     
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/icon-192.png">
@@ -19,7 +36,36 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     
-    <link rel="stylesheet" href="css/styles.css?v=30">
+    <link rel="stylesheet" href="css/styles.css?v=31">
+    
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "C&C Red Alert Soundboard",
+        "description": "Play 70+ iconic Command & Conquer Red Alert sound effects including Tanya quotes, Allied and Soviet unit voices, explosions, and classic game sounds.",
+        "url": "https://ravidorr.github.io/cnc-red-alert-soundboard/",
+        "applicationCategory": "EntertainmentApplication",
+        "operatingSystem": "Any",
+        "browserRequirements": "Requires JavaScript. Works offline after first visit.",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+        },
+        "author": {
+            "@type": "Person",
+            "name": "Raanan Avidor",
+            "url": "https://www.linkedin.com/in/raanan-avidor/"
+        },
+        "sourceOrganization": {
+            "@type": "Organization",
+            "name": "Westwood Studios",
+            "description": "Original creators of Command & Conquer Red Alert"
+        }
+    }
+    </script>
 </head>
 <body>
     <a href="#content-area" class="skip-link">Skip to content</a>
@@ -78,6 +124,13 @@
         </aside>
 
         <div class="content-area" id="content-area">
+            <!-- SEO intro content - visible to search engines, hidden visually after JS loads -->
+            <section class="seo-intro" id="seo-intro">
+                <h2>Command & Conquer Red Alert Soundboard</h2>
+                <p>Relive the nostalgia of <strong>Command & Conquer: Red Alert</strong> with this free online soundboard featuring over 70 classic sound effects. Play iconic quotes from <strong>Tanya</strong>, hear Allied and Soviet unit voices, explosions, building sounds, and more from the legendary 1996 RTS game by Westwood Studios.</p>
+                <p>Features include: search functionality, favorites system, keyboard shortcuts, volume control, and full offline support as a Progressive Web App (PWA). Works on desktop and mobile browsers.</p>
+            </section>
+            
             <!-- Search result indicator -->
             <div class="search-result-indicator" id="search-result-indicator" style="display: none;">
                 <span id="search-result-text"></span>
