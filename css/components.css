@@ -7,16 +7,19 @@
     position: relative;
     display: flex;
     align-items: center;
+    height: 44px;
 }
 
 #search-input {
-    background: var(--bg-panel);
-    border: 1px solid var(--green-border);
+    background: var(--bg-button);
+    border: 1px solid var(--green-dark);
     color: var(--text-primary);
     font-family: var(--font-primary);
     font-size: 1rem;
     padding: 8px 35px 8px 12px;
     width: 250px;
+    height: 44px;
+    box-sizing: border-box;
     outline: none;
     transition: all 0.2s ease;
 }
@@ -61,42 +64,55 @@
 .volume-container {
     display: flex;
     align-items: center;
-    gap: 8px;
+    height: 44px;
+    border: 1px solid var(--green-primary);
+    background: var(--bg-button);
+    box-sizing: border-box;
+    overflow: hidden;
 }
 
 .btn-volume {
     background: none;
-    border: 1px solid var(--green-dark);
+    border: none;
+    border-right: 1px solid var(--green-primary);
     color: var(--text-secondary);
-    padding: 8px;
+    padding: 0;
     cursor: pointer;
     transition: all 0.2s ease;
     display: flex;
     align-items: center;
     justify-content: center;
-    min-width: 44px;
-    min-height: 44px;
+    width: 42px;
+    height: 100%;
+    box-sizing: border-box;
+    flex-shrink: 0;
 }
 
 .btn-volume:hover {
     color: var(--green-primary);
-    border-color: var(--green-border);
+    background: var(--bg-button-hover);
 }
 
 .btn-volume.muted {
     color: var(--red-alert);
+}
+
+.volume-container:has(.btn-volume.muted) {
     border-color: var(--red-dim);
 }
 
 /* Volume slider with larger hit area - visual track drawn via pseudo-element */
 #volume-slider {
     width: 80px;
-    height: 24px;
+    height: 100%;
     -webkit-appearance: none;
     appearance: none;
     background: transparent;
     cursor: pointer;
     position: relative;
+    margin: 0;
+    padding: 0 8px;
+    box-sizing: border-box;
 }
 
 /* Create visual track with larger clickable area */
@@ -104,8 +120,8 @@
     content: '';
     position: absolute;
     top: 50%;
-    left: 0;
-    right: 0;
+    left: 8px;
+    right: 8px;
     height: 4px;
     transform: translateY(-50%);
     background: var(--green-darker);
@@ -116,8 +132,8 @@
 #volume-slider::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    width: 24px;
-    height: 24px;
+    width: 20px;
+    height: 36px;
     background: var(--green-primary);
     border-radius: 0;
     cursor: pointer;
@@ -126,8 +142,8 @@
 }
 
 #volume-slider::-moz-range-thumb {
-    width: 24px;
-    height: 24px;
+    width: 20px;
+    height: 36px;
     background: var(--green-primary);
     border-radius: 0;
     cursor: pointer;
@@ -142,15 +158,20 @@
 /* Action Buttons */
 .btn-action {
     background: var(--bg-button);
-    border: 2px solid var(--red-dim);
+    border: 1px solid var(--red-dim);
     color: var(--red-alert);
     font-family: var(--font-primary);
     font-size: 1rem;
-    padding: 8px 16px;
+    padding: 0 16px;
+    height: 44px;
+    box-sizing: border-box;
     cursor: pointer;
     transition: all 0.2s ease;
     text-transform: uppercase;
     letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .btn-action:hover {
@@ -160,7 +181,7 @@
 }
 
 .btn-random {
-    border-color: var(--green-primary);
+    border: 1px solid var(--green-primary);
     color: var(--green-primary);
     display: flex;
     align-items: center;
@@ -193,6 +214,8 @@
     background: var(--bg-button);
     border-color: var(--green-primary);
     color: var(--green-primary);
+    height: 44px;
+    box-sizing: border-box;
 }
 
 .btn-install-header:hover {

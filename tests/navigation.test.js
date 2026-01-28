@@ -10,7 +10,6 @@ import {
     toggleCategory,
     scrollToCategory,
     createNavHeader,
-    renderMobileCategoryChips,
     loadCollapsedCategories,
     applyCollapsedStates,
 } from '../js/navigation.js';
@@ -373,67 +372,6 @@ describe('Navigation Functions', () => {
                 expect(itemsWithAriaCurrent.length).toBe(1);
                 expect(itemsWithAriaCurrent[0].dataset.category).toBe(secondCategory);
             }
-        });
-    });
-
-    describe('renderMobileCategoryChips', () => {
-        beforeEach(() => {
-            cacheElements();
-            // Add mobile chips container
-            const chipsContainer = document.createElement('nav');
-            chipsContainer.id = 'mobile-category-chips';
-            document.body.appendChild(chipsContainer);
-        });
-
-        test('should render category chips', () => {
-            renderMobileCategoryChips();
-
-            const chips = document.querySelectorAll('.category-chip');
-            expect(chips.length).toBeGreaterThan(0);
-        });
-
-        test('should render favorites chip when favorites exist', () => {
-            state.favorites = ['allies_1_achnoledged.wav'];
-            renderMobileCategoryChips();
-
-            const favoritesChip = document.querySelector('.category-chip[data-category="favorites"]');
-            expect(favoritesChip).not.toBeNull();
-        });
-
-        test('should always render favorites chip even with no favorites', () => {
-            state.favorites = [];
-            renderMobileCategoryChips();
-
-            const favoritesChip = document.querySelector('.category-chip[data-category="favorites"]');
-            expect(favoritesChip).not.toBeNull();
-        });
-
-        test('should handle missing container gracefully', () => {
-            document.getElementById('mobile-category-chips').remove();
-
-            expect(() => renderMobileCategoryChips()).not.toThrow();
-        });
-
-        test('clicking chip should update active state', () => {
-            window.scrollTo = jest.fn();
-            renderMobileCategoryChips();
-
-            const chips = document.querySelectorAll('.category-chip');
-            chips[0].click();
-
-            expect(chips[0].classList.contains('active')).toBe(true);
-        });
-
-        test('should skip empty categories in chip rendering', () => {
-            // This tests the count === 0 branch in renderMobileCategoryChips
-            renderMobileCategoryChips();
-
-            // All chips (except favorites and recent) should correspond to non-empty categories
-            const chips = document.querySelectorAll('.category-chip:not([data-category="favorites"]):not([data-category="recent"])');
-            chips.forEach(chip => {
-                // Each chip should exist because its category has sounds
-                expect(chip.dataset.category).toBeTruthy();
-            });
         });
     });
 

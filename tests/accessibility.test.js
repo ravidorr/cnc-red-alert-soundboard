@@ -89,7 +89,11 @@ describe('Accessibility Features', () => {
             localThis.volumeSlider = document.createElement('input');
             localThis.volumeSlider.type = 'range';
             localThis.volumeSlider.id = 'volume-slider';
+            localThis.volumeSlider.min = '0';
+            localThis.volumeSlider.max = '100';
             localThis.volumeSlider.value = '100';
+            localThis.volumeSlider.setAttribute('aria-valuemin', '0');
+            localThis.volumeSlider.setAttribute('aria-valuemax', '100');
             localThis.volumeSlider.setAttribute('aria-valuenow', '100');
             localThis.volumeSlider.setAttribute('aria-valuetext', '100 percent');
             document.body.appendChild(localThis.volumeSlider);
@@ -101,6 +105,14 @@ describe('Accessibility Features', () => {
 
         test('volume slider should have aria-valuetext', () => {
             expect(localThis.volumeSlider.getAttribute('aria-valuetext')).toBe('100 percent');
+        });
+
+        test('volume slider should have aria-valuemin', () => {
+            expect(localThis.volumeSlider.getAttribute('aria-valuemin')).toBe('0');
+        });
+
+        test('volume slider should have aria-valuemax', () => {
+            expect(localThis.volumeSlider.getAttribute('aria-valuemax')).toBe('100');
         });
 
         test('sidebar should have aria-hidden when closed', () => {

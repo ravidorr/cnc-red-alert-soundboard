@@ -1,6 +1,6 @@
 {
   "name": "cnc-red-alert-soundboard",
-  "version": "2.0.1",
+  "version": "2.1.1",
   "description": "Command & Conquer Red Alert Soundboard PWA",
   "type": "module",
   "main": "js/main.js",
@@ -15,7 +15,8 @@
     "lint:html": "htmlhint index.html",
     "lint:fix": "npm run lint:js -- --fix && npm run lint:css -- --fix",
     "precommit": "npm run lint && npm run test:coverage:check",
-    "prepare": "husky"
+    "prepare": "husky",
+    "version": "node scripts/sync-version.js && git add js/version.js"
   },
   "keywords": [
     "command-and-conquer",

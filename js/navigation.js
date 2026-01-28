@@ -47,45 +47,6 @@ export function renderNavigation() {
     elements.categoryNav.innerHTML = '';
     elements.categoryNav.appendChild(navHeader || createNavHeader());
     elements.categoryNav.insertAdjacentHTML('beforeend', favoritesNavHtml + recentNavHtml + navHtml);
-
-    // Also render mobile category chips
-    renderMobileCategoryChips();
-}
-
-// Render mobile category chips for quick navigation
-export function renderMobileCategoryChips() {
-    const mobileChips = document.getElementById('mobile-category-chips');
-    if (!mobileChips) {
-        return;
-    }
-
-    const sortedCategories = getSortedCategories(CATEGORIES);
-
-    // Always show favorites and recently played chips at the start
-    let chipsHtml = '<button class="category-chip" data-category="favorites" type="button" aria-label="Jump to Favorites section">FAVORITES</button>';
-    chipsHtml += '<button class="category-chip" data-category="recent" type="button" aria-label="Jump to Recently Played section">RECENT</button>';
-
-    chipsHtml += sortedCategories.map(([categoryId, categoryInfo]) => {
-        const count = getSoundsByCategory(SOUNDS, categoryId).length;
-        if (count === 0) {
-            return '';
-        }
-        // Use shorter names for mobile chips
-        const shortName = categoryInfo.name.replace('BUILDINGS & DEFENSES', 'BUILDINGS').replace('MISCELLANEOUS', 'MISC');
-        return `<button class="category-chip" data-category="${categoryId}" type="button" aria-label="Jump to ${categoryInfo.name} section, ${count} sounds">${shortName}</button>`;
-    }).join('');
-
-    mobileChips.innerHTML = chipsHtml;
-
-    // Add click handlers
-    mobileChips.querySelectorAll('.category-chip').forEach(chip => {
-        chip.addEventListener('click', () => {
-            scrollToCategory(chip.dataset.category);
-            // Update active state
-            mobileChips.querySelectorAll('.category-chip').forEach(c => c.classList.remove('active'));
-            chip.classList.add('active');
-        });
-    });
 }
 
 export function createNavHeader() {
