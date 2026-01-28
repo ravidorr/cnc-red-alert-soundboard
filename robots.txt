@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://ravidorr.github.io/cnc-red-alert-soundboard/sitemap.xml
