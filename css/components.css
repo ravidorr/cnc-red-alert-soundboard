@@ -237,6 +237,13 @@
     margin-bottom: 30px;
     border: 1px solid var(--green-darker);
     background: var(--bg-secondary);
+    display: grid;
+    grid-template-rows: auto 1fr;
+    transition: grid-template-rows 0.3s ease;
+}
+
+.category-section.collapsed {
+    grid-template-rows: auto 0fr;
 }
 
 /* Category header as button element */
@@ -317,13 +324,12 @@ button.category-header:focus-visible {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 16px;
-    max-height: 2000px;
+    min-height: 0;
     overflow: hidden;
-    transition: max-height 0.3s ease, padding 0.3s ease;
+    transition: padding 0.3s ease;
 }
 
 .category-section.collapsed .category-content {
-    max-height: 0;
     padding-top: 0;
     padding-bottom: 0;
 }

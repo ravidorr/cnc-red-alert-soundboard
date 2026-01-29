@@ -174,8 +174,8 @@ export function renderFavoritesSection() {
                 </button>
                 <button class="btn-clear-favorites" id="btn-clear-favorites" aria-label="Clear all favorites" title="Clear all favorites">CLEAR</button>
             </div>
-            ${dragTooltipHtml}
             <div class="category-content" id="category-content-favorites">
+                ${dragTooltipHtml}
                 ${buttonsHtml}
             </div>
         </section>
