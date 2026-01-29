@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 import { jest } from '@jest/globals';
-import { setupFullDOM, resetState, resetElements, useFakeTimers, useRealTimers, advanceTimers } from './helpers.js';
+import { setupFullDOM, resetState, resetElements, useFakeTimers, useRealTimers, advanceTimers, mockClipboard, mockFetch, mockWebShare, createMockBlob } from './helpers.js';
 import { state, elements } from '../js/state.js';
 import { SOUNDS, CATEGORIES } from '../js/constants.js';
 import {
@@ -369,30 +369,20 @@ describe('UI Rendering', () => {
             if (elements.toastContainer) {
                 elements.toastContainer.innerHTML = '';
             }
-            // Mock fetch for file sharing tests
-            localThis.originalFetch = global.fetch;
-        });
-
-        afterEach(() => {
-            global.fetch = localThis.originalFetch;
         });
 
         test('should copy link to clipboard on success (fallback)', async () => {
-            const writeTextMock = jest.fn().mockResolvedValue();
-            Object.assign(navigator, {
-                clipboard: { writeText: writeTextMock },
-            });
+            const clipboard = mockClipboard();
 
             await shareSound('test.wav', 'Test Sound');
 
-            expect(writeTextMock).toHaveBeenCalled();
-            expect(writeTextMock.mock.calls[0][0]).toContain('#sound=test.wav');
+            expect(clipboard.writeText).toHaveBeenCalled();
+            expect(clipboard.writeText.mock.calls[0][0]).toContain('#sound=test.wav');
+            clipboard.restore();
         });
 
         test('should show success toast on copy', async () => {
-            Object.assign(navigator, {
-                clipboard: { writeText: jest.fn().mockResolvedValue() },
-            });
+            const clipboard = mockClipboard();
 
             await shareSound('test.wav', 'Test Sound');
 
@@ -402,12 +392,11 @@ describe('UI Rendering', () => {
             const toast = document.querySelector('.toast-success');
             expect(toast).not.toBeNull();
             expect(toast.textContent).toContain('LINK ACQUIRED');
+            clipboard.restore();
         });
 
         test('should show error toast on copy failure', async () => {
-            Object.assign(navigator, {
-                clipboard: { writeText: jest.fn().mockRejectedValue(new Error()) },
-            });
+            const clipboard = mockClipboard({ shouldFail: true });
 
             await shareSound('test.wav', 'Test Sound');
 
@@ -416,16 +405,13 @@ describe('UI Rendering', () => {
 
             const toast = document.querySelector('.toast-error');
             expect(toast).not.toBeNull();
+            clipboard.restore();
         });
 
         test('should handle Web Share API abort gracefully', async () => {
             // When user cancels share, no error toast should appear
-            const abortError = new Error('Share canceled');
-            abortError.name = 'AbortError';
-            Object.assign(navigator, {
-                share: jest.fn().mockRejectedValue(abortError),
-                clipboard: { writeText: jest.fn().mockResolvedValue() },
-            });
+            const webShare = mockWebShare({ shouldAbort: true });
+            const clipboard = mockClipboard();
 
             await shareSound('test.wav', 'Test Sound');
 

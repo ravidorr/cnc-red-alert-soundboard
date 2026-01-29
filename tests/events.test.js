@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 import { jest } from '@jest/globals';
-import { setupFullDOM, resetState, resetElements, useFakeTimers, useRealTimers, advanceTimers } from './helpers.js';
+import { setupFullDOM, resetState, resetElements, useFakeTimers, useRealTimers, advanceTimers, mockClipboard } from './helpers.js';
 import { state, elements } from '../js/state.js';
 import { cacheElements, renderCategories, renderFavoritesSection } from '../js/ui.js';
 import { renderNavigation } from '../js/navigation.js';
@@ -71,12 +71,7 @@ describe('Event Handlers', () => {
 
         test('clicking share button should call shareSound', async () => {
             setupEventListeners();
-
-            // Mock clipboard API
-            const writeTextMock = jest.fn().mockResolvedValue();
-            Object.assign(navigator, {
-                clipboard: { writeText: writeTextMock },
-            });
+            const clipboard = mockClipboard();
 
             const shareBtn = document.querySelector('.share-btn');
             shareBtn.click();
@@ -84,17 +79,13 @@ describe('Event Handlers', () => {
             // Wait for async clipboard operation
             await Promise.resolve();
 
-            expect(writeTextMock).toHaveBeenCalled();
+            expect(clipboard.writeText).toHaveBeenCalled();
+            clipboard.restore();
         });
 
         test('pressing Enter on share button should call shareSound', async () => {
             setupEventListeners();
-
-            // Mock clipboard API
-            const writeTextMock = jest.fn().mockResolvedValue();
-            Object.assign(navigator, {
-                clipboard: { writeText: writeTextMock },
-            });
+            const clipboard = mockClipboard();
 
             const shareBtn = document.querySelector('.share-btn');
             const event = new KeyboardEvent('keydown', { key: 'Enter', bubbles: true });
@@ -103,17 +94,13 @@ describe('Event Handlers', () => {
             // Wait for async clipboard operation
             await Promise.resolve();
 
-            expect(writeTextMock).toHaveBeenCalled();
+            expect(clipboard.writeText).toHaveBeenCalled();
+            clipboard.restore();
         });
 
         test('pressing Space on share button should call shareSound', async () => {
             setupEventListeners();
-
-            // Mock clipboard API
-            const writeTextMock = jest.fn().mockResolvedValue();
-            Object.assign(navigator, {
-                clipboard: { writeText: writeTextMock },
-            });
+            const clipboard = mockClipboard();
 
             const shareBtn = document.querySelector('.share-btn');
             const event = new KeyboardEvent('keydown', { key: ' ', bubbles: true });
@@ -122,7 +109,8 @@ describe('Event Handlers', () => {
             // Wait for async clipboard operation
             await Promise.resolve();
 
-            expect(writeTextMock).toHaveBeenCalled();
+            expect(clipboard.writeText).toHaveBeenCalled();
+            clipboard.restore();
         });
 
         test('clicking category header should toggle collapse', () => {

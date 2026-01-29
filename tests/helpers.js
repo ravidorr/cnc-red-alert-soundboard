@@ -143,3 +143,115 @@ export async function flushPromisesAndTimers() {
     jest.runAllTimers();
     await Promise.resolve();
 }
+
+/**
+ * Mock clipboard API for testing copy/paste functionality
+ * @param {Object} options - Mock options
+ * @param {boolean} [options.shouldFail=false] - Whether writeText should reject
+ * @returns {Object} - Object with mock function and cleanup
+ */
+export function mockClipboard(options = {}) {
+    const { shouldFail = false } = options;
+    const originalClipboard = navigator.clipboard;
+    
+    const writeTextMock = shouldFail
+        ? jest.fn().mockRejectedValue(new Error('Clipboard write failed'))
+        : jest.fn().mockResolvedValue();
+    
+    Object.assign(navigator, {
+        clipboard: { writeText: writeTextMock },
+    });
+    
+    return {
+        writeText: writeTextMock,
+        restore: () => {
+            Object.assign(navigator, { clipboard: originalClipboard });
+        },
+    };
+}
+
+/**
+ * Mock fetch API for testing network requests
+ * @param {Object} options - Mock options
+ * @param {*} [options.response] - Response data
+ * @param {boolean} [options.shouldFail=false] - Whether fetch should reject
+ * @param {Blob} [options.blob] - Blob to return from response.blob()
+ * @returns {Object} - Object with mock function and cleanup
+ */
+export function mockFetch(options = {}) {
+    const { response, shouldFail = false, blob } = options;
+    const originalFetch = global.fetch;
+    
+    let fetchMock;
+    if (shouldFail) {
+        fetchMock = jest.fn().mockRejectedValue(new Error('Fetch failed'));
+    } else if (blob) {
+        fetchMock = jest.fn().mockResolvedValue({
+            blob: () => Promise.resolve(blob),
+        });
+    } else {
+        fetchMock = jest.fn().mockResolvedValue(response);
+    }
+    
+    global.fetch = fetchMock;
+    
+    return {
+        fetch: fetchMock,
+        restore: () => {
+            global.fetch = originalFetch;
+        },
+    };
+}
+
+/**
+ * Mock Web Share API for testing share functionality
+ * @param {Object} options - Mock options
+ * @param {boolean} [options.canShare=true] - Whether canShare returns true
+ * @param {boolean} [options.shouldFail=false] - Whether share should reject
+ * @param {boolean} [options.shouldAbort=false] - Whether share should reject with AbortError
+ * @returns {Object} - Object with mock functions and cleanup
+ */
+export function mockWebShare(options = {}) {
+    const { canShare = true, shouldFail = false, shouldAbort = false } = options;
+    const originalShare = navigator.share;
+    const originalCanShare = navigator.canShare;
+    
+    let shareMock;
+    if (shouldAbort) {
+        const abortError = new Error('Share cancelled');
+        abortError.name = 'AbortError';
+        shareMock = jest.fn().mockRejectedValue(abortError);
+    } else if (shouldFail) {
+        shareMock = jest.fn().mockRejectedValue(new Error('Share failed'));
+    } else {
+        shareMock = jest.fn().mockResolvedValue();
+    }
+    
+    const canShareMock = jest.fn().mockReturnValue(canShare);
+    
+    Object.assign(navigator, {
+        share: shareMock,
+        canShare: canShareMock,
+    });
+    
+    return {
+        share: shareMock,
+        canShare: canShareMock,
+        restore: () => {
+            Object.assign(navigator, {
+                share: originalShare,
+                canShare: originalCanShare,
+            });
+        },
+    };
+}
+
+/**
+ * Create a mock blob for testing file operations
+ * @param {string} [content='audio data'] - Content of the blob
+ * @param {string} [type='audio/wav'] - MIME type
+ * @returns {Blob}
+ */
+export function createMockBlob(content = 'audio data', type = 'audio/wav') {
+    return new Blob([content], { type });
+}
