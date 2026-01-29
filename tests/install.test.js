@@ -256,16 +256,8 @@ describe('Install Functions', () => {
         });
 
         test('should handle appinstalled event', () => {
-            const localThis = {};
             window.matchMedia = jest.fn().mockReturnValue({ matches: false });
             state.deferredInstallPrompt = { prompt: jest.fn() };
-            // Mock service worker for cacheAllSoundsForOffline
-            localThis.mockPostMessage = jest.fn();
-            Object.defineProperty(navigator, 'serviceWorker', {
-                value: { controller: { postMessage: localThis.mockPostMessage } },
-                writable: true,
-                configurable: true,
-            });
             setupInstallPrompt();
             showInstallPrompt();
             showInstallButton();
@@ -275,11 +267,10 @@ describe('Install Functions', () => {
             expect(elements.installPrompt.classList.contains('visible')).toBe(false);
             expect(elements.installBtn.classList.contains('visible')).toBe(false);
             expect(state.deferredInstallPrompt).toBeNull();
-            // Verify cacheAllSoundsForOffline was triggered
-            expect(localThis.mockPostMessage).toHaveBeenCalledWith(
-                { type: 'CACHE_ALL_SOUNDS' },
-                expect.any(Array),
-            );
+            // Verify success toast is shown (sound caching now automatic via SW activation)
+            const successToasts = document.querySelectorAll('.toast-success');
+            expect(successToasts.length).toBeGreaterThan(0);
+            expect(successToasts[0].textContent).toContain('APP INSTALLED');
         });
 
         test('should handle header install button click', async () => {
@@ -532,7 +523,7 @@ describe('Install Functions', () => {
             );
         });
 
-        test('should show info toast when starting cache', () => {
+        test('should show info toast when starting cache verification', () => {
             const localThis = {};
             localThis.mockPostMessage = jest.fn();
             Object.defineProperty(navigator, 'serviceWorker', {
@@ -546,7 +537,7 @@ describe('Install Functions', () => {
             // Check that info toast was shown
             const toasts = document.querySelectorAll('.toast-info');
             expect(toasts.length).toBeGreaterThan(0);
-            expect(toasts[0].textContent).toContain('CACHING SOUNDS FOR OFFLINE OPERATIONS...');
+            expect(toasts[0].textContent).toContain('VERIFYING SOUND CACHE...');
         });
 
         test('should show success toast when caching completes', () => {
@@ -571,11 +562,13 @@ describe('Install Functions', () => {
             cacheAllSoundsForOffline();
 
             // Simulate success response from service worker by triggering port1.onmessage
-            localThis.capturedMessageChannel.port1.onmessage({ data: { success: true } });
+            localThis.capturedMessageChannel.port1.onmessage({
+                data: { success: true, cachedCount: 190, failedCount: 0, total: 190 },
+            });
 
             const successToasts = document.querySelectorAll('.toast-success');
             expect(successToasts.length).toBeGreaterThan(0);
-            expect(successToasts[0].textContent).toContain('ALL SOUNDS CACHED AND READY');
+            expect(successToasts[0].textContent).toContain('ALL 190/190 SOUNDS CACHED AND READY');
 
             // Restore original MessageChannel
             global.MessageChannel = OriginalMessageChannel;
@@ -603,11 +596,45 @@ describe('Install Functions', () => {
             cacheAllSoundsForOffline();
 
             // Simulate failure response from service worker by triggering port1.onmessage
-            localThis.capturedMessageChannel.port1.onmessage({ data: { success: false } });
+            localThis.capturedMessageChannel.port1.onmessage({
+                data: { success: false, cachedCount: 180, failedCount: 10, total: 190 },
+            });
 
             const errorToasts = document.querySelectorAll('.toast-error');
             expect(errorToasts.length).toBeGreaterThan(0);
-            expect(errorToasts[0].textContent).toContain('CACHE INCOMPLETE. SOME SOUNDS UNAVAILABLE OFFLINE.');
+            expect(errorToasts[0].textContent).toContain('CACHE STATUS: 180/190 READY, 10 FAILED');
+
+            // Restore original MessageChannel
+            global.MessageChannel = OriginalMessageChannel;
+        });
+
+        test('should show error toast when response has no data', () => {
+            const localThis = {};
+            localThis.capturedMessageChannel = null;
+            // Override MessageChannel to capture the instance
+            const OriginalMessageChannel = global.MessageChannel;
+            global.MessageChannel = class {
+                constructor() {
+                    this.port1 = { onmessage: null };
+                    this.port2 = {};
+                    localThis.capturedMessageChannel = this;
+                }
+            };
+            localThis.mockPostMessage = jest.fn();
+            Object.defineProperty(navigator, 'serviceWorker', {
+                value: { controller: { postMessage: localThis.mockPostMessage } },
+                writable: true,
+                configurable: true,
+            });
+
+            cacheAllSoundsForOffline();
+
+            // Simulate response with no data
+            localThis.capturedMessageChannel.port1.onmessage({ data: null });
+
+            const errorToasts = document.querySelectorAll('.toast-error');
+            expect(errorToasts.length).toBeGreaterThan(0);
+            expect(errorToasts[0].textContent).toContain('CACHE VERIFICATION FAILED');
 
             // Restore original MessageChannel
             global.MessageChannel = OriginalMessageChannel;

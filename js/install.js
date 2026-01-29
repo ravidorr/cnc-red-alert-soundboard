@@ -81,9 +81,8 @@ export function setupInstallPrompt() {
         hideInstallPrompt();
         hideInstallButton();
         state.deferredInstallPrompt = null;
-
-        // Cache all sounds for offline use after installation
-        cacheAllSoundsForOffline();
+        // Sound caching now happens automatically via service worker activation
+        showToast('APP INSTALLED. SOUNDS CACHING IN BACKGROUND...', 'success');
     });
 }
 
@@ -139,21 +138,25 @@ export function hideInstallButton() {
     }
 }
 
-// Cache all sounds for offline use
+// Manually refresh/verify sound cache (sounds are cached automatically on SW activation)
 export function cacheAllSoundsForOffline() {
     if (!('serviceWorker' in navigator) || !navigator.serviceWorker || !navigator.serviceWorker.controller) {
         console.log('Service worker not available for caching');
         return;
     }
 
-    showToast('CACHING SOUNDS FOR OFFLINE OPERATIONS...', 'info');
+    showToast('VERIFYING SOUND CACHE...', 'info');
 
     const messageChannel = new MessageChannel();
     messageChannel.port1.onmessage = (event) => {
         if (event.data && event.data.success) {
-            showToast('ALL SOUNDS CACHED AND READY', 'success');
+            const { cachedCount, total } = event.data;
+            showToast(`ALL ${cachedCount}/${total} SOUNDS CACHED AND READY`, 'success');
+        } else if (event.data) {
+            const { cachedCount, failedCount, total } = event.data;
+            showToast(`CACHE STATUS: ${cachedCount}/${total} READY, ${failedCount} FAILED`, 'error');
         } else {
-            showToast('CACHE INCOMPLETE. SOME SOUNDS UNAVAILABLE OFFLINE.', 'error');
+            showToast('CACHE VERIFICATION FAILED', 'error');
         }
     };
 

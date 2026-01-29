@@ -1,5 +1,5 @@
 // C&C Red Alert Soundboard - Service Worker
-const CACHE_NAME = 'cnc-soundboard-v8';
+const CACHE_NAME = 'cnc-soundboard-v9';
 
 // Core assets to cache immediately
 const CORE_ASSETS = [
@@ -221,6 +221,39 @@ const SOUND_FILES = [
     '/sounds/water explosion.wav',
 ];
 
+// Cache sounds in the background (non-blocking)
+function cacheSoundsInBackground() {
+    console.log('[SW] Starting background sound caching...');
+    caches.open(CACHE_NAME)
+        .then((cache) => {
+            // Check which sounds are already cached
+            return Promise.all(
+                SOUND_FILES.map((url) => {
+                    return cache.match(url).then((cached) => {
+                        if (cached) {
+                            return null; // Already cached, skip
+                        }
+                        return fetch(url)
+                            .then((response) => {
+                                if (response.ok) {
+                                    return cache.put(url, response);
+                                }
+                            })
+                            .catch((err) => {
+                                console.log('[SW] Failed to cache:', url, err);
+                            });
+                    });
+                }),
+            );
+        })
+        .then(() => {
+            console.log('[SW] Background sound caching complete');
+        })
+        .catch((err) => {
+            console.log('[SW] Background sound caching failed:', err);
+        });
+}
+
 // Install event - cache core assets
 self.addEventListener('install', (event) => {
     console.log('[SW] Installing...');
@@ -237,7 +270,7 @@ self.addEventListener('install', (event) => {
     );
 });
 
-// Activate event - clean up old caches
+// Activate event - clean up old caches and start background sound caching
 self.addEventListener('activate', (event) => {
     console.log('[SW] Activating...');
     event.waitUntil(
@@ -255,6 +288,10 @@ self.addEventListener('activate', (event) => {
             .then(() => {
                 console.log('[SW] Claiming clients');
                 return self.clients.claim();
+            })
+            .then(() => {
+                // Start background sound caching after activation (non-blocking)
+                cacheSoundsInBackground();
             }),
     );
 });
@@ -301,29 +338,47 @@ self.addEventListener('fetch', (event) => {
     );
 });
 
-// Background sync for caching all sounds
+// Manual trigger for caching all sounds (kept for refresh/retry functionality)
 self.addEventListener('message', (event) => {
     if (event.data && event.data.type === 'CACHE_ALL_SOUNDS') {
-        console.log('[SW] Caching all sound files...');
+        console.log('[SW] Manual sound caching triggered...');
         caches.open(CACHE_NAME)
             .then((cache) => {
+                let cachedCount = 0;
+                let failedCount = 0;
                 return Promise.all(
                     SOUND_FILES.map((url) => {
-                        return fetch(url)
-                            .then((response) => {
-                                if (response.ok) {
-                                    return cache.put(url, response);
-                                }
-                            })
-                            .catch((err) => {
-                                console.log('[SW] Failed to cache:', url, err);
-                            });
+                        return cache.match(url).then((cached) => {
+                            if (cached) {
+                                cachedCount++;
+                                return null; // Already cached, skip
+                            }
+                            return fetch(url)
+                                .then((response) => {
+                                    if (response.ok) {
+                                        cachedCount++;
+                                        return cache.put(url, response);
+                                    }
+                                    failedCount++;
+                                })
+                                .catch((err) => {
+                                    failedCount++;
+                                    console.log('[SW] Failed to cache:', url, err);
+                                });
+                        });
                     }),
-                );
+                ).then(() => ({ cachedCount, failedCount }));
             })
-            .then(() => {
-                console.log('[SW] All sounds cached');
-                event.ports[0].postMessage({ success: true });
+            .then(({ cachedCount, failedCount }) => {
+                console.log(`[SW] Sound caching complete: ${cachedCount} cached, ${failedCount} failed`);
+                if (event.ports && event.ports[0]) {
+                    event.ports[0].postMessage({
+                        success: failedCount === 0,
+                        cachedCount,
+                        failedCount,
+                        total: SOUND_FILES.length,
+                    });
+                }
             });
     }
 });
