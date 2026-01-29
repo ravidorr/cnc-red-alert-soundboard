@@ -2,6 +2,7 @@
  * @jest-environment jsdom
  */
 import { showContactModal, hideContactModal, handleContactModalKeydown } from '../js/contact-modal.js';
+import { useFakeTimers, useRealTimers, advanceTimers } from './helpers.js';
 
 describe('Contact Modal Functions', () => {
     const localThis = {};
@@ -41,11 +42,13 @@ describe('Contact Modal Functions', () => {
             expect(localThis.modal.classList.contains('visible')).toBe(true);
         });
 
-        test('should focus close button after showing', async () => {
+        test('should focus close button after showing', () => {
+            useFakeTimers();
             showContactModal();
-            // Wait for setTimeout to focus the button
-            await new Promise(resolve => setTimeout(resolve, 100));
+            // Advance timers for focus
+            advanceTimers(100);
             expect(document.activeElement).toBe(localThis.closeBtn);
+            useRealTimers();
         });
 
         test('should store trigger element for focus restoration', () => {
@@ -60,12 +63,14 @@ describe('Contact Modal Functions', () => {
             expect(() => showContactModal()).not.toThrow();
         });
 
-        test('should handle modal without close button', async () => {
+        test('should handle modal without close button', () => {
+            useFakeTimers();
             localThis.closeBtn.remove();
             showContactModal();
-            // Wait for setTimeout
-            await new Promise(resolve => setTimeout(resolve, 100));
+            // Advance timers
+            advanceTimers(100);
             expect(localThis.modal.classList.contains('visible')).toBe(true);
+            useRealTimers();
         });
     });
 

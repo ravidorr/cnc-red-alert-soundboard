@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 import { jest } from '@jest/globals';
-import { setupFullDOM, resetState, resetElements } from './helpers.js';
+import { setupFullDOM, resetState, resetElements, useFakeTimers, useRealTimers, advanceTimers } from './helpers.js';
 import { state, elements } from '../js/state.js';
 import { cacheElements } from '../js/ui.js';
 import {
@@ -411,7 +411,8 @@ describe('Install Functions', () => {
             expect(elements.installPrompt.classList.contains('visible')).toBe(true);
         });
 
-        test('showInstallPrompt should focus first button when available', (done) => {
+        test('showInstallPrompt should focus first button when available', () => {
+            useFakeTimers();
             const localThis = {};
             // Add a button to focus
             localThis.firstBtn = document.createElement('button');
@@ -420,11 +421,10 @@ describe('Install Functions', () => {
 
             showInstallPrompt();
 
-            // Wait for setTimeout in showInstallPrompt
-            setTimeout(() => {
-                expect(document.activeElement).toBe(localThis.firstBtn);
-                done();
-            }, 100);
+            // Advance timers for focus
+            advanceTimers(100);
+            expect(document.activeElement).toBe(localThis.firstBtn);
+            useRealTimers();
         });
     });
 
@@ -464,7 +464,8 @@ describe('Install Functions', () => {
             window.dispatchEvent(new Event('load'));
 
             // Wait for the promise to resolve
-            await new Promise(resolve => setTimeout(resolve, 10));
+            await Promise.resolve();
+            await Promise.resolve();
 
             expect(mockRegister).toHaveBeenCalled();
             consoleSpy.mockRestore();
@@ -713,7 +714,7 @@ describe('Install Functions', () => {
             expect(result === null || typeof result === 'object').toBe(true);
         });
 
-        test('registerServiceWorker should set up update interval', () => {
+        test('registerServiceWorker should set up update interval', async () => {
             const localThis = {};
             localThis.mockRegistration = {
                 scope: '/',
@@ -741,13 +742,14 @@ describe('Install Functions', () => {
             window.dispatchEvent(new Event('load'));
 
             // Wait for promise to resolve
-            return new Promise(resolve => setTimeout(resolve, 0)).then(() => {
-                expect(global.setInterval).toHaveBeenCalledWith(expect.any(Function), 60 * 60 * 1000);
-                global.setInterval = originalSetInterval;
-            });
+            await Promise.resolve();
+            await Promise.resolve();
+
+            expect(global.setInterval).toHaveBeenCalledWith(expect.any(Function), 60 * 60 * 1000);
+            global.setInterval = originalSetInterval;
         });
 
-        test('registerServiceWorker should listen for updatefound event', () => {
+        test('registerServiceWorker should listen for updatefound event', async () => {
             const localThis = {};
             localThis.mockRegistration = {
                 scope: '/',
@@ -767,12 +769,14 @@ describe('Install Functions', () => {
             registerServiceWorker();
             window.dispatchEvent(new Event('load'));
 
-            return new Promise(resolve => setTimeout(resolve, 0)).then(() => {
-                expect(localThis.mockRegistration.addEventListener).toHaveBeenCalledWith(
-                    'updatefound',
-                    expect.any(Function),
-                );
-            });
+            // Wait for promise to resolve
+            await Promise.resolve();
+            await Promise.resolve();
+
+            expect(localThis.mockRegistration.addEventListener).toHaveBeenCalledWith(
+                'updatefound',
+                expect.any(Function),
+            );
         });
     });
 });

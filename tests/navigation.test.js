@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 import { jest } from '@jest/globals';
-import { setupFullDOM, resetState, resetElements } from './helpers.js';
+import { setupFullDOM, resetState, resetElements, useFakeTimers, useRealTimers, advanceTimers } from './helpers.js';
 import { state, elements } from '../js/state.js';
 import { cacheElements, renderCategories } from '../js/ui.js';
 import {
@@ -201,7 +201,8 @@ describe('Navigation Functions', () => {
             expect(() => closeMobileMenu()).not.toThrow();
         });
 
-        test('openMobileMenu should focus first focusable element', (done) => {
+        test('openMobileMenu should focus first focusable element', () => {
+            useFakeTimers();
             // Add a button inside sidebar
             const btn = document.createElement('button');
             btn.textContent = 'Test';
@@ -209,11 +210,10 @@ describe('Navigation Functions', () => {
 
             openMobileMenu();
 
-            // Wait for setTimeout in openMobileMenu
-            setTimeout(() => {
-                expect(document.activeElement).toBe(btn);
-                done();
-            }, 150);
+            // Advance timers for focus
+            advanceTimers(150);
+            expect(document.activeElement).toBe(btn);
+            useRealTimers();
         });
 
         test('closeMobileMenu should return focus to trigger element', () => {
@@ -523,22 +523,23 @@ describe('Navigation Functions', () => {
             cacheElements();
         });
 
-        test('openMobileMenu should handle sidebar with no focusable elements', (done) => {
+        test('openMobileMenu should handle sidebar with no focusable elements', () => {
+            useFakeTimers();
             // Clear sidebar and don't add any buttons
             elements.sidebar.innerHTML = '<div>No buttons here</div>';
 
             // This should not throw even with no focusable elements
             expect(() => openMobileMenu()).not.toThrow();
 
-            // Wait for setTimeout in openMobileMenu
-            setTimeout(() => {
-                // Menu should still be open
-                expect(elements.sidebar.classList.contains('open')).toBe(true);
-                done();
-            }, 150);
+            // Advance timers
+            advanceTimers(150);
+            // Menu should still be open
+            expect(elements.sidebar.classList.contains('open')).toBe(true);
+            useRealTimers();
         });
 
-        test('Tab from last element should cycle to first element', (done) => {
+        test('Tab from last element should cycle to first element', () => {
+            useFakeTimers();
             // Add focusable elements to sidebar
             const btn1 = document.createElement('button');
             btn1.id = 'first-btn';
@@ -551,30 +552,31 @@ describe('Navigation Functions', () => {
 
             openMobileMenu();
 
-            // Wait for menu to open and focus
-            setTimeout(() => {
-                // Focus the last element
-                btn2.focus();
-                expect(document.activeElement).toBe(btn2);
+            // Advance timers for menu to open and focus
+            advanceTimers(150);
 
-                // Simulate Tab key (not shift)
-                const tabEvent = new KeyboardEvent('keydown', { 
-                    key: 'Tab', 
-                    shiftKey: false,
-                    bubbles: true,
-                    cancelable: true
-                });
-                
-                // The event should be captured by the focus trap
-                document.dispatchEvent(tabEvent);
-                
-                // Focus should cycle (or trap should prevent default)
-                expect(elements.sidebar.classList.contains('open')).toBe(true);
-                done();
-            }, 150);
+            // Focus the last element
+            btn2.focus();
+            expect(document.activeElement).toBe(btn2);
+
+            // Simulate Tab key (not shift)
+            const tabEvent = new KeyboardEvent('keydown', { 
+                key: 'Tab', 
+                shiftKey: false,
+                bubbles: true,
+                cancelable: true
+            });
+            
+            // The event should be captured by the focus trap
+            document.dispatchEvent(tabEvent);
+            
+            // Focus should cycle (or trap should prevent default)
+            expect(elements.sidebar.classList.contains('open')).toBe(true);
+            useRealTimers();
         });
 
-        test('Shift+Tab from first element should cycle to last element', (done) => {
+        test('Shift+Tab from first element should cycle to last element', () => {
+            useFakeTimers();
             // Add focusable elements to sidebar
             const btn1 = document.createElement('button');
             btn1.id = 'first-btn';
@@ -587,29 +589,30 @@ describe('Navigation Functions', () => {
 
             openMobileMenu();
 
-            // Wait for menu to open and focus
-            setTimeout(() => {
-                // Focus the first element
-                btn1.focus();
-                expect(document.activeElement).toBe(btn1);
+            // Advance timers for menu to open and focus
+            advanceTimers(150);
 
-                // Simulate Shift+Tab key
-                const tabEvent = new KeyboardEvent('keydown', { 
-                    key: 'Tab', 
-                    shiftKey: true,
-                    bubbles: true,
-                    cancelable: true
-                });
-                
-                document.dispatchEvent(tabEvent);
-                
-                // Focus should cycle (or trap should prevent default)
-                expect(elements.sidebar.classList.contains('open')).toBe(true);
-                done();
-            }, 150);
+            // Focus the first element
+            btn1.focus();
+            expect(document.activeElement).toBe(btn1);
+
+            // Simulate Shift+Tab key
+            const tabEvent = new KeyboardEvent('keydown', { 
+                key: 'Tab', 
+                shiftKey: true,
+                bubbles: true,
+                cancelable: true
+            });
+            
+            document.dispatchEvent(tabEvent);
+            
+            // Focus should cycle (or trap should prevent default)
+            expect(elements.sidebar.classList.contains('open')).toBe(true);
+            useRealTimers();
         });
 
-        test('Tab should not cycle when not at boundary element', (done) => {
+        test('Tab should not cycle when not at boundary element', () => {
+            useFakeTimers();
             // Add three focusable elements to sidebar
             const btn1 = document.createElement('button');
             btn1.textContent = 'First';
@@ -623,24 +626,24 @@ describe('Navigation Functions', () => {
 
             openMobileMenu();
 
-            // Wait for menu to open and focus
-            setTimeout(() => {
-                // Focus the middle element
-                btn2.focus();
+            // Advance timers for menu to open and focus
+            advanceTimers(150);
 
-                // Tab from middle should not trigger cycle
-                const tabEvent = new KeyboardEvent('keydown', { 
-                    key: 'Tab', 
-                    shiftKey: false,
-                    bubbles: true
-                });
-                
-                document.dispatchEvent(tabEvent);
-                
-                // Menu should still be open
-                expect(elements.sidebar.classList.contains('open')).toBe(true);
-                done();
-            }, 150);
+            // Focus the middle element
+            btn2.focus();
+
+            // Tab from middle should not trigger cycle
+            const tabEvent = new KeyboardEvent('keydown', { 
+                key: 'Tab', 
+                shiftKey: false,
+                bubbles: true
+            });
+            
+            document.dispatchEvent(tabEvent);
+            
+            // Menu should still be open
+            expect(elements.sidebar.classList.contains('open')).toBe(true);
+            useRealTimers();
         });
     });
 });

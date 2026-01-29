@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 import { jest } from '@jest/globals';
-import { setupFullDOM, resetState, resetElements } from './helpers.js';
+import { setupFullDOM, resetState, resetElements, useFakeTimers, useRealTimers, advanceTimers } from './helpers.js';
 import { state, elements } from '../js/state.js';
 import { cacheElements, renderCategories } from '../js/ui.js';
 import {
@@ -335,7 +335,8 @@ describe('Audio Functions', () => {
             playSound(btn);
 
             // Wait for the promise rejection to be handled
-            await new Promise(resolve => setTimeout(resolve, 10));
+            await Promise.resolve();
+            await Promise.resolve();
 
             expect(consoleSpy).toHaveBeenCalledWith('Playback failed:', expect.any(Error));
             consoleSpy.mockRestore();
@@ -477,15 +478,15 @@ describe('Audio Functions', () => {
             expect(state.currentlyPlaying).toBeNull();
         });
 
-        test('should handle sound hash with valid sound', (done) => {
+        test('should handle sound hash with valid sound', () => {
+            useFakeTimers();
             window.location.hash = '#sound=allies_1_achnoledged.wav';
             checkUrlHash();
 
-            // Wait for setTimeout
-            setTimeout(() => {
-                expect(state.audioPlayer.src).toContain('sounds/');
-                done();
-            }, 600);
+            // Advance timers
+            advanceTimers(600);
+            expect(state.audioPlayer.src).toContain('sounds/');
+            useRealTimers();
         });
 
         test('should handle sound hash with invalid sound', () => {
@@ -495,19 +496,19 @@ describe('Audio Functions', () => {
             expect(state.currentlyPlaying).toBeNull();
         });
 
-        test('should handle when button not found for valid sound', (done) => {
+        test('should handle when button not found for valid sound', () => {
+            useFakeTimers();
             // Remove all buttons first
             document.querySelectorAll('.sound-btn').forEach(btn => btn.remove());
 
             window.location.hash = '#sound=allies_1_achnoledged.wav';
             checkUrlHash();
 
-            // Wait for setTimeout
-            setTimeout(() => {
-                // Should not throw, just not play
-                expect(state.currentlyPlaying).toBeNull();
-                done();
-            }, 600);
+            // Advance timers
+            advanceTimers(600);
+            // Should not throw, just not play
+            expect(state.currentlyPlaying).toBeNull();
+            useRealTimers();
         });
     });
 

@@ -1,7 +1,7 @@
 /**
  * @jest-environment jsdom
  */
-import { setupFullDOM, resetState, resetElements } from './helpers.js';
+import { setupFullDOM, resetState, resetElements, useFakeTimers, useRealTimers, advanceTimers } from './helpers.js';
 import { state, elements } from '../js/state.js';
 import { cacheElements, renderCategories, renderFavoritesSection } from '../js/ui.js';
 import { renderNavigation } from '../js/navigation.js';
@@ -406,11 +406,15 @@ describe('Favorites Functions', () => {
                 const soundBtn = secondWrapper.querySelector('.sound-btn');
                 soundBtn.remove();
 
+                useFakeTimers();
+
                 // Move should complete without throwing
                 expect(() => moveFavoriteUp('allies_1_affirmative.wav')).not.toThrow();
 
-                // Wait for focus timeout
-                await new Promise(resolve => setTimeout(resolve, 100));
+                // Advance timers to complete focus timeout
+                advanceTimers(100);
+
+                useRealTimers();
             });
 
             test('should save to localStorage after move', () => {
@@ -500,58 +504,66 @@ describe('Favorites Functions', () => {
         });
 
         test('should empty favorites array when confirmed', async () => {
+            useFakeTimers();
             state.favorites = ['a.wav', 'b.wav', 'c.wav'];
             renderFavoritesSection();
 
             const clearPromise = clearAllFavorites();
 
-            // Wait for modal to appear, then click execute
-            await new Promise(resolve => setTimeout(resolve, 50));
+            // Advance timers for modal to appear
+            advanceTimers(50);
             const executeBtn = document.getElementById('confirm-execute');
             executeBtn.click();
 
+            useRealTimers();
             await clearPromise;
             expect(state.favorites).toEqual([]);
         });
 
         test('should not empty favorites when cancelled', async () => {
+            useFakeTimers();
             state.favorites = ['a.wav', 'b.wav', 'c.wav'];
             renderFavoritesSection();
 
             const clearPromise = clearAllFavorites();
 
-            // Wait for modal to appear, then click abort
-            await new Promise(resolve => setTimeout(resolve, 50));
+            // Advance timers for modal to appear
+            advanceTimers(50);
             const abortBtn = document.getElementById('confirm-abort');
             abortBtn.click();
 
+            useRealTimers();
             await clearPromise;
             expect(state.favorites).toEqual(['a.wav', 'b.wav', 'c.wav']);
         });
 
         test('should save to localStorage when confirmed', async () => {
+            useFakeTimers();
             state.favorites = ['a.wav', 'b.wav'];
             renderFavoritesSection();
 
             const clearPromise = clearAllFavorites();
 
-            await new Promise(resolve => setTimeout(resolve, 50));
+            advanceTimers(50);
             document.getElementById('confirm-execute').click();
 
+            useRealTimers();
             await clearPromise;
             const stored = JSON.parse(localStorage.getItem('cnc-favorites'));
             expect(stored).toEqual([]);
         });
 
         test('should re-render favorites section when confirmed', async () => {
+            useFakeTimers();
             state.favorites = ['allies_1_achnoledged.wav'];
             renderFavoritesSection();
 
             const clearPromise = clearAllFavorites();
 
-            await new Promise(resolve => setTimeout(resolve, 50));
+            advanceTimers(50);
             document.getElementById('confirm-execute').click();
 
+            useRealTimers();
             await clearPromise;
             const favSection = document.getElementById('category-favorites');
             const emptyState = favSection.querySelector('.favorites-empty');
@@ -559,14 +571,16 @@ describe('Favorites Functions', () => {
         });
 
         test('should show toast notification when confirmed', async () => {
+            useFakeTimers();
             state.favorites = ['a.wav'];
             renderFavoritesSection();
 
             const clearPromise = clearAllFavorites();
 
-            await new Promise(resolve => setTimeout(resolve, 50));
+            advanceTimers(50);
             document.getElementById('confirm-execute').click();
 
+            useRealTimers();
             await clearPromise;
             const toast = document.querySelector('.toast');
             expect(toast).not.toBeNull();
@@ -591,7 +605,8 @@ describe('Favorites Functions', () => {
             renderNavigation();
         });
 
-        test('moveFavoriteUp should handle when wrapper is not found', (done) => {
+        test('moveFavoriteUp should handle when wrapper is not found', () => {
+            useFakeTimers();
             state.favorites = ['nonexistent.wav', 'allies_1_achnoledged.wav'];
             renderFavoritesSection();
 
@@ -599,61 +614,61 @@ describe('Favorites Functions', () => {
             // This should not throw even if wrapper is not found
             expect(() => moveFavoriteUp('nonexistent.wav')).not.toThrow();
 
-            // Wait for setTimeout in focusFavoriteItem
-            setTimeout(() => {
-                // No crash should occur
-                done();
-            }, 100);
+            // Advance timers to complete any pending timeouts
+            advanceTimers(100);
+            useRealTimers();
         });
 
-        test('moveFavoriteDown should handle when wrapper is not found', (done) => {
+        test('moveFavoriteDown should handle when wrapper is not found', () => {
+            useFakeTimers();
             state.favorites = ['allies_1_achnoledged.wav', 'nonexistent.wav'];
             renderFavoritesSection();
 
             // Try to move down a file that doesn't have a DOM element
             expect(() => moveFavoriteDown('allies_1_achnoledged.wav')).not.toThrow();
 
-            setTimeout(() => {
-                done();
-            }, 100);
+            advanceTimers(100);
+            useRealTimers();
         });
 
-        test('moveFavoriteUp should focus sound button after move', (done) => {
+        test('moveFavoriteUp should focus sound button after move', () => {
+            useFakeTimers();
             state.favorites = ['allies_1_achnoledged.wav', 'allies_1_affirmative.wav'];
             renderFavoritesSection();
 
             // Move the second item up
             moveFavoriteUp('allies_1_affirmative.wav');
 
-            // Wait for focusFavoriteItem setTimeout
-            setTimeout(() => {
-                // The moved item should be focused
-                const wrapper = document.querySelector(`.favorites-section .sound-btn-wrapper[data-file="${encodeURIComponent('allies_1_affirmative.wav')}"]`);
-                if (wrapper) {
-                    const soundBtn = wrapper.querySelector('.sound-btn');
-                    expect(document.activeElement).toBe(soundBtn);
-                }
-                done();
-            }, 100);
+            // Advance timers for focusFavoriteItem
+            advanceTimers(100);
+
+            // The moved item should be focused
+            const wrapper = document.querySelector(`.favorites-section .sound-btn-wrapper[data-file="${encodeURIComponent('allies_1_affirmative.wav')}"]`);
+            if (wrapper) {
+                const soundBtn = wrapper.querySelector('.sound-btn');
+                expect(document.activeElement).toBe(soundBtn);
+            }
+            useRealTimers();
         });
 
-        test('moveFavoriteDown should focus sound button after move', (done) => {
+        test('moveFavoriteDown should focus sound button after move', () => {
+            useFakeTimers();
             state.favorites = ['allies_1_achnoledged.wav', 'allies_1_affirmative.wav'];
             renderFavoritesSection();
 
             // Move the first item down
             moveFavoriteDown('allies_1_achnoledged.wav');
 
-            // Wait for focusFavoriteItem setTimeout
-            setTimeout(() => {
-                // The moved item should be focused
-                const wrapper = document.querySelector(`.favorites-section .sound-btn-wrapper[data-file="${encodeURIComponent('allies_1_achnoledged.wav')}"]`);
-                if (wrapper) {
-                    const soundBtn = wrapper.querySelector('.sound-btn');
-                    expect(document.activeElement).toBe(soundBtn);
-                }
-                done();
-            }, 100);
+            // Advance timers for focusFavoriteItem
+            advanceTimers(100);
+
+            // The moved item should be focused
+            const wrapper = document.querySelector(`.favorites-section .sound-btn-wrapper[data-file="${encodeURIComponent('allies_1_achnoledged.wav')}"]`);
+            if (wrapper) {
+                const soundBtn = wrapper.querySelector('.sound-btn');
+                expect(document.activeElement).toBe(soundBtn);
+            }
+            useRealTimers();
         });
 
         test('moveFavoriteUp should create reorder-announcer if it does not exist', () => {
@@ -687,7 +702,8 @@ describe('Favorites Functions', () => {
             expect(sameAnnouncer).toBe(announcer);
         });
 
-        test('should handle wrapper found but soundBtn missing', (done) => {
+        test('should handle wrapper found but soundBtn missing', () => {
+            useFakeTimers();
             state.favorites = ['allies_1_achnoledged.wav', 'allies_1_affirmative.wav'];
             renderFavoritesSection();
 
@@ -701,7 +717,8 @@ describe('Favorites Functions', () => {
             // Move should not throw even without sound button
             expect(() => moveFavoriteUp('allies_1_affirmative.wav')).not.toThrow();
 
-            setTimeout(done, 100);
+            advanceTimers(100);
+            useRealTimers();
         });
     });
 });

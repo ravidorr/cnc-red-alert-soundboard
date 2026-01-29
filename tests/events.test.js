@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 import { jest } from '@jest/globals';
-import { setupFullDOM, resetState, resetElements } from './helpers.js';
+import { setupFullDOM, resetState, resetElements, useFakeTimers, useRealTimers, advanceTimers } from './helpers.js';
 import { state, elements } from '../js/state.js';
 import { cacheElements, renderCategories, renderFavoritesSection } from '../js/ui.js';
 import { renderNavigation } from '../js/navigation.js';
@@ -81,8 +81,8 @@ describe('Event Handlers', () => {
             const shareBtn = document.querySelector('.share-btn');
             shareBtn.click();
 
-            // Wait for async operation
-            await new Promise(resolve => setTimeout(resolve, 50));
+            // Wait for async clipboard operation
+            await Promise.resolve();
 
             expect(writeTextMock).toHaveBeenCalled();
         });
@@ -100,8 +100,8 @@ describe('Event Handlers', () => {
             const event = new KeyboardEvent('keydown', { key: 'Enter', bubbles: true });
             shareBtn.dispatchEvent(event);
 
-            // Wait for async operation
-            await new Promise(resolve => setTimeout(resolve, 50));
+            // Wait for async clipboard operation
+            await Promise.resolve();
 
             expect(writeTextMock).toHaveBeenCalled();
         });
@@ -119,8 +119,8 @@ describe('Event Handlers', () => {
             const event = new KeyboardEvent('keydown', { key: ' ', bubbles: true });
             shareBtn.dispatchEvent(event);
 
-            // Wait for async operation
-            await new Promise(resolve => setTimeout(resolve, 50));
+            // Wait for async clipboard operation
+            await Promise.resolve();
 
             expect(writeTextMock).toHaveBeenCalled();
         });
@@ -578,6 +578,7 @@ describe('Event Handlers', () => {
         });
 
         test('clear all favorites button should clear favorites', async () => {
+            useFakeTimers();
             // Setup confirm modal in DOM for testing
             const confirmModal = document.createElement('div');
             confirmModal.id = 'confirm-modal';
@@ -598,14 +599,18 @@ describe('Event Handlers', () => {
             if (clearBtn) {
                 clearBtn.click();
 
-                // Wait for modal to appear, then click execute
-                await new Promise(resolve => setTimeout(resolve, 50));
+                // Advance timers for modal to appear
+                advanceTimers(50);
                 const executeBtn = document.getElementById('confirm-execute');
                 executeBtn.click();
 
-                // Wait for async operation to complete
-                await new Promise(resolve => setTimeout(resolve, 50));
+                // Advance timers for async operation
+                advanceTimers(50);
+                useRealTimers();
+                await Promise.resolve();
                 expect(state.favorites.length).toBe(0);
+            } else {
+                useRealTimers();
             }
 
             // Cleanup
@@ -613,6 +618,7 @@ describe('Event Handlers', () => {
         });
 
         test('pressing Enter on clear favorites button should trigger clear', async () => {
+            useFakeTimers();
             // Setup confirm modal in DOM for testing
             const confirmModal = document.createElement('div');
             confirmModal.id = 'confirm-modal';
@@ -634,14 +640,18 @@ describe('Event Handlers', () => {
                 const event = new KeyboardEvent('keydown', { key: 'Enter', bubbles: true });
                 clearBtn.dispatchEvent(event);
 
-                // Wait for modal to appear, then click execute
-                await new Promise(resolve => setTimeout(resolve, 50));
+                // Advance timers for modal to appear
+                advanceTimers(50);
                 const executeBtn = document.getElementById('confirm-execute');
                 executeBtn.click();
 
-                // Wait for async operation to complete
-                await new Promise(resolve => setTimeout(resolve, 50));
+                // Advance timers for async operation
+                advanceTimers(50);
+                useRealTimers();
+                await Promise.resolve();
                 expect(state.favorites.length).toBe(0);
+            } else {
+                useRealTimers();
             }
 
             // Cleanup
@@ -907,29 +917,29 @@ describe('Event Handlers', () => {
             expect(() => showShortcutsModal()).not.toThrow();
         });
 
-        test('showShortcutsModal should focus close button if it exists', (done) => {
+        test('showShortcutsModal should focus close button if it exists', () => {
+            useFakeTimers();
             const closeBtn = document.createElement('button');
             closeBtn.id = 'shortcuts-close';
             localThis.modal.appendChild(closeBtn);
 
             showShortcutsModal();
 
-            // Wait for setTimeout
-            setTimeout(() => {
-                expect(document.activeElement).toBe(closeBtn);
-                done();
-            }, 100);
+            // Advance timers for focus
+            advanceTimers(100);
+            expect(document.activeElement).toBe(closeBtn);
+            useRealTimers();
         });
 
-        test('showShortcutsModal should handle missing close button', (done) => {
+        test('showShortcutsModal should handle missing close button', () => {
+            useFakeTimers();
             // Modal exists but no close button
             showShortcutsModal();
 
-            // Wait for setTimeout
-            setTimeout(() => {
-                expect(localThis.modal.classList.contains('visible')).toBe(true);
-                done();
-            }, 100);
+            // Advance timers
+            advanceTimers(100);
+            expect(localThis.modal.classList.contains('visible')).toBe(true);
+            useRealTimers();
         });
 
         test('hideShortcutsModal should do nothing if modal does not exist', () => {

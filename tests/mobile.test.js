@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 import { jest } from '@jest/globals';
-import { setupFullDOM, resetState, resetElements } from './helpers.js';
+import { setupFullDOM, resetState, resetElements, useFakeTimers, useRealTimers, advanceTimers } from './helpers.js';
 import { state, elements } from '../js/state.js';
 import { cacheElements } from '../js/ui.js';
 import {
@@ -127,6 +127,7 @@ describe('Mobile Functions', () => {
         });
 
         test('should focus first focusable element in sidebar', async () => {
+            useFakeTimers();
             // Add a focusable button to sidebar
             const btn = document.createElement('button');
             btn.textContent = 'Focus Me';
@@ -134,23 +135,26 @@ describe('Mobile Functions', () => {
 
             openMobileMenu();
 
-            // Wait for the setTimeout to focus the element
-            await new Promise(resolve => setTimeout(resolve, 150));
+            // Advance timers for focus
+            advanceTimers(150);
 
             expect(document.activeElement).toBe(btn);
+            useRealTimers();
         });
 
-        test('should handle sidebar with no focusable elements', async () => {
+        test('should handle sidebar with no focusable elements', () => {
+            useFakeTimers();
             // Clear sidebar
             elements.sidebar.innerHTML = '<p>No buttons here</p>';
 
             openMobileMenu();
 
-            // Wait for the setTimeout
-            await new Promise(resolve => setTimeout(resolve, 150));
+            // Advance timers
+            advanceTimers(150);
 
             // Should not throw
             expect(elements.sidebar.classList.contains('open')).toBe(true);
+            useRealTimers();
         });
     });
 

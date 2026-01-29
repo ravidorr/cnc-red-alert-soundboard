@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 import { jest } from '@jest/globals';
-import { createMockStorage } from './helpers.js';
+import { createMockStorage, useFakeTimers, useRealTimers, advanceTimers } from './helpers.js';
 import {
     hasSeenOnboarding,
     markOnboardingSeen,
@@ -114,18 +114,18 @@ describe('Onboarding Functions', () => {
             expect(dismissBtn.textContent).toBe('ACKNOWLEDGED');
         });
 
-        test('clicking dismiss button should remove tooltip', (done) => {
+        test('clicking dismiss button should remove tooltip', () => {
+            useFakeTimers();
             showOnboardingTooltip();
 
             const dismissBtn = document.getElementById('onboarding-dismiss');
             dismissBtn.click();
 
-            // Wait for animation
-            setTimeout(() => {
-                const tooltip = document.getElementById('onboarding-tooltip');
-                expect(tooltip).toBeNull();
-                done();
-            }, 350);
+            // Advance timers for animation
+            advanceTimers(350);
+            const tooltip = document.getElementById('onboarding-tooltip');
+            expect(tooltip).toBeNull();
+            useRealTimers();
         });
 
         test('clicking dismiss button should mark onboarding as seen', () => {
@@ -137,19 +137,19 @@ describe('Onboarding Functions', () => {
             expect(localThis.mockStorage.setItem).toHaveBeenCalledWith('cnc-onboarding-seen', 'true');
         });
 
-        test('pressing Escape should dismiss tooltip', (done) => {
+        test('pressing Escape should dismiss tooltip', () => {
+            useFakeTimers();
             showOnboardingTooltip();
 
             const tooltip = document.getElementById('onboarding-tooltip');
             const escEvent = new KeyboardEvent('keydown', { key: 'Escape', bubbles: true });
             tooltip.dispatchEvent(escEvent);
 
-            // Wait for animation
-            setTimeout(() => {
-                const tooltipAfter = document.getElementById('onboarding-tooltip');
-                expect(tooltipAfter).toBeNull();
-                done();
-            }, 350);
+            // Advance timers for animation
+            advanceTimers(350);
+            const tooltipAfter = document.getElementById('onboarding-tooltip');
+            expect(tooltipAfter).toBeNull();
+            useRealTimers();
         });
 
         test('tooltip should have hiding class when dismissed', () => {
@@ -390,17 +390,17 @@ describe('Onboarding Functions', () => {
             expect(tips.length).toBe(3);
         });
 
-        test('clicking dismiss button should remove tooltip', (done) => {
+        test('clicking dismiss button should remove tooltip', () => {
+            useFakeTimers();
             showOnboardingTooltipForced();
 
             const dismissBtn = document.getElementById('onboarding-dismiss');
             dismissBtn.click();
 
-            setTimeout(() => {
-                const tooltip = document.getElementById('onboarding-tooltip');
-                expect(tooltip).toBeNull();
-                done();
-            }, 350);
+            advanceTimers(350);
+            const tooltip = document.getElementById('onboarding-tooltip');
+            expect(tooltip).toBeNull();
+            useRealTimers();
         });
 
         test('clicking dismiss should NOT mark onboarding as seen', () => {
@@ -416,18 +416,18 @@ describe('Onboarding Functions', () => {
             expect(calls.length).toBe(0);
         });
 
-        test('pressing Escape should dismiss tooltip', (done) => {
+        test('pressing Escape should dismiss tooltip', () => {
+            useFakeTimers();
             showOnboardingTooltipForced();
 
             const tooltip = document.getElementById('onboarding-tooltip');
             const escEvent = new KeyboardEvent('keydown', { key: 'Escape', bubbles: true });
             tooltip.dispatchEvent(escEvent);
 
-            setTimeout(() => {
-                const tooltipAfter = document.getElementById('onboarding-tooltip');
-                expect(tooltipAfter).toBeNull();
-                done();
-            }, 350);
+            advanceTimers(350);
+            const tooltipAfter = document.getElementById('onboarding-tooltip');
+            expect(tooltipAfter).toBeNull();
+            useRealTimers();
         });
 
         test('should remove existing tooltip before showing new one', () => {

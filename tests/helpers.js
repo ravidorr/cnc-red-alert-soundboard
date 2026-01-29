@@ -97,3 +97,49 @@ export function mockRequestAnimationFrame() {
         window.requestAnimationFrame = originalRAF;
     };
 }
+
+/**
+ * Enable Jest fake timers for testing setTimeout/setInterval
+ * Call in beforeEach or at the start of a test
+ */
+export function useFakeTimers() {
+    jest.useFakeTimers();
+}
+
+/**
+ * Restore real timers after using fake timers
+ * Call in afterEach or at the end of a test
+ */
+export function useRealTimers() {
+    jest.useRealTimers();
+}
+
+/**
+ * Advance fake timers by specified milliseconds
+ * @param {number} ms - Milliseconds to advance
+ */
+export function advanceTimers(ms) {
+    jest.advanceTimersByTime(ms);
+}
+
+/**
+ * Run all pending timers (setTimeout, setInterval)
+ */
+export function runAllTimers() {
+    jest.runAllTimers();
+}
+
+/**
+ * Run only pending timers (not newly created ones)
+ */
+export function runOnlyPendingTimers() {
+    jest.runOnlyPendingTimers();
+}
+
+/**
+ * Flush all promises and timers - useful for async code with timers
+ */
+export async function flushPromisesAndTimers() {
+    jest.runAllTimers();
+    await Promise.resolve();
+}

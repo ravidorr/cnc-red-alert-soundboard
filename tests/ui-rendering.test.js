@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 import { jest } from '@jest/globals';
-import { setupFullDOM, resetState, resetElements } from './helpers.js';
+import { setupFullDOM, resetState, resetElements, useFakeTimers, useRealTimers, advanceTimers } from './helpers.js';
 import { state, elements } from '../js/state.js';
 import { SOUNDS, CATEGORIES } from '../js/constants.js';
 import {
@@ -255,17 +255,18 @@ describe('UI Rendering', () => {
             expect(() => showToast('Test', 'info')).not.toThrow();
         });
 
-        test('should remove toast after duration', (done) => {
+        test('should remove toast after duration', () => {
+            useFakeTimers();
             showToast('Test message', 'info', 100);
 
-            setTimeout(() => {
-                const toast = document.querySelector('.toast');
-                expect(toast).toBeNull();
-                done();
-            }, 150);
+            advanceTimers(150);
+            const toast = document.querySelector('.toast');
+            expect(toast).toBeNull();
+            useRealTimers();
         });
 
-        test('should pause timer on mouseenter and resume on mouseleave', (done) => {
+        test('should pause timer on mouseenter and resume on mouseleave', () => {
+            useFakeTimers();
             showToast('Test message', 'info', 100);
 
             const toast = document.querySelector('.toast');
@@ -273,23 +274,22 @@ describe('UI Rendering', () => {
             // Trigger mouseenter to pause timer
             toast.dispatchEvent(new Event('mouseenter'));
             
-            // Wait past original timeout
-            setTimeout(() => {
-                // Toast should still exist because timer was paused
-                expect(document.querySelector('.toast')).not.toBeNull();
-                
-                // Trigger mouseleave to resume timer with 2000ms
-                toast.dispatchEvent(new Event('mouseleave'));
-                
-                // Toast should eventually be removed
-                setTimeout(() => {
-                    expect(document.querySelector('.toast')).toBeNull();
-                    done();
-                }, 2100);
-            }, 150);
+            // Advance past original timeout
+            advanceTimers(150);
+            // Toast should still exist because timer was paused
+            expect(document.querySelector('.toast')).not.toBeNull();
+            
+            // Trigger mouseleave to resume timer with 2000ms
+            toast.dispatchEvent(new Event('mouseleave'));
+            
+            // Advance past resume timeout
+            advanceTimers(2100);
+            expect(document.querySelector('.toast')).toBeNull();
+            useRealTimers();
         });
 
-        test('should pause timer on focusin and resume on focusout', (done) => {
+        test('should pause timer on focusin and resume on focusout', () => {
+            useFakeTimers();
             showToast('Test message', 'info', 100);
 
             const toast = document.querySelector('.toast');
@@ -297,20 +297,18 @@ describe('UI Rendering', () => {
             // Trigger focusin to pause timer
             toast.dispatchEvent(new Event('focusin'));
             
-            // Wait past original timeout
-            setTimeout(() => {
-                // Toast should still exist because timer was paused
-                expect(document.querySelector('.toast')).not.toBeNull();
-                
-                // Trigger focusout to resume timer with 2000ms
-                toast.dispatchEvent(new Event('focusout'));
-                
-                // Toast should eventually be removed
-                setTimeout(() => {
-                    expect(document.querySelector('.toast')).toBeNull();
-                    done();
-                }, 2100);
-            }, 150);
+            // Advance past original timeout
+            advanceTimers(150);
+            // Toast should still exist because timer was paused
+            expect(document.querySelector('.toast')).not.toBeNull();
+            
+            // Trigger focusout to resume timer with 2000ms
+            toast.dispatchEvent(new Event('focusout'));
+            
+            // Advance past resume timeout
+            advanceTimers(2100);
+            expect(document.querySelector('.toast')).toBeNull();
+            useRealTimers();
         });
 
         test('should handle mouseleave when toast already removed', () => {
@@ -399,7 +397,7 @@ describe('UI Rendering', () => {
             await shareSound('test.wav', 'Test Sound');
 
             // Wait for promise
-            await new Promise(resolve => setTimeout(resolve, 10));
+            await Promise.resolve();
 
             const toast = document.querySelector('.toast-success');
             expect(toast).not.toBeNull();
@@ -414,7 +412,7 @@ describe('UI Rendering', () => {
             await shareSound('test.wav', 'Test Sound');
 
             // Wait for promise
-            await new Promise(resolve => setTimeout(resolve, 10));
+            await Promise.resolve();
 
             const toast = document.querySelector('.toast-error');
             expect(toast).not.toBeNull();
@@ -432,7 +430,7 @@ describe('UI Rendering', () => {
             await shareSound('test.wav', 'Test Sound');
 
             // Wait for promise
-            await new Promise(resolve => setTimeout(resolve, 10));
+            await Promise.resolve();
 
             // No error toast should appear for abort
             const errorToast = document.querySelector('.toast-error');
@@ -455,7 +453,7 @@ describe('UI Rendering', () => {
             await shareSound('test.wav', 'Test Sound');
 
             // Wait for promise
-            await new Promise(resolve => setTimeout(resolve, 10));
+            await Promise.resolve();
 
             expect(shareMock).toHaveBeenCalled();
             expect(shareMock.mock.calls[0][0].files).toBeDefined();
@@ -482,7 +480,7 @@ describe('UI Rendering', () => {
             await shareSound('test.wav', 'Test Sound');
 
             // Wait for promise
-            await new Promise(resolve => setTimeout(resolve, 10));
+            await Promise.resolve();
 
             expect(shareMock).toHaveBeenCalled();
             expect(shareMock.mock.calls[0][0].url).toBeDefined();
@@ -529,7 +527,7 @@ describe('UI Rendering', () => {
             await shareSound('test.wav', 'Test Sound');
 
             // Wait for promise
-            await new Promise(resolve => setTimeout(resolve, 10));
+            await Promise.resolve();
 
             expect(clipboardMock).toHaveBeenCalled();
         });
@@ -577,7 +575,7 @@ describe('UI Rendering', () => {
             await shareSound('test.wav', 'Test Sound');
 
             // Wait for promise
-            await new Promise(resolve => setTimeout(resolve, 10));
+            await Promise.resolve();
 
             // Should NOT fall back to clipboard when user cancels
             expect(clipboardMock).not.toHaveBeenCalled();
