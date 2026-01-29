@@ -118,4 +118,4 @@ export * from './onboarding.js';
 export * from './confirm-modal.js';
 export * from './contact-modal.js';
 
-export { init };
+export { init, handleShortcutActions };

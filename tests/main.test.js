@@ -30,10 +30,10 @@ describe('Main.js Functions', () => {
 
         test('should show success toast when going online', () => {
             const toastContainer = document.getElementById('toast-container');
-            
+
             // Dispatch online event
             window.dispatchEvent(new Event('online'));
-            
+
             // Check for toast (showToast creates a toast element)
             const toast = toastContainer.querySelector('.toast');
             expect(toast).not.toBeNull();
@@ -42,10 +42,10 @@ describe('Main.js Functions', () => {
 
         test('should show info toast when going offline', () => {
             const toastContainer = document.getElementById('toast-container');
-            
+
             // Dispatch offline event
             window.dispatchEvent(new Event('offline'));
-            
+
             // Check for toast
             const toast = toastContainer.querySelector('.toast');
             expect(toast).not.toBeNull();
@@ -59,7 +59,7 @@ describe('Main.js Functions', () => {
         beforeEach(() => {
             // Store original location
             localThis.originalLocation = window.location;
-            
+
             // Mock history.replaceState
             localThis.replaceStateSpy = jest.spyOn(window.history, 'replaceState').mockImplementation(() => {});
         });
@@ -70,7 +70,14 @@ describe('Main.js Functions', () => {
             window.location = localThis.originalLocation;
         });
 
-        test('should do nothing when no action parameter', () => {
+        // Helper to load handleShortcutActions dynamically after DOM is set up
+        async function getHandleShortcutActions() {
+            // Use dynamic import to load main.js after DOM setup
+            const mainModule = await import('../js/main.js');
+            return mainModule.handleShortcutActions;
+        }
+
+        test('should do nothing when no action parameter', async () => {
             // No ?action parameter
             delete window.location;
             window.location = {
@@ -79,14 +86,16 @@ describe('Main.js Functions', () => {
                 hash: '',
             };
 
-            // Import and call handleShortcutActions directly would require exports
-            // Instead, test the behavior by checking no side effects
+            const handleShortcutActions = await getHandleShortcutActions();
+            handleShortcutActions();
+
+            // replaceState should NOT be called when there's no action
             expect(localThis.replaceStateSpy).not.toHaveBeenCalled();
         });
 
-        test('should handle random action', () => {
+        test('should clear URL and schedule playRandomSound for random action', async () => {
             useFakeTimers();
-            
+
             // Set up URL with action=random
             delete window.location;
             window.location = {
@@ -95,18 +104,18 @@ describe('Main.js Functions', () => {
                 hash: '',
             };
 
-            // Parse the URL params as the function would
-            const params = new URLSearchParams(window.location.search);
-            const action = params.get('action');
-            
-            expect(action).toBe('random');
-            
+            const handleShortcutActions = await getHandleShortcutActions();
+            handleShortcutActions();
+
+            // Should clear URL parameter
+            expect(localThis.replaceStateSpy).toHaveBeenCalledWith({}, '', '/');
+
             useRealTimers();
         });
 
-        test('should handle search action', () => {
+        test('should clear URL and focus search input for search action', async () => {
             useFakeTimers();
-            
+
             // Set up URL with action=search
             delete window.location;
             window.location = {
@@ -115,16 +124,26 @@ describe('Main.js Functions', () => {
                 hash: '',
             };
 
-            // Parse the URL params as the function would
-            const params = new URLSearchParams(window.location.search);
-            const action = params.get('action');
-            
-            expect(action).toBe('search');
-            
+            // Ensure search input is cached in elements
+            const searchInput = document.getElementById('search-input');
+            const focusSpy = jest.spyOn(searchInput, 'focus');
+
+            const handleShortcutActions = await getHandleShortcutActions();
+            handleShortcutActions();
+
+            // Should clear URL parameter
+            expect(localThis.replaceStateSpy).toHaveBeenCalledWith({}, '', '/');
+
+            // Search input focus is called after 300ms delay
+            expect(focusSpy).not.toHaveBeenCalled();
+            advanceTimers(300);
+            expect(focusSpy).toHaveBeenCalledTimes(1);
+
+            focusSpy.mockRestore();
             useRealTimers();
         });
 
-        test('should handle unknown action gracefully', () => {
+        test('should handle unknown action gracefully', async () => {
             // Set up URL with unknown action
             delete window.location;
             window.location = {
@@ -133,11 +152,28 @@ describe('Main.js Functions', () => {
                 hash: '',
             };
 
-            const params = new URLSearchParams(window.location.search);
-            const action = params.get('action');
-            
-            expect(action).toBe('unknown');
-            // Function should not throw
+            const handleShortcutActions = await getHandleShortcutActions();
+
+            // Should not throw
+            expect(() => handleShortcutActions()).not.toThrow();
+
+            // Should still clear URL parameter
+            expect(localThis.replaceStateSpy).toHaveBeenCalledWith({}, '', '/');
+        });
+
+        test('should preserve hash when clearing URL', async () => {
+            delete window.location;
+            window.location = {
+                search: '?action=random',
+                pathname: '/app',
+                hash: '#section',
+            };
+
+            const handleShortcutActions = await getHandleShortcutActions();
+            handleShortcutActions();
+
+            // Should preserve pathname and hash
+            expect(localThis.replaceStateSpy).toHaveBeenCalledWith({}, '', '/app#section');
         });
     });
 
@@ -157,7 +193,9 @@ describe('Main.js Functions', () => {
         test('should handle missing footer element gracefully', () => {
             // Ensure no footer-version element
             const existing = document.querySelector('.footer-version');
-            if (existing) existing.remove();
+            if (existing) {
+                existing.remove();
+            }
 
             // Should not throw
             expect(() => {
