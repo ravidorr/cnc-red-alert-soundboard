@@ -30,6 +30,60 @@ export function cacheElements() {
     elements.randomSoundBtn = document.getElementById('random-sound');
 }
 
+// Share button SVG icon (extracted to avoid duplication)
+const SHARE_ICON_SVG = `<svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true">
+    <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"/>
+</svg>`;
+
+/**
+ * Create HTML for a sound button wrapper with all action buttons
+ * @param {object} sound - Sound object with file and name properties
+ * @param {object} options - Configuration options
+ * @param {string} options.category - Category ID for the button
+ * @param {boolean} [options.isFavorite] - Whether the sound is favorited
+ * @param {boolean} [options.draggable] - Whether the wrapper is draggable
+ * @param {number} [options.index] - Index for draggable items
+ * @param {boolean} [options.showDragIndicator] - Whether to show drag indicator
+ * @returns {string} HTML string for the sound button wrapper
+ */
+function createSoundButtonHtml(sound, options) {
+    const { category, isFavorite: isFav = false, draggable = false, index, showDragIndicator = false } = options;
+    const encodedFile = encodeURIComponent(sound.file);
+    const favAriaLabel = isFav ? `Remove ${sound.name} from favorites` : `Add ${sound.name} to favorites`;
+    const favTitle = isFav ? 'Remove from favorites' : 'Add to favorites';
+    const favIcon = isFav ? '&#9733;' : '&#9734;';
+
+    const wrapperAttrs = draggable
+        ? `class="sound-btn-wrapper" draggable="true" data-file="${encodedFile}" data-index="${index}"`
+        : 'class="sound-btn-wrapper"';
+
+    const dragIndicator = showDragIndicator ? '<span class="drag-indicator">&#9776;</span>' : '';
+
+    return `
+        <div ${wrapperAttrs}>
+            ${dragIndicator}
+            <button class="sound-btn"
+                    data-file="${encodedFile}"
+                    data-name="${sound.name}"
+                    data-category="${category}"
+                    title="Play ${sound.name}">
+                ${sound.name}
+            </button>
+            <button class="share-btn"
+                    data-file="${encodedFile}"
+                    data-name="${sound.name}"
+                    aria-label="Share ${sound.name}"
+                    title="Share sound">
+                ${SHARE_ICON_SVG}
+            </button>
+            <button class="favorite-btn ${isFav ? 'is-favorite' : ''}"
+                    data-file="${encodedFile}"
+                    aria-label="${favAriaLabel}"
+                    title="${favTitle}"><span aria-hidden="true">${favIcon}</span></button>
+        </div>
+    `;
+}
+
 // Render all category sections
 export function renderCategories() {
     const sortedCategories = getSortedCategories(CATEGORIES);
@@ -40,34 +94,10 @@ export function renderCategories() {
             return '';
         }
 
-        const buttonsHtml = sounds.map(sound => {
-            const isFav = isFavorite(state.favorites, sound.file);
-            const favAriaLabel = isFav ? `Remove ${sound.name} from favorites` : `Add ${sound.name} to favorites`;
-            return `
-            <div class="sound-btn-wrapper">
-                <button class="sound-btn" 
-                        data-file="${encodeURIComponent(sound.file)}" 
-                        data-name="${sound.name}"
-                        data-category="${categoryId}"
-                        title="Play ${sound.name}">
-                    ${sound.name}
-                </button>
-                <button class="share-btn" 
-                        data-file="${encodeURIComponent(sound.file)}"
-                        data-name="${sound.name}"
-                        aria-label="Share ${sound.name}"
-                        title="Share sound">
-                    <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true">
-                        <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"/>
-                    </svg>
-                </button>
-                <button class="favorite-btn ${isFav ? 'is-favorite' : ''}" 
-                        data-file="${encodeURIComponent(sound.file)}"
-                        aria-label="${favAriaLabel}"
-                        title="${isFav ? 'Remove from favorites' : 'Add to favorites'}"><span aria-hidden="true">${isFav ? '&#9733;' : '&#9734;'}</span></button>
-            </div>
-        `;
-        }).join('');
+        const buttonsHtml = sounds.map(sound => createSoundButtonHtml(sound, {
+            category: categoryId,
+            isFavorite: isFavorite(state.favorites, sound.file),
+        })).join('');
 
         return `
             <section class="category-section" id="category-${categoryId}" data-category="${categoryId}">
@@ -127,31 +157,13 @@ export function renderFavoritesSection() {
         .map(file => SOUNDS.find(s => s.file === file))
         .filter(Boolean);
 
-    const buttonsHtml = favoriteSounds.map((sound, index) => `
-        <div class="sound-btn-wrapper" draggable="true" data-file="${encodeURIComponent(sound.file)}" data-index="${index}">
-            <span class="drag-indicator">&#9776;</span>
-            <button class="sound-btn" 
-                    data-file="${encodeURIComponent(sound.file)}" 
-                    data-name="${sound.name}"
-                    data-category="favorites"
-                    title="Play ${sound.name}">
-                ${sound.name}
-            </button>
-            <button class="share-btn" 
-                    data-file="${encodeURIComponent(sound.file)}"
-                    data-name="${sound.name}"
-                    aria-label="Share ${sound.name}"
-                    title="Share sound">
-                <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true">
-                    <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"/>
-                </svg>
-            </button>
-            <button class="favorite-btn is-favorite" 
-                    data-file="${encodeURIComponent(sound.file)}"
-                    aria-label="Remove ${sound.name} from favorites"
-                    title="Remove from favorites"><span aria-hidden="true">&#9733;</span></button>
-        </div>
-    `).join('');
+    const buttonsHtml = favoriteSounds.map((sound, index) => createSoundButtonHtml(sound, {
+        category: 'favorites',
+        isFavorite: true,
+        draggable: true,
+        index,
+        showDragIndicator: true,
+    })).join('');
 
     // Show drag tooltip if first time with 2+ favorites and not seen before
     const showDragTooltip = favoriteSounds.length >= 2 && !localStorage.getItem('dragTooltipSeen');
@@ -219,34 +231,10 @@ export function renderPopularSection() {
         return;
     }
 
-    const buttonsHtml = popularSounds.map(sound => {
-        const isFav = isFavorite(state.favorites, sound.file);
-        const favAriaLabel = isFav ? `Remove ${sound.name} from favorites` : `Add ${sound.name} to favorites`;
-        return `
-        <div class="sound-btn-wrapper">
-            <button class="sound-btn" 
-                    data-file="${encodeURIComponent(sound.file)}" 
-                    data-name="${sound.name}"
-                    data-category="popular"
-                    title="Play ${sound.name}">
-                ${sound.name}
-            </button>
-            <button class="share-btn" 
-                    data-file="${encodeURIComponent(sound.file)}"
-                    data-name="${sound.name}"
-                    aria-label="Share ${sound.name}"
-                    title="Share sound">
-                <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true">
-                    <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"/>
-                </svg>
-            </button>
-            <button class="favorite-btn ${isFav ? 'is-favorite' : ''}" 
-                    data-file="${encodeURIComponent(sound.file)}"
-                    aria-label="${favAriaLabel}"
-                    title="${isFav ? 'Remove from favorites' : 'Add to favorites'}"><span aria-hidden="true">${isFav ? '&#9733;' : '&#9734;'}</span></button>
-        </div>
-    `;
-    }).join('');
+    const buttonsHtml = popularSounds.map(sound => createSoundButtonHtml(sound, {
+        category: 'popular',
+        isFavorite: isFavorite(state.favorites, sound.file),
+    })).join('');
 
     const sectionHtml = `
         <section class="category-section popular-section" id="category-popular" data-category="popular">
