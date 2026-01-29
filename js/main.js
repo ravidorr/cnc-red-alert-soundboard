@@ -7,7 +7,8 @@ import { cacheElements, renderCategories, renderFavoritesSection, renderPopularS
 import { renderNavigation, applyCollapsedStates } from './navigation.js';
 import { renderRecentlyPlayedSection, loadRecentlyPlayed } from './recently-played.js';
 import { loadFavorites } from './favorites.js';
-import { setupAudioPlayer, checkUrlHash } from './audio.js';
+import { setupAudioPlayer, checkUrlHash, playRandomSound } from './audio.js';
+import { elements } from './state.js';
 import { setupInstallPrompt, registerServiceWorker } from './install.js';
 import { setupEventListeners } from './events.js';
 import { showOnboardingTooltip } from './onboarding.js';
@@ -32,6 +33,35 @@ function setupNetworkStatusListeners() {
     });
 }
 
+// Handle PWA shortcut actions from URL parameters
+function handleShortcutActions() {
+    const params = new URLSearchParams(window.location.search);
+    const action = params.get('action');
+
+    if (!action) {
+        return;
+    }
+
+    // Clear the URL parameter without reloading
+    const cleanUrl = window.location.pathname + window.location.hash;
+    window.history.replaceState({}, '', cleanUrl);
+
+    switch (action) {
+    case 'random':
+        // Delay to ensure audio is set up
+        setTimeout(() => playRandomSound(), 500);
+        break;
+    case 'search':
+        // Focus the search input
+        setTimeout(() => {
+            if (elements.searchInput) {
+                elements.searchInput.focus();
+            }
+        }, 300);
+        break;
+    }
+}
+
 // Initialize the application
 function init() {
     cacheElements();
@@ -52,6 +82,7 @@ function init() {
     registerServiceWorker();
     setupNetworkStatusListeners();
     checkUrlHash();
+    handleShortcutActions();
 
     // Initialize sidebar accessibility based on viewport
     initSidebarAccessibility();
