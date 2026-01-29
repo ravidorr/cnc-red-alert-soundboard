@@ -168,9 +168,7 @@ export function closeMobileMenu() {
     document.removeEventListener('keydown', handleMobileMenuKeydown);
 
     // Return focus to the element that triggered the menu
-    if (menuTriggerElement && menuTriggerElement.focus) {
-        menuTriggerElement.focus();
-    }
+    menuTriggerElement?.focus?.();
     menuTriggerElement = null;
 }
 

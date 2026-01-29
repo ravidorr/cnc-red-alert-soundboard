@@ -227,9 +227,9 @@ export function setupEventListeners() {
         if (e.key === 'Escape') {
             const shortcutsModal = document.getElementById('shortcuts-modal');
             const contactModal = document.getElementById('contact-modal');
-            if (shortcutsModal && shortcutsModal.classList.contains('visible')) {
+            if (shortcutsModal?.classList.contains('visible')) {
                 hideShortcutsModal();
-            } else if (contactModal && contactModal.classList.contains('visible')) {
+            } else if (contactModal?.classList.contains('visible')) {
                 hideContactModal();
             } else {
                 // Stop any playing sound
@@ -349,9 +349,7 @@ function hideShortcutsModal() {
         // Remove focus trap event listener
         modal.removeEventListener('keydown', handleShortcutsModalKeydown);
 
-        if (shortcutsTrigger && shortcutsTrigger.focus) {
-            shortcutsTrigger.focus();
-        }
+        shortcutsTrigger?.focus?.();
         shortcutsTrigger = null;
     }
 }

@@ -101,9 +101,7 @@ function hideConfirmModal(result) {
     }
 
     // Restore focus to trigger element
-    if (confirmTrigger && confirmTrigger.focus) {
-        confirmTrigger.focus();
-    }
+    confirmTrigger?.focus?.();
     confirmTrigger = null;
 }
 

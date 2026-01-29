@@ -46,9 +46,7 @@ export function hideContactModal() {
         }
 
         // Restore focus to trigger element
-        if (contactTrigger && contactTrigger.focus) {
-            contactTrigger.focus();
-        }
+        contactTrigger?.focus?.();
         contactTrigger = null;
     }
 }

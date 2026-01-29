@@ -122,9 +122,7 @@ export function hideInstallPrompt() {
     if (elements.installPrompt) {
         elements.installPrompt.classList.remove('visible');
         // Return focus to the previously focused element
-        if (previouslyFocusedElement && previouslyFocusedElement.focus) {
-            previouslyFocusedElement.focus();
-        }
+        previouslyFocusedElement?.focus?.();
         previouslyFocusedElement = null;
     }
 }
