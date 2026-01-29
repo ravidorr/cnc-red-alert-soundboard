@@ -66,6 +66,8 @@ describe('Main.js Functions', () => {
 
         afterEach(() => {
             localThis.replaceStateSpy.mockRestore();
+            // Restore original location to prevent test pollution
+            window.location = localThis.originalLocation;
         });
 
         test('should do nothing when no action parameter', () => {
