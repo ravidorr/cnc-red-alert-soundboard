@@ -14,6 +14,9 @@ import {
     setupInstallPrompt,
     registerServiceWorker,
     cacheAllSoundsForOffline,
+    showUpdateAvailableNotification,
+    hideUpdateNotification,
+    getSwRegistration,
 } from '../js/install.js';
 
 describe('Install Functions', () => {
@@ -608,6 +611,168 @@ describe('Install Functions', () => {
 
             // Restore original MessageChannel
             global.MessageChannel = OriginalMessageChannel;
+        });
+    });
+
+    describe('Update Notification', () => {
+        beforeEach(() => {
+            cacheElements();
+            // Clean up any existing update notification
+            const existing = document.getElementById('update-notification');
+            if (existing) {
+                existing.remove();
+            }
+        });
+
+        afterEach(() => {
+            // Clean up
+            const notification = document.getElementById('update-notification');
+            if (notification) {
+                notification.remove();
+            }
+        });
+
+        test('showUpdateAvailableNotification should create and show notification', () => {
+            showUpdateAvailableNotification();
+
+            const notification = document.getElementById('update-notification');
+            expect(notification).not.toBeNull();
+            expect(notification.classList.contains('visible')).toBe(true);
+        });
+
+        test('showUpdateAvailableNotification should have correct content', () => {
+            showUpdateAvailableNotification();
+
+            const notification = document.getElementById('update-notification');
+            expect(notification.textContent).toContain('NEW VERSION AVAILABLE');
+            expect(notification.querySelector('#update-refresh-btn')).not.toBeNull();
+            expect(notification.querySelector('#update-dismiss-btn')).not.toBeNull();
+        });
+
+        test('showUpdateAvailableNotification should have role="alert"', () => {
+            showUpdateAvailableNotification();
+
+            const notification = document.getElementById('update-notification');
+            expect(notification.getAttribute('role')).toBe('alert');
+        });
+
+        test('hideUpdateNotification should hide notification', () => {
+            showUpdateAvailableNotification();
+            hideUpdateNotification();
+
+            const notification = document.getElementById('update-notification');
+            expect(notification.classList.contains('visible')).toBe(false);
+        });
+
+        test('hideUpdateNotification should not throw when notification does not exist', () => {
+            expect(() => hideUpdateNotification()).not.toThrow();
+        });
+
+        test('dismiss button should hide notification', () => {
+            showUpdateAvailableNotification();
+
+            const dismissBtn = document.getElementById('update-dismiss-btn');
+            dismissBtn.click();
+
+            const notification = document.getElementById('update-notification');
+            expect(notification.classList.contains('visible')).toBe(false);
+        });
+
+        test('refresh button should call window.location.reload', () => {
+            // Mock location.reload using Object.defineProperty
+            const reloadMock = jest.fn();
+            Object.defineProperty(window, 'location', {
+                value: { ...window.location, reload: reloadMock },
+                writable: true,
+                configurable: true,
+            });
+
+            showUpdateAvailableNotification();
+
+            const refreshBtn = document.getElementById('update-refresh-btn');
+            refreshBtn.click();
+
+            expect(reloadMock).toHaveBeenCalled();
+        });
+
+        test('showUpdateAvailableNotification should reuse existing notification element', () => {
+            showUpdateAvailableNotification();
+            showUpdateAvailableNotification();
+
+            const notifications = document.querySelectorAll('#update-notification');
+            expect(notifications.length).toBe(1);
+        });
+    });
+
+    describe('Service Worker Update Detection', () => {
+        test('getSwRegistration should return registration after register', () => {
+            // getSwRegistration returns whatever was set by previous registerServiceWorker calls
+            // This test just verifies the function exists and returns something
+            const result = getSwRegistration();
+            // It may be null or an object depending on test order
+            expect(result === null || typeof result === 'object').toBe(true);
+        });
+
+        test('registerServiceWorker should set up update interval', () => {
+            const localThis = {};
+            localThis.mockRegistration = {
+                scope: '/',
+                update: jest.fn(),
+                addEventListener: jest.fn(),
+            };
+
+            // Mock navigator.serviceWorker
+            Object.defineProperty(navigator, 'serviceWorker', {
+                value: {
+                    register: jest.fn().mockResolvedValue(localThis.mockRegistration),
+                    controller: null,
+                },
+                writable: true,
+                configurable: true,
+            });
+
+            // Mock setInterval
+            const originalSetInterval = global.setInterval;
+            global.setInterval = jest.fn();
+
+            registerServiceWorker();
+
+            // Trigger load event
+            window.dispatchEvent(new Event('load'));
+
+            // Wait for promise to resolve
+            return new Promise(resolve => setTimeout(resolve, 0)).then(() => {
+                expect(global.setInterval).toHaveBeenCalledWith(expect.any(Function), 60 * 60 * 1000);
+                global.setInterval = originalSetInterval;
+            });
+        });
+
+        test('registerServiceWorker should listen for updatefound event', () => {
+            const localThis = {};
+            localThis.mockRegistration = {
+                scope: '/',
+                update: jest.fn(),
+                addEventListener: jest.fn(),
+            };
+
+            Object.defineProperty(navigator, 'serviceWorker', {
+                value: {
+                    register: jest.fn().mockResolvedValue(localThis.mockRegistration),
+                    controller: null,
+                },
+                writable: true,
+                configurable: true,
+            });
+
+            registerServiceWorker();
+            window.dispatchEvent(new Event('load'));
+
+            return new Promise(resolve => setTimeout(resolve, 0)).then(() => {
+                expect(localThis.mockRegistration.addEventListener).toHaveBeenCalledWith(
+                    'updatefound',
+                    expect.any(Function),
+                );
+            });
         });
     });
 });

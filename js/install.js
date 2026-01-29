@@ -165,6 +165,9 @@ export function cacheAllSoundsForOffline() {
     );
 }
 
+// Track service worker registration for update checks
+let swRegistration = null;
+
 // Register service worker for PWA
 export function registerServiceWorker() {
     if ('serviceWorker' in navigator) {
@@ -172,10 +175,87 @@ export function registerServiceWorker() {
             navigator.serviceWorker.register('service-worker.js')
                 .then(registration => {
                     console.log('SW registered:', registration.scope);
+                    swRegistration = registration;
+
+                    // Check for updates periodically (every hour)
+                    setInterval(() => {
+                        registration.update();
+                    }, 60 * 60 * 1000);
+
+                    // Listen for new service worker installing
+                    registration.addEventListener('updatefound', () => {
+                        const newWorker = registration.installing;
+                        if (newWorker) {
+                            newWorker.addEventListener('statechange', () => {
+                                // New service worker is installed and waiting
+                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                    showUpdateAvailableNotification();
+                                }
+                            });
+                        }
+                    });
                 })
                 .catch(error => {
                     console.log('SW registration failed:', error);
                 });
         });
     }
+}
+
+/**
+ * Show notification that a new version is available
+ */
+export function showUpdateAvailableNotification() {
+    // Create update notification element if it doesn't exist
+    let updateNotification = document.getElementById('update-notification');
+    if (!updateNotification) {
+        updateNotification = document.createElement('div');
+        updateNotification.id = 'update-notification';
+        updateNotification.className = 'update-notification';
+        updateNotification.setAttribute('role', 'alert');
+        updateNotification.innerHTML = `
+            <div class="update-notification-content">
+                <span class="update-notification-message">NEW VERSION AVAILABLE</span>
+                <button id="update-refresh-btn" class="update-refresh-btn">REFRESH NOW</button>
+                <button id="update-dismiss-btn" class="update-dismiss-btn" aria-label="Dismiss">X</button>
+            </div>
+        `;
+        document.body.appendChild(updateNotification);
+
+        // Handle refresh button click
+        const refreshBtn = updateNotification.querySelector('#update-refresh-btn');
+        if (refreshBtn) {
+            refreshBtn.addEventListener('click', () => {
+                window.location.reload();
+            });
+        }
+
+        // Handle dismiss button click
+        const dismissBtn = updateNotification.querySelector('#update-dismiss-btn');
+        if (dismissBtn) {
+            dismissBtn.addEventListener('click', () => {
+                hideUpdateNotification();
+            });
+        }
+    }
+
+    // Show the notification
+    updateNotification.classList.add('visible');
+}
+
+/**
+ * Hide the update notification
+ */
+export function hideUpdateNotification() {
+    const updateNotification = document.getElementById('update-notification');
+    if (updateNotification) {
+        updateNotification.classList.remove('visible');
+    }
+}
+
+/**
+ * Get the current service worker registration (for testing)
+ */
+export function getSwRegistration() {
+    return swRegistration;
 }

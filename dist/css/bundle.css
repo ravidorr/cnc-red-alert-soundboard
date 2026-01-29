@@ -2189,6 +2189,99 @@ button.category-header:focus-visible {
     }
 }
 
+/* Update Notification */
+.update-notification {
+    position: fixed;
+    top: calc(var(--header-height) + 10px);
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2500;
+    display: none;
+    animation: updateSlideIn 0.3s ease;
+}
+
+.update-notification.visible {
+    display: block;
+}
+
+.update-notification-content {
+    background: var(--bg-panel);
+    border: 2px solid var(--green-primary);
+    box-shadow: var(--glow-green-intense);
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.update-notification-message {
+    color: var(--green-primary);
+    font-family: var(--font-primary);
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+}
+
+.update-refresh-btn {
+    background: var(--green-dark);
+    border: 1px solid var(--green-primary);
+    color: var(--green-primary);
+    font-family: var(--font-primary);
+    font-size: 0.85rem;
+    padding: 8px 16px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    letter-spacing: 1px;
+    min-width: 44px;
+    min-height: 44px;
+}
+
+.update-refresh-btn:hover {
+    background: var(--green-primary);
+    color: var(--bg-primary);
+    box-shadow: var(--glow-green);
+}
+
+.update-refresh-btn:focus-visible {
+    outline: 3px solid var(--green-primary);
+    outline-offset: 2px;
+}
+
+.update-dismiss-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-dim);
+    font-family: var(--font-primary);
+    font-size: 1rem;
+    padding: 8px;
+    cursor: pointer;
+    transition: color 0.2s ease;
+    min-width: 44px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.update-dismiss-btn:hover {
+    color: var(--green-primary);
+}
+
+.update-dismiss-btn:focus-visible {
+    outline: 3px solid var(--green-primary);
+    outline-offset: 2px;
+}
+
+@keyframes updateSlideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
 /* Mobile positioning */
 @media (max-width: 768px) {
     .onboarding-tooltip {
@@ -2200,6 +2293,18 @@ button.category-header:focus-visible {
 
     .onboarding-content {
         max-width: none;
+    }
+
+    .update-notification {
+        left: 10px;
+        right: 10px;
+        transform: none;
+    }
+
+    .update-notification-content {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
     }
 }
 
