@@ -112,6 +112,25 @@ body {
     background: var(--green-dark);
 }
 
+/* Base Button Styles */
+.btn-base {
+    font-family: var(--font-primary);
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    transition: var(--transition-base);
+    min-width: 44px;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-base:focus-visible {
+    outline: 2px solid var(--green-primary);
+    outline-offset: 2px;
+}
+
 
 /* ============================================
    Accessibility - Skip links and focus styles
