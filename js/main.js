@@ -3,7 +3,7 @@
 // ============================================
 
 import { VERSION } from './version.js';
-import { cacheElements, renderCategories, renderFavoritesSection, renderPopularSection } from './ui.js';
+import { cacheElements, renderCategories, renderFavoritesSection, renderPopularSection, showToast } from './ui.js';
 import { renderNavigation, applyCollapsedStates } from './navigation.js';
 import { renderRecentlyPlayedSection, loadRecentlyPlayed } from './recently-played.js';
 import { loadFavorites } from './favorites.js';
@@ -19,6 +19,17 @@ function setFooterVersion() {
     if (versionElement) {
         versionElement.textContent = `v${VERSION}`;
     }
+}
+
+// Set up offline/online status notifications
+function setupNetworkStatusListeners() {
+    window.addEventListener('online', () => {
+        showToast('CONNECTION RESTORED', 'success');
+    });
+
+    window.addEventListener('offline', () => {
+        showToast('OPERATING OFFLINE MODE', 'info');
+    });
 }
 
 // Initialize the application
@@ -39,6 +50,7 @@ function init() {
     applyCollapsedStates(); // Apply saved collapse states
     setupEventListeners();
     registerServiceWorker();
+    setupNetworkStatusListeners();
     checkUrlHash();
 
     // Initialize sidebar accessibility based on viewport
