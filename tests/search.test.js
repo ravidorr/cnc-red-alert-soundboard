@@ -1,7 +1,7 @@
 /**
  * @jest-environment jsdom
  */
-import { setupFullDOM, resetState, resetElements } from './helpers.js';
+import { setupFullDOM, resetState, resetElements, mockRequestAnimationFrame } from './helpers.js';
 import { state, elements } from '../js/state.js';
 import { SOUNDS } from '../js/constants.js';
 import { cacheElements, renderCategories, showSearchEmptyState, hideSearchEmptyState } from '../js/ui.js';
@@ -9,10 +9,18 @@ import { filterSounds } from '../js/search.js';
 import { fuzzyMatch, levenshteinDistance, filterSoundsArray } from '../js/utils.js';
 
 describe('Search Functions', () => {
+    const localThis = {};
+
     beforeEach(() => {
         setupFullDOM();
         resetState(state);
         resetElements(elements);
+        // Mock rAF to execute synchronously for testing
+        localThis.restoreRAF = mockRequestAnimationFrame();
+    });
+
+    afterEach(() => {
+        localThis.restoreRAF();
     });
 
     describe('filterSounds', () => {

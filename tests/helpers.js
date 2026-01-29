@@ -82,3 +82,18 @@ export function resetElements(elements) {
     elements.btnClearSearch = null;
     elements.randomSoundBtn = null;
 }
+
+/**
+ * Mock requestAnimationFrame to execute callbacks synchronously
+ * Useful for testing code that batches DOM updates with rAF
+ */
+export function mockRequestAnimationFrame() {
+    const originalRAF = window.requestAnimationFrame;
+    window.requestAnimationFrame = (callback) => {
+        callback(performance.now());
+        return 0;
+    };
+    return () => {
+        window.requestAnimationFrame = originalRAF;
+    };
+}
