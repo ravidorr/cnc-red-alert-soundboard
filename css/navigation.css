@@ -24,7 +24,7 @@
     border: 1px solid transparent;
     background: transparent;
     font-family: var(--font-primary);
-    transition: all 0.2s ease;
+    transition: var(--transition-base);
     font-size: 0.9rem;
     margin-bottom: 2px;
     text-align: left;
@@ -93,7 +93,7 @@
     align-items: center;
     width: 44px;
     height: 44px;
-    transition: all 0.2s ease;
+    transition: var(--transition-base);
 }
 
 .mobile-menu-toggle:hover {

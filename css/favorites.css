@@ -30,7 +30,7 @@
     font-family: var(--font-primary);
     font-size: 0.75rem;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: var(--transition-base);
     min-width: 44px;
     min-height: 44px;
     display: flex;
@@ -148,7 +148,7 @@
     font-size: 0.9rem;
     opacity: 0.6;
     pointer-events: none;
-    transition: all 0.15s ease;
+    transition: var(--transition-fast);
 }
 
 .favorites-section .sound-btn-wrapper:hover .drag-indicator {
@@ -184,7 +184,7 @@
     font-family: var(--font-primary);
     font-size: 0.8rem;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: var(--transition-base);
     flex-shrink: 0;
     min-width: 44px;
     min-height: 44px;

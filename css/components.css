@@ -21,7 +21,7 @@
     height: 44px;
     box-sizing: border-box;
     outline: none;
-    transition: all 0.2s ease;
+    transition: var(--transition-base);
 }
 
 #search-input::placeholder {
@@ -78,7 +78,7 @@
     color: var(--text-secondary);
     padding: 0;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: var(--transition-base);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -166,7 +166,7 @@
     height: 44px;
     box-sizing: border-box;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: var(--transition-base);
     text-transform: uppercase;
     letter-spacing: 1px;
     display: flex;
@@ -343,7 +343,7 @@ button.category-header:focus-visible {
     font-size: 0.9rem;
     padding: 12px 16px;
     cursor: pointer;
-    transition: all 0.15s ease;
+    transition: var(--transition-fast);
     text-align: left;
     position: relative;
     overflow: hidden;
@@ -400,7 +400,7 @@ button.category-header:focus-visible {
     align-items: stretch;
     background: var(--bg-button);
     border: 1px solid var(--green-dark);
-    transition: all 0.15s ease;
+    transition: var(--transition-fast);
 }
 
 .sound-btn-wrapper:hover {
@@ -425,7 +425,7 @@ button.category-header:focus-visible {
     cursor: pointer;
     min-width: 36px;
     line-height: 1;
-    transition: all 0.15s ease;
+    transition: var(--transition-fast);
     font-size: 0.9rem;
     display: flex;
     align-items: center;
@@ -554,7 +554,7 @@ button.category-header:focus-visible {
     font-family: var(--font-primary);
     font-size: 0.8rem;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: var(--transition-base);
     min-width: 44px;
     min-height: 44px;
     display: flex;

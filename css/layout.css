@@ -273,7 +273,7 @@
     font-family: var(--font-primary);
     font-size: 1rem;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: var(--transition-base);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -372,7 +372,7 @@
     font-size: 0.9rem;
     padding: 12px 20px;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: var(--transition-base);
     letter-spacing: 1px;
 }
 
@@ -431,7 +431,7 @@
     font-family: var(--font-primary);
     font-size: 1rem;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: var(--transition-base);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -506,7 +506,7 @@
     border: 1px solid var(--green-dark);
     color: var(--text-secondary);
     text-decoration: none;
-    transition: all 0.2s ease;
+    transition: var(--transition-base);
     min-height: 44px;
 }
 
