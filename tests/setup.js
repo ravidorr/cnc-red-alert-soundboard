@@ -75,3 +75,11 @@ beforeEach(() => {
     localStorage.clear();
     jest.clearAllMocks();
 });
+
+// Cleanup after each test for proper isolation
+afterEach(() => {
+    // Restore any spied functions to their original implementations
+    jest.restoreAllMocks();
+    // Ensure real timers are used (in case a test used fake timers and didn't restore)
+    jest.useRealTimers();
+});
