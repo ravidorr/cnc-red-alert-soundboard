@@ -137,6 +137,22 @@ describe('Onboarding Functions', () => {
             expect(localThis.mockStorage.setItem).toHaveBeenCalledWith('cnc-onboarding-seen', 'true');
         });
 
+        test('should handle tooltip already removed before setTimeout fires', () => {
+            useFakeTimers();
+            showOnboardingTooltip();
+
+            const tooltip = document.getElementById('onboarding-tooltip');
+            const dismissBtn = document.getElementById('onboarding-dismiss');
+            dismissBtn.click();
+
+            // Manually remove tooltip before the setTimeout fires
+            tooltip.remove();
+
+            // This should not throw even though tooltip is already removed
+            expect(() => advanceTimers(350)).not.toThrow();
+            useRealTimers();
+        });
+
         test('pressing Escape should dismiss tooltip', () => {
             useFakeTimers();
             showOnboardingTooltip();
@@ -427,6 +443,22 @@ describe('Onboarding Functions', () => {
             advanceTimers(350);
             const tooltipAfter = document.getElementById('onboarding-tooltip');
             expect(tooltipAfter).toBeNull();
+            useRealTimers();
+        });
+
+        test('should handle tooltip already removed before setTimeout fires', () => {
+            useFakeTimers();
+            showOnboardingTooltipForced();
+
+            const tooltip = document.getElementById('onboarding-tooltip');
+            const dismissBtn = document.getElementById('onboarding-dismiss');
+            dismissBtn.click();
+
+            // Manually remove tooltip before the setTimeout fires
+            tooltip.remove();
+
+            // This should not throw even though tooltip is already removed
+            expect(() => advanceTimers(350)).not.toThrow();
             useRealTimers();
         });
 

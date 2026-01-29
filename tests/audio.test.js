@@ -47,6 +47,30 @@ describe('Audio Functions', () => {
             expect(btn.classList.contains('playing')).toBe(false);
         });
 
+        test('should hide now playing after delay when audio ends', () => {
+            useFakeTimers();
+            cacheElements();
+            setupAudioPlayer();
+            renderCategories();
+
+            // Make now playing visible
+            elements.nowPlaying.classList.add('visible');
+            elements.nowPlayingTitle.textContent = 'Test Sound';
+
+            // Trigger ended event
+            state.audioPlayer.dispatchEvent(new Event('ended'));
+
+            // Before delay, still visible
+            expect(elements.nowPlaying.classList.contains('visible')).toBe(true);
+
+            // After 1500ms delay, should be hidden
+            advanceTimers(1500);
+            expect(elements.nowPlaying.classList.contains('visible')).toBe(false);
+            expect(elements.nowPlayingTitle.textContent).toBe('-');
+
+            useRealTimers();
+        });
+
         test('should handle audio error', () => {
             cacheElements();
             setupAudioPlayer();

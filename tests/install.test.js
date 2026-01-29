@@ -777,5 +777,136 @@ describe('Install Functions', () => {
                 expect.any(Function),
             );
         });
+
+        test('should handle updatefound with null installing worker', async () => {
+            const localThis = {};
+            localThis.updateFoundCallback = null;
+            localThis.mockRegistration = {
+                scope: '/',
+                update: jest.fn(),
+                addEventListener: jest.fn((event, callback) => {
+                    if (event === 'updatefound') {
+                        localThis.updateFoundCallback = callback;
+                    }
+                }),
+                installing: null, // No installing worker
+            };
+
+            Object.defineProperty(navigator, 'serviceWorker', {
+                value: {
+                    register: jest.fn().mockResolvedValue(localThis.mockRegistration),
+                    controller: {},
+                },
+                writable: true,
+                configurable: true,
+            });
+
+            registerServiceWorker();
+            window.dispatchEvent(new Event('load'));
+
+            await Promise.resolve();
+            await Promise.resolve();
+
+            // Trigger the updatefound callback with null installing
+            expect(() => localThis.updateFoundCallback?.()).not.toThrow();
+        });
+
+        test('should handle updatefound with new worker not in installed state', async () => {
+            const localThis = {};
+            localThis.updateFoundCallback = null;
+            localThis.stateChangeCallback = null;
+            localThis.mockWorker = {
+                state: 'installing', // Not 'installed'
+                addEventListener: jest.fn((event, callback) => {
+                    if (event === 'statechange') {
+                        localThis.stateChangeCallback = callback;
+                    }
+                }),
+            };
+            localThis.mockRegistration = {
+                scope: '/',
+                update: jest.fn(),
+                addEventListener: jest.fn((event, callback) => {
+                    if (event === 'updatefound') {
+                        localThis.updateFoundCallback = callback;
+                    }
+                }),
+                installing: localThis.mockWorker,
+            };
+
+            Object.defineProperty(navigator, 'serviceWorker', {
+                value: {
+                    register: jest.fn().mockResolvedValue(localThis.mockRegistration),
+                    controller: {},
+                },
+                writable: true,
+                configurable: true,
+            });
+
+            registerServiceWorker();
+            window.dispatchEvent(new Event('load'));
+
+            await Promise.resolve();
+            await Promise.resolve();
+
+            // Trigger updatefound
+            localThis.updateFoundCallback?.();
+
+            // Trigger statechange with 'installing' state (not 'installed')
+            expect(() => localThis.stateChangeCallback?.()).not.toThrow();
+            
+            // No notification should be shown
+            const notification = document.getElementById('update-notification');
+            expect(notification).toBeNull();
+        });
+
+        test('should show notification when new worker is installed with controller', async () => {
+            const localThis = {};
+            localThis.updateFoundCallback = null;
+            localThis.stateChangeCallback = null;
+            localThis.mockWorker = {
+                state: 'installed',
+                addEventListener: jest.fn((event, callback) => {
+                    if (event === 'statechange') {
+                        localThis.stateChangeCallback = callback;
+                    }
+                }),
+            };
+            localThis.mockRegistration = {
+                scope: '/',
+                update: jest.fn(),
+                addEventListener: jest.fn((event, callback) => {
+                    if (event === 'updatefound') {
+                        localThis.updateFoundCallback = callback;
+                    }
+                }),
+                installing: localThis.mockWorker,
+            };
+
+            Object.defineProperty(navigator, 'serviceWorker', {
+                value: {
+                    register: jest.fn().mockResolvedValue(localThis.mockRegistration),
+                    controller: {}, // Has controller (not first install)
+                },
+                writable: true,
+                configurable: true,
+            });
+
+            registerServiceWorker();
+            window.dispatchEvent(new Event('load'));
+
+            await Promise.resolve();
+            await Promise.resolve();
+
+            // Trigger updatefound
+            localThis.updateFoundCallback?.();
+
+            // Trigger statechange with 'installed' state
+            localThis.stateChangeCallback?.();
+
+            // Notification should be shown
+            const notification = document.getElementById('update-notification');
+            expect(notification).not.toBeNull();
+        });
     });
 });
