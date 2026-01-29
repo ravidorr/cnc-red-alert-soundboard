@@ -2,6 +2,8 @@
 // Onboarding - First-time user onboarding tooltip
 // ============================================
 
+import { createFocusTrap } from './utils.js';
+
 const ONBOARDING_KEY = 'cnc-onboarding-seen';
 
 /**
@@ -65,35 +67,11 @@ export function showOnboardingTooltip() {
     });
 
     // Handle keyboard events (escape and focus trap)
-    tooltip.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-            dismissOnboarding(tooltip);
-            return;
-        }
-
-        // Focus trap on Tab key
-        if (e.key === 'Tab') {
-            const focusableElements = tooltip.querySelectorAll(
-                'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
-            );
-
-            if (focusableElements.length === 0) {
-                e.preventDefault();
-                return;
-            }
-
-            const firstElement = focusableElements[0];
-            const lastElement = focusableElements[focusableElements.length - 1];
-
-            if (e.shiftKey && document.activeElement === firstElement) {
-                e.preventDefault();
-                lastElement.focus();
-            } else if (!e.shiftKey && document.activeElement === lastElement) {
-                e.preventDefault();
-                firstElement.focus();
-            }
-        }
+    const focusTrapHandler = createFocusTrap(tooltip, {
+        onEscape: () => dismissOnboarding(tooltip),
+        onEmptyFocusables: (e) => e.preventDefault(),
     });
+    tooltip.addEventListener('keydown', focusTrapHandler);
 
     // Auto-dismiss after 30 seconds (extended for accessibility)
     setTimeout(() => {
@@ -149,35 +127,11 @@ export function showOnboardingTooltipForced() {
     });
 
     // Handle keyboard events (escape and focus trap)
-    tooltip.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-            dismissOnboardingForced(tooltip);
-            return;
-        }
-
-        // Focus trap on Tab key
-        if (e.key === 'Tab') {
-            const focusableElements = tooltip.querySelectorAll(
-                'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
-            );
-
-            if (focusableElements.length === 0) {
-                e.preventDefault();
-                return;
-            }
-
-            const firstElement = focusableElements[0];
-            const lastElement = focusableElements[focusableElements.length - 1];
-
-            if (e.shiftKey && document.activeElement === firstElement) {
-                e.preventDefault();
-                lastElement.focus();
-            } else if (!e.shiftKey && document.activeElement === lastElement) {
-                e.preventDefault();
-                firstElement.focus();
-            }
-        }
+    const focusTrapHandler = createFocusTrap(tooltip, {
+        onEscape: () => dismissOnboardingForced(tooltip),
+        onEmptyFocusables: (e) => e.preventDefault(),
     });
+    tooltip.addEventListener('keydown', focusTrapHandler);
 
     // Auto-dismiss after 30 seconds
     setTimeout(() => {

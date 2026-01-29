@@ -3,6 +3,7 @@
 // ============================================
 
 import { elements } from './state.js';
+import { createFocusTrap } from './utils.js';
 
 // Store reference to element that opened the menu
 let menuTriggerElement = null;
@@ -157,13 +158,6 @@ function handleMobileMenuKeydown(e) {
         return;
     }
 
-    // Close on Escape
-    if (e.key === 'Escape') {
-        e.preventDefault();
-        closeMobileMenu();
-        return;
-    }
-
     // Close on Enter/Space when focused on overlay (keyboard backup for overlay click)
     if ((e.key === 'Enter' || e.key === ' ') && document.activeElement === elements.mobileMenuOverlay) {
         e.preventDefault();
@@ -171,27 +165,10 @@ function handleMobileMenuKeydown(e) {
         return;
     }
 
-    // Trap focus on Tab
-    if (e.key === 'Tab') {
-        const focusableElements = elements.sidebar.querySelectorAll(
-            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
-        );
-
-        if (focusableElements.length === 0) {
-            // Safety: if no focusable elements, close menu to prevent trap
-            closeMobileMenu();
-            return;
-        }
-
-        const firstElement = focusableElements[0];
-        const lastElement = focusableElements[focusableElements.length - 1];
-
-        if (e.shiftKey && document.activeElement === firstElement) {
-            e.preventDefault();
-            lastElement.focus();
-        } else if (!e.shiftKey && document.activeElement === lastElement) {
-            e.preventDefault();
-            firstElement.focus();
-        }
-    }
+    // Use centralized focus trap utility for Escape and Tab handling
+    const focusTrapHandler = createFocusTrap(elements.sidebar, {
+        onEscape: () => closeMobileMenu(),
+        onEmptyFocusables: () => closeMobileMenu(),
+    });
+    focusTrapHandler(e);
 }

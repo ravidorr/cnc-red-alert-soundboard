@@ -304,3 +304,107 @@ export function debounce(func, wait) {
         timeout = setTimeout(later, wait);
     };
 }
+
+/**
+ * Default selector for focusable elements
+ */
+export const FOCUSABLE_SELECTOR = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
+
+/**
+ * Create a focus trap keydown handler for modal-like elements
+ * @param {HTMLElement} container - The container element to trap focus within
+ * @param {Object} options - Configuration options
+ * @param {Function} [options.onEscape] - Callback when Escape is pressed
+ * @param {boolean} [options.stopPropagation=false] - Whether to stop Escape propagation
+ * @param {Function} [options.onEmptyFocusables] - Callback when no focusables found (for closing)
+ * @param {string} [options.focusableSelector] - Custom selector for focusable elements
+ * @returns {Function} Keydown event handler
+ */
+export function createFocusTrap(container, options = {}) {
+    const {
+        onEscape,
+        stopPropagation = false,
+        onEmptyFocusables,
+        focusableSelector = FOCUSABLE_SELECTOR,
+    } = options;
+
+    return function handleKeydown(e) {
+        // Handle Escape key
+        if (e.key === 'Escape') {
+            if (stopPropagation) {
+                e.stopPropagation();
+            }
+            if (onEscape) {
+                onEscape(e);
+            }
+            return;
+        }
+
+        // Handle Tab key for focus trapping
+        if (e.key === 'Tab') {
+            const focusableElements = container.querySelectorAll(focusableSelector);
+
+            if (focusableElements.length === 0) {
+                e.preventDefault();
+                if (onEmptyFocusables) {
+                    onEmptyFocusables(e);
+                }
+                return;
+            }
+
+            const firstFocusable = focusableElements[0];
+            const lastFocusable = focusableElements[focusableElements.length - 1];
+
+            if (e.shiftKey) {
+                // Shift+Tab: if on first element, go to last
+                if (document.activeElement === firstFocusable) {
+                    e.preventDefault();
+                    lastFocusable.focus();
+                }
+            } else {
+                // Tab: if on last element, go to first
+                if (document.activeElement === lastFocusable) {
+                    e.preventDefault();
+                    firstFocusable.focus();
+                }
+            }
+        }
+    };
+}
+
+/**
+ * Set up focus management for a modal-like element
+ * @param {HTMLElement} container - The container element
+ * @param {Object} options - Configuration options
+ * @param {HTMLElement} [options.initialFocusElement] - Element to focus when opened
+ * @param {number} [options.focusDelay=50] - Delay before focusing (ms)
+ * @param {Function} [options.onEscape] - Callback when Escape is pressed
+ * @param {boolean} [options.stopPropagation=false] - Whether to stop Escape propagation
+ * @param {Function} [options.onEmptyFocusables] - Callback when no focusables found
+ * @param {string} [options.focusableSelector] - Custom selector for focusable elements
+ * @returns {Object} Object with cleanup function and handler
+ */
+export function setupFocusTrap(container, options = {}) {
+    const {
+        initialFocusElement,
+        focusDelay = 50,
+        ...trapOptions
+    } = options;
+
+    const handler = createFocusTrap(container, trapOptions);
+    container.addEventListener('keydown', handler);
+
+    // Focus the initial element if provided
+    if (initialFocusElement) {
+        setTimeout(() => {
+            initialFocusElement.focus();
+        }, focusDelay);
+    }
+
+    return {
+        handler,
+        cleanup: () => {
+            container.removeEventListener('keydown', handler);
+        },
+    };
+}

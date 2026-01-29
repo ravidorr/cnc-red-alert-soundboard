@@ -3,7 +3,7 @@
 // ============================================
 
 import { state, elements } from './state.js';
-import { shouldShowInstallPrompt } from './utils.js';
+import { shouldShowInstallPrompt, createFocusTrap } from './utils.js';
 import { showToast } from './ui.js';
 
 // Track the element that triggered the modal for focus return
@@ -65,10 +65,13 @@ export function setupInstallPrompt() {
         }
     });
 
-    // Focus trap within modal
+    // Focus trap within modal using centralized utility
+    const installFocusTrapHandler = createFocusTrap(elements.installPrompt, {
+        // Escape is handled by the document keydown listener above
+    });
     elements.installPrompt.addEventListener('keydown', (e) => {
-        if (e.key === 'Tab' && elements.installPrompt.classList.contains('visible')) {
-            trapFocus(e);
+        if (elements.installPrompt.classList.contains('visible')) {
+            installFocusTrapHandler(e);
         }
     });
 
@@ -82,23 +85,6 @@ export function setupInstallPrompt() {
         // Cache all sounds for offline use after installation
         cacheAllSoundsForOffline();
     });
-}
-
-// Trap focus within install modal
-function trapFocus(e) {
-    const focusableElements = elements.installPrompt.querySelectorAll(
-        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
-    );
-    const firstElement = focusableElements[0];
-    const lastElement = focusableElements[focusableElements.length - 1];
-
-    if (e.shiftKey && document.activeElement === firstElement) {
-        e.preventDefault();
-        lastElement.focus();
-    } else if (!e.shiftKey && document.activeElement === lastElement) {
-        e.preventDefault();
-        firstElement.focus();
-    }
 }
 
 // Trigger the install prompt

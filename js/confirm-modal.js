@@ -2,9 +2,12 @@
 // Confirm Modal - Themed confirmation dialog
 // ============================================
 
+import { createFocusTrap } from './utils.js';
+
 // Store callback functions and trigger element
 let resolveCallback = null;
 let confirmTrigger = null;
+let focusTrapHandler = null;
 
 /**
  * Show a themed confirmation modal
@@ -53,6 +56,11 @@ export function showConfirmModal({
         executeBtn.addEventListener('click', handleConfirm);
         abortBtn.addEventListener('click', handleCancel);
         modal.addEventListener('click', handleBackdropClick);
+
+        // Create focus trap handler
+        focusTrapHandler = createFocusTrap(modal, {
+            onEscape: () => hideConfirmModal(false),
+        });
         document.addEventListener('keydown', handleKeydown);
 
         // Focus the abort button (safer default for destructive actions)
@@ -84,6 +92,7 @@ function hideConfirmModal(result) {
         modal.removeEventListener('click', handleBackdropClick);
     }
     document.removeEventListener('keydown', handleKeydown);
+    focusTrapHandler = null;
 
     // Resolve the promise
     if (resolveCallback) {
@@ -132,28 +141,8 @@ function handleKeydown(e) {
         return;
     }
 
-    // Close on Escape
-    if (e.key === 'Escape') {
-        e.preventDefault();
-        hideConfirmModal(false);
-        return;
-    }
-
-    // Focus trap on Tab
-    if (e.key === 'Tab') {
-        const executeBtn = document.getElementById('confirm-execute');
-        const abortBtn = document.getElementById('confirm-abort');
-
-        if (!executeBtn || !abortBtn) {
-            return;
-        }
-
-        if (e.shiftKey && document.activeElement === executeBtn) {
-            e.preventDefault();
-            abortBtn.focus();
-        } else if (!e.shiftKey && document.activeElement === abortBtn) {
-            e.preventDefault();
-            executeBtn.focus();
-        }
+    // Delegate to focus trap handler
+    if (focusTrapHandler) {
+        focusTrapHandler(e);
     }
 }

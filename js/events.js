@@ -9,7 +9,7 @@ import { toggleCategory, scrollToCategory } from './navigation.js';
 import { filterSounds } from './search.js';
 import { toggleMobileMenu, closeMobileMenu } from './mobile.js';
 import { shareSound } from './ui.js';
-import { debounce } from './utils.js';
+import { debounce, createFocusTrap } from './utils.js';
 import { showOnboardingTooltipForced } from './onboarding.js';
 import { showContactModal, hideContactModal } from './contact-modal.js';
 
@@ -334,41 +334,19 @@ function hideShortcutsModal() {
     }
 }
 
-// Handle keyboard events for shortcuts modal focus trap
+// Create focus trap handler for shortcuts modal
+// Using createFocusTrap for consistent focus trap behavior
 function handleShortcutsModalKeydown(e) {
     const modal = document.getElementById('shortcuts-modal');
     if (!modal || !modal.classList.contains('visible')) {
         return;
     }
 
-    // Close on Escape
-    if (e.key === 'Escape') {
-        e.preventDefault();
-        hideShortcutsModal();
-        return;
-    }
-
-    // Trap focus on Tab
-    if (e.key === 'Tab') {
-        const focusableElements = modal.querySelectorAll(
-            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
-        );
-
-        if (focusableElements.length === 0) {
-            return;
-        }
-
-        const firstElement = focusableElements[0];
-        const lastElement = focusableElements[focusableElements.length - 1];
-
-        if (e.shiftKey && document.activeElement === firstElement) {
-            e.preventDefault();
-            lastElement.focus();
-        } else if (!e.shiftKey && document.activeElement === lastElement) {
-            e.preventDefault();
-            firstElement.focus();
-        }
-    }
+    // Use the centralized focus trap utility
+    const focusTrapHandler = createFocusTrap(modal, {
+        onEscape: () => hideShortcutsModal(),
+    });
+    focusTrapHandler(e);
 }
 
 // Export for testing

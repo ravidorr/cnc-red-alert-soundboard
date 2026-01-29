@@ -2,6 +2,8 @@
 // Contact Modal - Contact information dialog
 // ============================================
 
+import { createFocusTrap } from './utils.js';
+
 // Store trigger element for focus restoration
 let contactTrigger = null;
 
@@ -71,33 +73,10 @@ export function handleContactModalKeydown(e) {
         return;
     }
 
-    // Close on Escape
-    if (e.key === 'Escape') {
-        e.preventDefault();
-        e.stopPropagation();
-        hideContactModal();
-        return;
-    }
-
-    // Trap focus on Tab
-    if (e.key === 'Tab') {
-        const focusableElements = modal.querySelectorAll(
-            'a[href], button, [tabindex]:not([tabindex="-1"])',
-        );
-
-        if (focusableElements.length === 0) {
-            return;
-        }
-
-        const firstElement = focusableElements[0];
-        const lastElement = focusableElements[focusableElements.length - 1];
-
-        if (e.shiftKey && document.activeElement === firstElement) {
-            e.preventDefault();
-            lastElement.focus();
-        } else if (!e.shiftKey && document.activeElement === lastElement) {
-            e.preventDefault();
-            firstElement.focus();
-        }
-    }
+    // Use centralized focus trap utility
+    const focusTrapHandler = createFocusTrap(modal, {
+        onEscape: () => hideContactModal(),
+        stopPropagation: true,
+    });
+    focusTrapHandler(e);
 }
