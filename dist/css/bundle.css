@@ -497,9 +497,9 @@ button.category-header:focus-visible {
     left: var(--sidebar-width);
     right: 0;
     bottom: var(--footer-height);
-    background-image: 
-        linear-gradient(rgba(0, 255, 0, 0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0, 255, 0, 0.03) 1px, transparent 1px);
+    background-image:
+        linear-gradient(var(--green-alpha-03) 1px, transparent 1px),
+        linear-gradient(90deg, var(--green-alpha-03) 1px, transparent 1px);
     background-size: 50px 50px;
     pointer-events: none;
     z-index: -1;
@@ -682,7 +682,7 @@ button.category-header:focus-visible {
     transform: translateY(100%);
     transition: transform 0.3s ease;
     z-index: 500;
-    box-shadow: 0 -2px 10px rgba(0, 255, 0, 0.15);
+    box-shadow: 0 -2px 10px var(--green-alpha-15);
 }
 
 .now-playing.visible {
@@ -1190,7 +1190,7 @@ button.category-header:focus-visible {
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(0, 255, 0, 0.1), transparent);
+    background: linear-gradient(90deg, transparent, var(--green-alpha-10), transparent);
     transition: left 0.3s ease;
 }
 
@@ -1499,7 +1499,7 @@ button.category-header:focus-visible {
 /* Nav item for favorites */
 .nav-item.favorites-nav {
     border-color: transparent;
-    background: rgba(0, 255, 0, 0.05);
+    background: var(--green-alpha-05);
 }
 
 .nav-item.favorites-nav:hover,
@@ -1511,7 +1511,7 @@ button.category-header:focus-visible {
 /* Nav item for recently played */
 .nav-item.recent-nav {
     border-color: transparent;
-    background: rgba(0, 255, 0, 0.03);
+    background: var(--green-alpha-03);
 }
 
 .nav-item.recent-nav:hover,
@@ -1736,7 +1736,7 @@ button.category-header:focus-visible {
 
 .favorites-section .sound-btn-wrapper.drag-over {
     border: 2px dashed var(--green-primary);
-    background: rgba(0, 255, 0, 0.1);
+    background: var(--green-alpha-10);
 }
 
 .favorites-section .category-content {
@@ -1933,7 +1933,7 @@ button.category-header:focus-visible {
 .install-prompt-content {
     background: var(--bg-panel);
     border: 2px solid var(--green-primary);
-    box-shadow: var(--glow-green-intense), inset 0 0 50px rgba(0, 255, 0, 0.05);
+    box-shadow: var(--glow-green-intense), inset 0 0 50px var(--green-alpha-05);
     padding: 30px 40px;
     max-width: 400px;
     width: 90%;
@@ -1943,7 +1943,7 @@ button.category-header:focus-visible {
 .install-prompt-icon {
     color: var(--green-primary);
     margin-bottom: 15px;
-    filter: drop-shadow(0 0 10px rgba(0, 255, 0, 0.5));
+    filter: drop-shadow(0 0 10px var(--green-alpha-50));
 }
 
 .install-prompt-title {

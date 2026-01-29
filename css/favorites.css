@@ -132,7 +132,7 @@
 
 .favorites-section .sound-btn-wrapper.drag-over {
     border: 2px dashed var(--green-primary);
-    background: rgba(0, 255, 0, 0.1);
+    background: var(--green-alpha-10);
 }
 
 .favorites-section .category-content {

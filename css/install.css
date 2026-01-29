@@ -23,7 +23,7 @@
 .install-prompt-content {
     background: var(--bg-panel);
     border: 2px solid var(--green-primary);
-    box-shadow: var(--glow-green-intense), inset 0 0 50px rgba(0, 255, 0, 0.05);
+    box-shadow: var(--glow-green-intense), inset 0 0 50px var(--green-alpha-05);
     padding: 30px 40px;
     max-width: 400px;
     width: 90%;
@@ -33,7 +33,7 @@
 .install-prompt-icon {
     color: var(--green-primary);
     margin-bottom: 15px;
-    filter: drop-shadow(0 0 10px rgba(0, 255, 0, 0.5));
+    filter: drop-shadow(0 0 10px var(--green-alpha-50));
 }
 
 .install-prompt-title {

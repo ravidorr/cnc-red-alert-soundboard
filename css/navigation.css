@@ -60,7 +60,7 @@
 /* Nav item for favorites */
 .nav-item.favorites-nav {
     border-color: transparent;
-    background: rgba(0, 255, 0, 0.05);
+    background: var(--green-alpha-05);
 }
 
 .nav-item.favorites-nav:hover,
@@ -72,7 +72,7 @@
 /* Nav item for recently played */
 .nav-item.recent-nav {
     border-color: transparent;
-    background: rgba(0, 255, 0, 0.03);
+    background: var(--green-alpha-03);
 }
 
 .nav-item.recent-nav:hover,
