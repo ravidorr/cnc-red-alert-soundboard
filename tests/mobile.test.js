@@ -1,6 +1,7 @@
 /**
  * @jest-environment jsdom
  */
+import { jest } from '@jest/globals';
 import { setupFullDOM, resetState, resetElements } from './helpers.js';
 import { state, elements } from '../js/state.js';
 import { cacheElements } from '../js/ui.js';
@@ -11,6 +12,7 @@ import {
     toggleMobileMenu,
     openMobileMenu,
     closeMobileMenu,
+    cleanupMobileListeners,
 } from '../js/mobile.js';
 
 describe('Mobile Functions', () => {
@@ -492,6 +494,37 @@ describe('Mobile Functions', () => {
         test('should handle null sidebar in toggleMobileMenu', () => {
             elements.sidebar = null;
             expect(() => toggleMobileMenu()).not.toThrow();
+        });
+    });
+
+    describe('cleanupMobileListeners', () => {
+        test('should not throw when called', () => {
+            setupViewportListener();
+            expect(() => cleanupMobileListeners()).not.toThrow();
+        });
+
+        test('should remove resize listener', () => {
+            setupViewportListener();
+
+            const removeEventListenerSpy = jest.spyOn(window, 'removeEventListener');
+
+            cleanupMobileListeners();
+
+            expect(removeEventListenerSpy).toHaveBeenCalledWith('resize', expect.any(Function));
+
+            removeEventListenerSpy.mockRestore();
+        });
+
+        test('should be callable multiple times safely', () => {
+            setupViewportListener();
+            cleanupMobileListeners();
+            expect(() => cleanupMobileListeners()).not.toThrow();
+        });
+
+        test('should allow re-setup after cleanup', () => {
+            setupViewportListener();
+            cleanupMobileListeners();
+            expect(() => setupViewportListener()).not.toThrow();
         });
     });
 });

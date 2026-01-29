@@ -16,6 +16,26 @@ import { showContactModal, hideContactModal } from './contact-modal.js';
 // Debounced search function (200ms delay for performance)
 const debouncedFilterSounds = debounce(filterSounds, 200);
 
+// Cleanup registry for event listeners that need to be removed
+const cleanupFunctions = [];
+
+/**
+ * Register a cleanup function to be called when cleaning up event listeners
+ * @param {Function} cleanupFn - Function to call during cleanup
+ */
+function registerCleanup(cleanupFn) {
+    cleanupFunctions.push(cleanupFn);
+}
+
+/**
+ * Clean up all registered event listeners
+ * Useful for testing or when re-initializing the app
+ */
+export function cleanupEventListeners() {
+    cleanupFunctions.forEach(fn => fn());
+    cleanupFunctions.length = 0;
+}
+
 // Setup event listeners
 export function setupEventListeners() {
     // Sound button, share button, and favorite button clicks
@@ -187,9 +207,11 @@ export function setupEventListeners() {
     // Back to top button
     const backToTopBtn = document.getElementById('back-to-top');
     if (backToTopBtn) {
-        window.addEventListener('scroll', () => {
+        const scrollHandler = () => {
             backToTopBtn.classList.toggle('visible', window.scrollY > 500);
-        });
+        };
+        window.addEventListener('scroll', scrollHandler);
+        registerCleanup(() => window.removeEventListener('scroll', scrollHandler));
 
         backToTopBtn.addEventListener('click', () => {
             window.scrollTo({ top: 0, behavior: 'smooth' });

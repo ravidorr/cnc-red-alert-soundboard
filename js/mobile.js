@@ -8,6 +8,25 @@ import { createFocusTrap } from './utils.js';
 // Store reference to element that opened the menu
 let menuTriggerElement = null;
 
+// Cleanup registry for event listeners
+const cleanupFunctions = [];
+
+/**
+ * Register a cleanup function
+ * @param {Function} cleanupFn - Function to call during cleanup
+ */
+function registerCleanup(cleanupFn) {
+    cleanupFunctions.push(cleanupFn);
+}
+
+/**
+ * Clean up all registered event listeners
+ */
+export function cleanupMobileListeners() {
+    cleanupFunctions.forEach(fn => fn());
+    cleanupFunctions.length = 0;
+}
+
 // Mobile breakpoint (matches CSS)
 const MOBILE_BREAKPOINT = 768;
 
@@ -44,7 +63,7 @@ export function initSidebarAccessibility() {
 export function setupViewportListener() {
     let wasMovile = isMobileViewport();
 
-    window.addEventListener('resize', () => {
+    const resizeHandler = () => {
         const isMobile = isMobileViewport();
 
         // Only update if crossing the breakpoint
@@ -65,7 +84,10 @@ export function setupViewportListener() {
                 }
             }
         }
-    });
+    };
+
+    window.addEventListener('resize', resizeHandler);
+    registerCleanup(() => window.removeEventListener('resize', resizeHandler));
 }
 
 // Toggle mobile menu

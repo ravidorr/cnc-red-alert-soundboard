@@ -7,7 +7,7 @@ import { state, elements } from '../js/state.js';
 import { cacheElements, renderCategories, renderFavoritesSection } from '../js/ui.js';
 import { renderNavigation } from '../js/navigation.js';
 import { setupAudioPlayer, playSound } from '../js/audio.js';
-import { setupEventListeners, handleShortcutsModalKeydown, showShortcutsModal, hideShortcutsModal, showContactModal, hideContactModal } from '../js/events.js';
+import { setupEventListeners, cleanupEventListeners, handleShortcutsModalKeydown, showShortcutsModal, hideShortcutsModal, showContactModal, hideContactModal } from '../js/events.js';
 
 describe('Event Handlers', () => {
     beforeEach(() => {
@@ -1068,6 +1068,46 @@ describe('Event Handlers', () => {
         test('should handle missing contact modal gracefully', () => {
             localThis.modal.remove();
 
+            expect(() => setupEventListeners()).not.toThrow();
+        });
+    });
+
+    describe('cleanupEventListeners', () => {
+        beforeEach(() => {
+            cacheElements();
+            setupAudioPlayer();
+            renderCategories();
+            renderNavigation();
+        });
+
+        test('should not throw when called', () => {
+            setupEventListeners();
+            expect(() => cleanupEventListeners()).not.toThrow();
+        });
+
+        test('should remove scroll listener for back-to-top', () => {
+            setupEventListeners();
+
+            // Get the number of scroll listeners before cleanup
+            const addEventListenerSpy = jest.spyOn(window, 'removeEventListener');
+
+            cleanupEventListeners();
+
+            // Should have called removeEventListener for scroll
+            expect(addEventListenerSpy).toHaveBeenCalledWith('scroll', expect.any(Function));
+
+            addEventListenerSpy.mockRestore();
+        });
+
+        test('should be callable multiple times safely', () => {
+            setupEventListeners();
+            cleanupEventListeners();
+            expect(() => cleanupEventListeners()).not.toThrow();
+        });
+
+        test('should allow re-setup after cleanup', () => {
+            setupEventListeners();
+            cleanupEventListeners();
             expect(() => setupEventListeners()).not.toThrow();
         });
     });
