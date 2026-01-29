@@ -332,7 +332,7 @@ describe('Favorites Functions', () => {
             renderFavoritesSection();
 
             const wrapper = document.querySelector('#category-favorites .sound-btn-wrapper');
-            
+
             // Remove the sound button to test edge case
             const soundBtn = wrapper.querySelector('.sound-btn');
             soundBtn.remove();
@@ -340,7 +340,7 @@ describe('Favorites Functions', () => {
             // Simulate dragstart - should use fallback name "Sound"
             const dragStartEvent = new Event('dragstart', { bubbles: true });
             dragStartEvent.dataTransfer = { effectAllowed: '', setData: () => {} };
-            
+
             // Should not throw
             expect(() => wrapper.dispatchEvent(dragStartEvent)).not.toThrow();
         });
@@ -365,7 +365,7 @@ describe('Favorites Functions', () => {
             // Simulate drop on second wrapper
             const dropEvent = new Event('drop', { bubbles: true, cancelable: true });
             dropEvent.dataTransfer = { dropEffect: '' };
-            
+
             // Should not throw and should use fallback name
             expect(() => secondWrapper.dispatchEvent(dropEvent)).not.toThrow();
         });
@@ -478,8 +478,6 @@ describe('Favorites Functions', () => {
     });
 
     describe('clearAllFavorites', () => {
-        const localThis = {};
-
         beforeEach(() => {
             cacheElements();
             renderCategories();
@@ -500,7 +498,9 @@ describe('Favorites Functions', () => {
 
         afterEach(() => {
             const confirmModal = document.getElementById('confirm-modal');
-            if (confirmModal) confirmModal.remove();
+            if (confirmModal) {
+                confirmModal.remove();
+            }
         });
 
         test('should empty favorites array when confirmed', async () => {
@@ -674,7 +674,9 @@ describe('Favorites Functions', () => {
         test('moveFavoriteUp should create reorder-announcer if it does not exist', () => {
             // Ensure announcer doesn't exist
             const existingAnnouncer = document.getElementById('reorder-announcer');
-            if (existingAnnouncer) existingAnnouncer.remove();
+            if (existingAnnouncer) {
+                existingAnnouncer.remove();
+            }
 
             state.favorites = ['allies_1_achnoledged.wav', 'allies_1_affirmative.wav'];
             renderFavoritesSection();
@@ -711,7 +713,9 @@ describe('Favorites Functions', () => {
             const wrapper = document.querySelector(`.favorites-section .sound-btn-wrapper[data-file="${encodeURIComponent('allies_1_affirmative.wav')}"]`);
             if (wrapper) {
                 const soundBtn = wrapper.querySelector('.sound-btn');
-                if (soundBtn) soundBtn.remove();
+                if (soundBtn) {
+                    soundBtn.remove();
+                }
             }
 
             // Move should not throw even without sound button

@@ -35,7 +35,7 @@ describe('Confirm Modal Functions', () => {
         test('should do nothing when modal is not visible', async () => {
             // First show the modal to attach the keydown listener
             const promise = showConfirmModal({ message: 'Test' });
-            
+
             // Manually remove visible class to simulate edge case
             localThis.modal.classList.remove('visible');
 
@@ -44,7 +44,7 @@ describe('Confirm Modal Functions', () => {
 
             // Modal should remain in its current state (not visible)
             expect(localThis.modal.classList.contains('visible')).toBe(false);
-            
+
             // Add visible class back and click abort to cleanup
             localThis.modal.classList.add('visible');
             localThis.abortBtn.click();
@@ -56,7 +56,7 @@ describe('Confirm Modal Functions', () => {
             localThis.modal.remove();
 
             const escEvent = new KeyboardEvent('keydown', { key: 'Escape', bubbles: true });
-            
+
             // Should not throw
             expect(() => document.dispatchEvent(escEvent)).not.toThrow();
         });
@@ -229,7 +229,7 @@ describe('Confirm Modal Functions', () => {
             // Mock activeElement to be something other than first/last
             const middleElement = document.createElement('button');
             localThis.modal.appendChild(middleElement);
-            
+
             Object.defineProperty(document, 'activeElement', {
                 value: middleElement,
                 writable: true,
@@ -298,55 +298,55 @@ describe('Confirm Modal Functions', () => {
 
         test('should handle hideConfirmModal when modal is null', async () => {
             const promise = showConfirmModal({ message: 'Test' });
-            
+
             // Remove modal
             localThis.modal.remove();
-            
+
             // Click should still work (abort button still exists in DOM temporarily)
             document.getElementById('confirm-abort')?.click();
-            
+
             // Escape should be handled gracefully
             const escEvent = new KeyboardEvent('keydown', { key: 'Escape', bubbles: true });
             expect(() => document.dispatchEvent(escEvent)).not.toThrow();
-            
+
             // Force resolve the promise
             await Promise.race([promise, Promise.resolve(false)]);
         });
 
         test('should handle hideConfirmModal when execute button is null', async () => {
             const promise = showConfirmModal({ message: 'Test' });
-            
+
             // Remove execute button during modal display
             localThis.executeBtn.remove();
-            
+
             // Trigger hide via abort
             localThis.abortBtn.click();
             const result = await promise;
-            
+
             expect(result).toBe(false);
         });
 
         test('should handle hideConfirmModal when abort button is null', async () => {
             const promise = showConfirmModal({ message: 'Test' });
-            
+
             // Remove abort button during modal display
             localThis.abortBtn.remove();
-            
+
             // Trigger hide via execute
             localThis.executeBtn.click();
             const result = await promise;
-            
+
             expect(result).toBe(true);
         });
 
         test('should handle keydown with no focusTrapHandler', async () => {
             const promise = showConfirmModal({ message: 'Test' });
-            
+
             // The focus trap handler should exist, but test edge case
             // Press a non-special key
             const keyEvent = new KeyboardEvent('keydown', { key: 'a', bubbles: true });
             expect(() => document.dispatchEvent(keyEvent)).not.toThrow();
-            
+
             localThis.abortBtn.click();
             await promise;
         });

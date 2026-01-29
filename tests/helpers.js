@@ -153,15 +153,15 @@ export async function flushPromisesAndTimers() {
 export function mockClipboard(options = {}) {
     const { shouldFail = false } = options;
     const originalClipboard = navigator.clipboard;
-    
+
     const writeTextMock = shouldFail
         ? jest.fn().mockRejectedValue(new Error('Clipboard write failed'))
         : jest.fn().mockResolvedValue();
-    
+
     Object.assign(navigator, {
         clipboard: { writeText: writeTextMock },
     });
-    
+
     return {
         writeText: writeTextMock,
         restore: () => {
@@ -181,7 +181,7 @@ export function mockClipboard(options = {}) {
 export function mockFetch(options = {}) {
     const { response, shouldFail = false, blob } = options;
     const originalFetch = global.fetch;
-    
+
     let fetchMock;
     if (shouldFail) {
         fetchMock = jest.fn().mockRejectedValue(new Error('Fetch failed'));
@@ -192,9 +192,9 @@ export function mockFetch(options = {}) {
     } else {
         fetchMock = jest.fn().mockResolvedValue(response);
     }
-    
+
     global.fetch = fetchMock;
-    
+
     return {
         fetch: fetchMock,
         restore: () => {
@@ -215,7 +215,7 @@ export function mockWebShare(options = {}) {
     const { canShare = true, shouldFail = false, shouldAbort = false } = options;
     const originalShare = navigator.share;
     const originalCanShare = navigator.canShare;
-    
+
     let shareMock;
     if (shouldAbort) {
         const abortError = new Error('Share cancelled');
@@ -226,14 +226,14 @@ export function mockWebShare(options = {}) {
     } else {
         shareMock = jest.fn().mockResolvedValue();
     }
-    
+
     const canShareMock = jest.fn().mockReturnValue(canShare);
-    
+
     Object.assign(navigator, {
         share: shareMock,
         canShare: canShareMock,
     });
-    
+
     return {
         share: shareMock,
         canShare: canShareMock,

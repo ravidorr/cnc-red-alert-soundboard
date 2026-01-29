@@ -546,7 +546,7 @@ describe('Audio Functions', () => {
         test('should play most recently played sound', () => {
             // Add a sound to recently played
             state.recentlyPlayed = ['allies_1_achnoledged.wav'];
-            
+
             replayLastSound();
 
             expect(state.audioPlayer.src).toContain('sounds/');
@@ -589,7 +589,9 @@ describe('Audio Functions', () => {
         test('should handle missing volume slider gracefully', () => {
             // Remove the volume slider
             const volumeSlider = document.getElementById('volume-slider');
-            if (volumeSlider) volumeSlider.remove();
+            if (volumeSlider) {
+                volumeSlider.remove();
+            }
 
             // Triggering volume change should not throw even without slider
             const volumeToggle = document.getElementById('volume-toggle');
@@ -605,7 +607,7 @@ describe('Audio Functions', () => {
                 toggle.id = 'volume-toggle';
                 document.body.appendChild(toggle);
             }
-            
+
             if (!document.getElementById('volume-slider')) {
                 const slider = document.createElement('input');
                 slider.type = 'range';

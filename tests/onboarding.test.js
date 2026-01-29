@@ -256,7 +256,7 @@ describe('Onboarding Functions', () => {
 
             const tooltip = document.getElementById('onboarding-tooltip');
             const dismissBtn = document.getElementById('onboarding-dismiss');
-            
+
             // Add another focusable element
             const extraLink = document.createElement('a');
             extraLink.href = '#';
@@ -288,8 +288,7 @@ describe('Onboarding Functions', () => {
             showOnboardingTooltip();
 
             const tooltip = document.getElementById('onboarding-tooltip');
-            const dismissBtn = document.getElementById('onboarding-dismiss');
-            
+
             // Add another focusable element at the beginning
             const extraLink = document.createElement('a');
             extraLink.href = '#';
@@ -464,10 +463,7 @@ describe('Onboarding Functions', () => {
 
         test('should remove existing tooltip before showing new one', () => {
             showOnboardingTooltipForced();
-            const firstTooltip = document.getElementById('onboarding-tooltip');
-
             showOnboardingTooltipForced();
-            const secondTooltip = document.getElementById('onboarding-tooltip');
 
             // Should be a new tooltip, not the same reference
             expect(document.querySelectorAll('.onboarding-tooltip').length).toBe(1);
@@ -551,7 +547,7 @@ describe('Onboarding Functions', () => {
 
             const tooltip = document.getElementById('onboarding-tooltip');
             const dismissBtn = document.getElementById('onboarding-dismiss');
-            
+
             // Add another focusable element
             const extraLink = document.createElement('a');
             extraLink.href = '#';
@@ -583,8 +579,7 @@ describe('Onboarding Functions', () => {
             showOnboardingTooltipForced();
 
             const tooltip = document.getElementById('onboarding-tooltip');
-            const dismissBtn = document.getElementById('onboarding-dismiss');
-            
+
             // Add another focusable element at the beginning
             const extraLink = document.createElement('a');
             extraLink.href = '#';

@@ -250,7 +250,7 @@ describe('Install Functions', () => {
 
             // Simulate Tab key when prompt is NOT visible
             const tabEvent = new KeyboardEvent('keydown', { key: 'Tab', bubbles: true, cancelable: true });
-            
+
             // Should not throw
             expect(() => elements.installPrompt.dispatchEvent(tabEvent)).not.toThrow();
         });
@@ -881,7 +881,7 @@ describe('Install Functions', () => {
 
             // Trigger statechange with 'installing' state (not 'installed')
             expect(() => localThis.stateChangeCallback?.()).not.toThrow();
-            
+
             // No notification should be shown
             const notification = document.getElementById('update-notification');
             expect(notification).toBeNull();

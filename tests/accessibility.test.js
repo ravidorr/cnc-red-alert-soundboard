@@ -1,13 +1,11 @@
 /**
  * @jest-environment jsdom
  */
-import { jest } from '@jest/globals';
 import { setupFullDOM, resetState, resetElements } from './helpers.js';
 import { state, elements } from '../js/state.js';
 import { cacheElements, renderCategories, renderFavoritesSection } from '../js/ui.js';
-import { setupEventListeners, showShortcutsModal, hideShortcutsModal, handleShortcutsModalKeydown } from '../js/events.js';
-import { setupAudioPlayer } from '../js/audio.js';
-import { openMobileMenu, closeMobileMenu } from '../js/mobile.js';
+import { showShortcutsModal, hideShortcutsModal, handleShortcutsModalKeydown } from '../js/events.js';
+import { openMobileMenu } from '../js/mobile.js';
 import { renderNavigation } from '../js/navigation.js';
 
 describe('Accessibility Features', () => {

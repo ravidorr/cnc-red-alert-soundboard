@@ -36,7 +36,9 @@ describe('Navigation Functions', () => {
         test('should render navigation without nav-header', () => {
             // Remove the nav-header
             const navHeader = elements.categoryNav.querySelector('.nav-header');
-            if (navHeader) navHeader.remove();
+            if (navHeader) {
+                navHeader.remove();
+            }
 
             renderNavigation();
 
@@ -280,7 +282,7 @@ describe('Navigation Functions', () => {
         test('should ignore keydown when menu is closed', () => {
             // Don't open the menu, just dispatch keydown
             const escEvent = new KeyboardEvent('keydown', { key: 'Escape' });
-            
+
             // This should not throw and should not affect sidebar
             expect(() => document.dispatchEvent(escEvent)).not.toThrow();
             expect(elements.sidebar.classList.contains('open')).toBe(false);
@@ -289,13 +291,13 @@ describe('Navigation Functions', () => {
         test('should close menu on Tab when sidebar has no focusable elements', () => {
             // Clear sidebar content
             elements.sidebar.innerHTML = '';
-            
+
             openMobileMenu();
 
             // Tab should not throw when no focusable elements
             const tabEvent = new KeyboardEvent('keydown', { key: 'Tab', bubbles: true });
             expect(() => document.dispatchEvent(tabEvent)).not.toThrow();
-            
+
             // Menu should be closed as a safety measure to prevent keyboard trap
             expect(elements.sidebar.classList.contains('open')).toBe(false);
         });
@@ -386,7 +388,9 @@ describe('Navigation Functions', () => {
         test('should create announcer if it does not exist', () => {
             // Ensure announcer doesn't exist
             const existingAnnouncer = document.getElementById('category-announcer');
-            if (existingAnnouncer) existingAnnouncer.remove();
+            if (existingAnnouncer) {
+                existingAnnouncer.remove();
+            }
 
             const section = document.querySelector('.category-section');
             toggleCategory(section);
@@ -482,7 +486,7 @@ describe('Navigation Functions', () => {
             const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
 
             const section = document.querySelector('.category-section');
-            
+
             // This should not throw even when localStorage fails
             expect(() => toggleCategory(section)).not.toThrow();
             expect(consoleSpy).toHaveBeenCalled();
@@ -560,16 +564,16 @@ describe('Navigation Functions', () => {
             expect(document.activeElement).toBe(btn2);
 
             // Simulate Tab key (not shift)
-            const tabEvent = new KeyboardEvent('keydown', { 
-                key: 'Tab', 
+            const tabEvent = new KeyboardEvent('keydown', {
+                key: 'Tab',
                 shiftKey: false,
                 bubbles: true,
-                cancelable: true
+                cancelable: true,
             });
-            
+
             // The event should be captured by the focus trap
             document.dispatchEvent(tabEvent);
-            
+
             // Focus should cycle (or trap should prevent default)
             expect(elements.sidebar.classList.contains('open')).toBe(true);
             useRealTimers();
@@ -597,15 +601,15 @@ describe('Navigation Functions', () => {
             expect(document.activeElement).toBe(btn1);
 
             // Simulate Shift+Tab key
-            const tabEvent = new KeyboardEvent('keydown', { 
-                key: 'Tab', 
+            const tabEvent = new KeyboardEvent('keydown', {
+                key: 'Tab',
                 shiftKey: true,
                 bubbles: true,
-                cancelable: true
+                cancelable: true,
             });
-            
+
             document.dispatchEvent(tabEvent);
-            
+
             // Focus should cycle (or trap should prevent default)
             expect(elements.sidebar.classList.contains('open')).toBe(true);
             useRealTimers();
@@ -633,14 +637,14 @@ describe('Navigation Functions', () => {
             btn2.focus();
 
             // Tab from middle should not trigger cycle
-            const tabEvent = new KeyboardEvent('keydown', { 
-                key: 'Tab', 
+            const tabEvent = new KeyboardEvent('keydown', {
+                key: 'Tab',
                 shiftKey: false,
-                bubbles: true
+                bubbles: true,
             });
-            
+
             document.dispatchEvent(tabEvent);
-            
+
             // Menu should still be open
             expect(elements.sidebar.classList.contains('open')).toBe(true);
             useRealTimers();

@@ -10,7 +10,7 @@
     "test:coverage": "node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage",
     "test:coverage:check": "node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage --coverageThreshold='{\"global\":{\"statements\":90,\"branches\":85,\"functions\":90,\"lines\":90}}'",
     "lint": "npm run lint:js && npm run lint:css && npm run lint:html",
-    "lint:js": "eslint js/**/*.js tests/**/*.js",
+    "lint:js": "eslint js/**/*.js tests/**/*.js scripts/**/*.js service-worker.js",
     "lint:css": "stylelint css/**/*.css",
     "lint:html": "htmlhint index.html",
     "lint:fix": "npm run lint:js -- --fix && npm run lint:css -- --fix",

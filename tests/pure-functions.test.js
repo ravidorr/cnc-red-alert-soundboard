@@ -426,44 +426,44 @@ describe('Pure Functions', () => {
         test('should call onEscape when Escape key is pressed', () => {
             const onEscape = jest.fn();
             const handler = createFocusTrap(localThis.container, { onEscape });
-            
+
             const event = new KeyboardEvent('keydown', { key: 'Escape', bubbles: true });
             handler(event);
-            
+
             expect(onEscape).toHaveBeenCalled();
         });
 
         test('should stop propagation when stopPropagation option is true', () => {
             const onEscape = jest.fn();
-            const handler = createFocusTrap(localThis.container, { 
-                onEscape, 
+            const handler = createFocusTrap(localThis.container, {
+                onEscape,
                 stopPropagation: true,
             });
-            
+
             const event = new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true });
             const stopPropSpy = jest.spyOn(event, 'stopPropagation');
             handler(event);
-            
+
             expect(stopPropSpy).toHaveBeenCalled();
         });
 
         test('should cycle focus from last to first on Tab', () => {
             const handler = createFocusTrap(localThis.container);
             localThis.btn2.focus();
-            
+
             const event = new KeyboardEvent('keydown', { key: 'Tab', shiftKey: false, bubbles: true, cancelable: true });
             handler(event);
-            
+
             expect(document.activeElement).toBe(localThis.btn1);
         });
 
         test('should cycle focus from first to last on Shift+Tab', () => {
             const handler = createFocusTrap(localThis.container);
             localThis.btn1.focus();
-            
+
             const event = new KeyboardEvent('keydown', { key: 'Tab', shiftKey: true, bubbles: true, cancelable: true });
             handler(event);
-            
+
             expect(document.activeElement).toBe(localThis.btn2);
         });
 
@@ -471,13 +471,13 @@ describe('Pure Functions', () => {
             const btn3 = document.createElement('button');
             btn3.textContent = 'Middle';
             localThis.container.insertBefore(btn3, localThis.btn2);
-            
+
             const handler = createFocusTrap(localThis.container);
             btn3.focus();
-            
+
             const event = new KeyboardEvent('keydown', { key: 'Tab', shiftKey: false, bubbles: true, cancelable: true });
             handler(event);
-            
+
             // Focus should not have changed (native tab would move it)
             expect(document.activeElement).toBe(btn3);
         });
@@ -486,13 +486,13 @@ describe('Pure Functions', () => {
             const emptyContainer = document.createElement('div');
             emptyContainer.innerHTML = '<p>No buttons</p>';
             document.body.appendChild(emptyContainer);
-            
+
             const onEmptyFocusables = jest.fn();
             const handler = createFocusTrap(emptyContainer, { onEmptyFocusables });
-            
+
             const event = new KeyboardEvent('keydown', { key: 'Tab', bubbles: true, cancelable: true });
             handler(event);
-            
+
             expect(onEmptyFocusables).toHaveBeenCalled();
         });
 
@@ -500,13 +500,13 @@ describe('Pure Functions', () => {
             const emptyContainer = document.createElement('div');
             emptyContainer.innerHTML = '<p>No buttons</p>';
             document.body.appendChild(emptyContainer);
-            
+
             const handler = createFocusTrap(emptyContainer);
-            
+
             const event = new KeyboardEvent('keydown', { key: 'Tab', bubbles: true, cancelable: true });
             const preventDefaultSpy = jest.spyOn(event, 'preventDefault');
             handler(event);
-            
+
             expect(preventDefaultSpy).toHaveBeenCalled();
         });
 
@@ -516,18 +516,18 @@ describe('Pure Functions', () => {
             link.href = '#';
             link.textContent = 'Link';
             localThis.container.appendChild(link);
-            
+
             // Custom selector that only finds buttons
-            const handler = createFocusTrap(localThis.container, { 
+            const handler = createFocusTrap(localThis.container, {
                 focusableSelector: 'button',
             });
-            
+
             // Focus last button
             localThis.btn2.focus();
-            
+
             const event = new KeyboardEvent('keydown', { key: 'Tab', shiftKey: false, bubbles: true, cancelable: true });
             handler(event);
-            
+
             // Should cycle to first button, not the link
             expect(document.activeElement).toBe(localThis.btn1);
         });
@@ -536,10 +536,10 @@ describe('Pure Functions', () => {
             const onEscape = jest.fn();
             const handler = createFocusTrap(localThis.container, { onEscape });
             localThis.btn1.focus();
-            
+
             const event = new KeyboardEvent('keydown', { key: 'Enter', bubbles: true });
             handler(event);
-            
+
             expect(onEscape).not.toHaveBeenCalled();
             expect(document.activeElement).toBe(localThis.btn1);
         });
@@ -574,11 +574,11 @@ describe('Pure Functions', () => {
 
         test('should focus initialFocusElement after delay', async () => {
             jest.useFakeTimers();
-            setupFocusTrap(localThis.container, { 
+            setupFocusTrap(localThis.container, {
                 initialFocusElement: localThis.btn,
                 focusDelay: 50,
             });
-            
+
             jest.advanceTimersByTime(50);
             expect(document.activeElement).toBe(localThis.btn);
             jest.useRealTimers();

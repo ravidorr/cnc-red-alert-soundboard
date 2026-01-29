@@ -181,7 +181,7 @@ describe('Search Functions', () => {
             document.querySelectorAll('#search-announcer').forEach(el => el.remove());
 
             state.searchTerm = 'tanya';
-            
+
             // Should not throw
             expect(() => filterSounds()).not.toThrow();
         });

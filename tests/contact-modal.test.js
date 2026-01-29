@@ -102,17 +102,17 @@ describe('Contact Modal Functions', () => {
         test('should handle trigger element without focus method', () => {
             // Create a trigger that doesn't have focus method
             const fakeTrigger = { nodeName: 'DIV' };
-            Object.defineProperty(document, 'activeElement', { 
-                value: fakeTrigger, 
+            Object.defineProperty(document, 'activeElement', {
+                value: fakeTrigger,
                 writable: true,
-                configurable: true 
+                configurable: true,
             });
             showContactModal();
             // Restore document.activeElement behavior
-            Object.defineProperty(document, 'activeElement', { 
-                value: document.body, 
+            Object.defineProperty(document, 'activeElement', {
+                value: document.body,
                 writable: true,
-                configurable: true 
+                configurable: true,
             });
             expect(() => hideContactModal()).not.toThrow();
         });
@@ -135,19 +135,19 @@ describe('Contact Modal Functions', () => {
 
         test('should stop propagation on Escape to prevent stopAllSounds', () => {
             showContactModal();
-            
+
             let propagationStopped = false;
             const escEvent = new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true });
-            
+
             // Override stopPropagation to track if it was called
             const originalStopPropagation = escEvent.stopPropagation.bind(escEvent);
             escEvent.stopPropagation = () => {
                 propagationStopped = true;
                 originalStopPropagation();
             };
-            
+
             handleContactModalKeydown(escEvent);
-            
+
             expect(propagationStopped).toBe(true);
         });
 

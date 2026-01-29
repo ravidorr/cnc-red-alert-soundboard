@@ -7,7 +7,7 @@ import { state, elements } from '../js/state.js';
 import { cacheElements, renderCategories, renderFavoritesSection } from '../js/ui.js';
 import { renderNavigation } from '../js/navigation.js';
 import { setupAudioPlayer, playSound } from '../js/audio.js';
-import { setupEventListeners, cleanupEventListeners, handleShortcutsModalKeydown, showShortcutsModal, hideShortcutsModal, showContactModal, hideContactModal } from '../js/events.js';
+import { setupEventListeners, cleanupEventListeners, handleShortcutsModalKeydown, showShortcutsModal, hideShortcutsModal, showContactModal } from '../js/events.js';
 
 describe('Event Handlers', () => {
     beforeEach(() => {
@@ -673,7 +673,9 @@ describe('Event Handlers', () => {
 
             // Cleanup
             modal.remove();
-            if (onboardingTooltip) onboardingTooltip.remove();
+            if (onboardingTooltip) {
+                onboardingTooltip.remove();
+            }
         });
     });
 
@@ -737,7 +739,7 @@ describe('Event Handlers', () => {
             setupAudioPlayer();
             renderCategories();
             renderNavigation();
-            
+
             // Add shortcuts modal
             localThis.modal = document.createElement('div');
             localThis.modal.id = 'shortcuts-modal';
@@ -781,7 +783,7 @@ describe('Event Handlers', () => {
             const closeBtn = document.createElement('button');
             closeBtn.id = 'shortcuts-close';
             localThis.modal.appendChild(closeBtn);
-            
+
             // Make modal visible
             localThis.modal.classList.add('visible');
 
@@ -800,10 +802,10 @@ describe('Event Handlers', () => {
             btn2.textContent = 'Last';
             localThis.modal.appendChild(btn1);
             localThis.modal.appendChild(btn2);
-            
+
             // Make modal visible
             localThis.modal.classList.add('visible');
-            
+
             // Focus last element
             btn2.focus();
 
@@ -823,10 +825,10 @@ describe('Event Handlers', () => {
             btn2.textContent = 'Last';
             localThis.modal.appendChild(btn1);
             localThis.modal.appendChild(btn2);
-            
+
             // Make modal visible
             localThis.modal.classList.add('visible');
-            
+
             // Focus first element
             btn1.focus();
 
@@ -849,10 +851,10 @@ describe('Event Handlers', () => {
             localThis.modal.appendChild(btn1);
             localThis.modal.appendChild(btn2);
             localThis.modal.appendChild(btn3);
-            
+
             // Make modal visible
             localThis.modal.classList.add('visible');
-            
+
             // Focus middle element
             btn2.focus();
 
@@ -869,7 +871,7 @@ describe('Event Handlers', () => {
             const btn1 = document.createElement('button');
             btn1.textContent = 'First';
             localThis.modal.appendChild(btn1);
-            
+
             // Make modal visible
             localThis.modal.classList.add('visible');
             btn1.focus();
@@ -891,7 +893,7 @@ describe('Event Handlers', () => {
             setupAudioPlayer();
             renderCategories();
             renderNavigation();
-            
+
             // Add shortcuts modal
             localThis.modal = document.createElement('div');
             localThis.modal.id = 'shortcuts-modal';
@@ -955,7 +957,7 @@ describe('Event Handlers', () => {
         test('hideShortcutsModal should handle null trigger', () => {
             // Show and immediately hide without a proper trigger
             showShortcutsModal();
-            
+
             // Manually clear the trigger
             hideShortcutsModal();
 

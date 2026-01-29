@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 import { jest } from '@jest/globals';
-import { setupFullDOM, resetState, resetElements, useFakeTimers, useRealTimers, advanceTimers, mockClipboard, mockFetch, mockWebShare, createMockBlob } from './helpers.js';
+import { setupFullDOM, resetState, resetElements, useFakeTimers, useRealTimers, advanceTimers, mockClipboard, mockWebShare } from './helpers.js';
 import { state, elements } from '../js/state.js';
 import { SOUNDS, CATEGORIES } from '../js/constants.js';
 import {
@@ -127,7 +127,7 @@ describe('UI Rendering', () => {
             const favSection = document.getElementById('category-favorites');
             const emptyTitle = favSection.querySelector('.favorites-empty-title');
             const emptyText = favSection.querySelector('.favorites-empty-text');
-            
+
             // Check for themed military-style copy
             expect(emptyTitle.textContent).toBe('AWAITING ORDERS');
             expect(emptyText.textContent).toContain('priority targets');
@@ -270,18 +270,18 @@ describe('UI Rendering', () => {
             showToast('Test message', 'info', 100);
 
             const toast = document.querySelector('.toast');
-            
+
             // Trigger mouseenter to pause timer
             toast.dispatchEvent(new Event('mouseenter'));
-            
+
             // Advance past original timeout
             advanceTimers(150);
             // Toast should still exist because timer was paused
             expect(document.querySelector('.toast')).not.toBeNull();
-            
+
             // Trigger mouseleave to resume timer with 2000ms
             toast.dispatchEvent(new Event('mouseleave'));
-            
+
             // Advance past resume timeout
             advanceTimers(2100);
             expect(document.querySelector('.toast')).toBeNull();
@@ -293,18 +293,18 @@ describe('UI Rendering', () => {
             showToast('Test message', 'info', 100);
 
             const toast = document.querySelector('.toast');
-            
+
             // Trigger focusin to pause timer
             toast.dispatchEvent(new Event('focusin'));
-            
+
             // Advance past original timeout
             advanceTimers(150);
             // Toast should still exist because timer was paused
             expect(document.querySelector('.toast')).not.toBeNull();
-            
+
             // Trigger focusout to resume timer with 2000ms
             toast.dispatchEvent(new Event('focusout'));
-            
+
             // Advance past resume timeout
             advanceTimers(2100);
             expect(document.querySelector('.toast')).toBeNull();
@@ -315,11 +315,11 @@ describe('UI Rendering', () => {
             showToast('Test message', 'info', 100);
 
             const toast = document.querySelector('.toast');
-            
+
             // Trigger mouseenter then manually remove toast
             toast.dispatchEvent(new Event('mouseenter'));
             toast.remove();
-            
+
             // Trigger mouseleave - should not throw
             expect(() => {
                 toast.dispatchEvent(new Event('mouseleave'));
@@ -358,8 +358,6 @@ describe('UI Rendering', () => {
     });
 
     describe('shareSound', () => {
-        const localThis = {};
-
         beforeEach(() => {
             cacheElements();
             // Ensure no Web Share API by default (falls back to clipboard)
@@ -410,8 +408,8 @@ describe('UI Rendering', () => {
 
         test('should handle Web Share API abort gracefully', async () => {
             // When user cancels share, no error toast should appear
-            const webShare = mockWebShare({ shouldAbort: true });
-            const clipboard = mockClipboard();
+            mockWebShare({ shouldAbort: true });
+            mockClipboard();
 
             await shareSound('test.wav', 'Test Sound');
 
@@ -605,7 +603,7 @@ describe('UI Rendering', () => {
             // Clear dragTooltipSeen so tooltip will show
             localStorage.removeItem('dragTooltipSeen');
             state.favorites = ['allies_1_achnoledged.wav', 'allies_1_affirmative.wav'];
-            
+
             renderFavoritesSection();
 
             const dismissBtn = document.getElementById('drag-tooltip-dismiss');
@@ -616,20 +614,20 @@ describe('UI Rendering', () => {
             // Clear dragTooltipSeen so tooltip will show
             localStorage.removeItem('dragTooltipSeen');
             state.favorites = ['allies_1_achnoledged.wav', 'allies_1_affirmative.wav'];
-            
+
             renderFavoritesSection();
 
             const dismissBtn = document.getElementById('drag-tooltip-dismiss');
             const tooltip = document.getElementById('drag-tooltip');
-            
+
             expect(tooltip).not.toBeNull();
-            
+
             // Click dismiss button
             dismissBtn.click();
 
             // localStorage should be updated
             expect(localStorage.getItem('dragTooltipSeen')).toBe('true');
-            
+
             // Tooltip should be removed
             expect(document.getElementById('drag-tooltip')).toBeNull();
         });
@@ -638,7 +636,7 @@ describe('UI Rendering', () => {
             // Set dragTooltipSeen
             localStorage.setItem('dragTooltipSeen', 'true');
             state.favorites = ['allies_1_achnoledged.wav', 'allies_1_affirmative.wav'];
-            
+
             renderFavoritesSection();
 
             const tooltip = document.getElementById('drag-tooltip');
@@ -648,7 +646,7 @@ describe('UI Rendering', () => {
         test('should not show tooltip for single favorite', () => {
             localStorage.removeItem('dragTooltipSeen');
             state.favorites = ['allies_1_achnoledged.wav'];
-            
+
             renderFavoritesSection();
 
             const tooltip = document.getElementById('drag-tooltip');
@@ -671,7 +669,7 @@ describe('UI Rendering', () => {
 
         test('should handle empty POPULAR_SOUNDS gracefully', () => {
             // This tests the early return when popularSounds.length === 0
-            // Since we can't modify POPULAR_SOUNDS constant, we test that 
+            // Since we can't modify POPULAR_SOUNDS constant, we test that
             // the function doesn't crash with valid data
             expect(() => renderPopularSection()).not.toThrow();
         });
@@ -679,10 +677,7 @@ describe('UI Rendering', () => {
         test('should remove existing section before re-rendering', () => {
             // Render twice to test removal of existing section
             renderPopularSection();
-            const firstSection = document.getElementById('category-popular');
-            
             renderPopularSection();
-            const secondSection = document.getElementById('category-popular');
 
             // Should only be one section (the new one replaced the old)
             const allPopularSections = document.querySelectorAll('#category-popular');
