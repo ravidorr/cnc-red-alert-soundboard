@@ -1,5 +1,5 @@
 // ============================================
-// Utils - Pure utility functions (no DOM dependencies)
+// Utils - Utility functions
 // ============================================
 
 /**
@@ -407,4 +407,53 @@ export function setupFocusTrap(container, options = {}) {
             container.removeEventListener('keydown', handler);
         },
     };
+}
+
+// ============================================
+// Screen Reader Announcements
+// ============================================
+
+// Cache for announcer elements by ID
+const announcerCache = new Map();
+
+/**
+ * Announce a message to screen readers using an aria-live region
+ * Creates the announcer element if it doesn't exist, reuses if it does
+ * @param {string} message - Message to announce
+ * @param {object} [options] - Configuration options
+ * @param {string} [options.id='sr-announcer'] - ID for the announcer element
+ * @param {string} [options.priority='polite'] - 'polite' or 'assertive'
+ * @param {boolean} [options.atomic=true] - Whether to announce entire region
+ * @returns {HTMLElement} The announcer element
+ */
+export function announce(message, options = {}) {
+    const {
+        id = 'sr-announcer',
+        priority = 'polite',
+        atomic = true,
+    } = options;
+
+    let announcer = announcerCache.get(id) || document.getElementById(id);
+
+    if (!announcer) {
+        announcer = document.createElement('div');
+        announcer.id = id;
+        announcer.setAttribute('aria-live', priority);
+        if (atomic) {
+            announcer.setAttribute('aria-atomic', 'true');
+        }
+        announcer.className = 'visually-hidden';
+        document.body.appendChild(announcer);
+        announcerCache.set(id, announcer);
+    }
+
+    announcer.textContent = message;
+    return announcer;
+}
+
+/**
+ * Clear the announcer cache (useful for testing)
+ */
+export function clearAnnouncerCache() {
+    announcerCache.clear();
 }

@@ -5,7 +5,7 @@
 import { SOUNDS } from './constants.js';
 import { state, elements } from './state.js';
 import { showSearchEmptyState, hideSearchEmptyState } from './ui.js';
-import { fuzzyMatch } from './utils.js';
+import { fuzzyMatch, announce } from './utils.js';
 
 // Cache: Map sound file to sound data for O(1) lookup
 let soundDataCache = null;
@@ -105,21 +105,16 @@ export function filterSounds() {
 
 // Announce search results to screen readers
 function announceSearchResults(count) {
-    const announcer = document.getElementById('search-announcer');
-    if (!announcer) {
-        return;
-    }
-
     // Only announce if there's a search term
     if (state.searchTerm) {
         const total = SOUNDS.length;
-        if (count === 0) {
-            announcer.textContent = `No sounds found for "${state.searchTerm}"`;
-        } else {
-            announcer.textContent = `Showing ${count} of ${total} sounds`;
-        }
+        const message = count === 0
+            ? `No sounds found for "${state.searchTerm}"`
+            : `Showing ${count} of ${total} sounds`;
+        announce(message, { id: 'search-announcer' });
     } else {
-        announcer.textContent = '';
+        // Clear the announcer when search is cleared
+        announce('', { id: 'search-announcer' });
     }
 
     // Also update visible indicator

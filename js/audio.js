@@ -6,6 +6,7 @@ import { SOUNDS } from './constants.js';
 import { state, elements } from './state.js';
 import { showToast } from './ui.js';
 import { addToRecentlyPlayed } from './recently-played.js';
+import { announce } from './utils.js';
 
 // Volume state
 let previousVolume = 100;
@@ -180,16 +181,7 @@ export function playSound(button) {
 
 // Announce playback status to screen readers
 function announcePlayback(message) {
-    let announcer = document.getElementById('playback-announcer');
-    if (!announcer) {
-        announcer = document.createElement('div');
-        announcer.id = 'playback-announcer';
-        announcer.setAttribute('aria-live', 'polite');
-        announcer.setAttribute('aria-atomic', 'true');
-        announcer.className = 'visually-hidden';
-        document.body.appendChild(announcer);
-    }
-    announcer.textContent = message;
+    announce(message, { id: 'playback-announcer' });
 }
 
 // Stop all sounds

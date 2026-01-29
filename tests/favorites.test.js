@@ -16,6 +16,7 @@ import {
     moveFavoriteDown,
     clearAllFavorites,
 } from '../js/favorites.js';
+import { clearAnnouncerCache } from '../js/utils.js';
 
 describe('Favorites Functions', () => {
     beforeEach(() => {
@@ -23,6 +24,7 @@ describe('Favorites Functions', () => {
         resetState(state);
         resetElements(elements);
         localStorage.clear();
+        clearAnnouncerCache();
     });
 
     describe('loadFavorites', () => {

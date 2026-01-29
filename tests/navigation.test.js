@@ -18,12 +18,14 @@ import {
     openMobileMenu,
     closeMobileMenu,
 } from '../js/mobile.js';
+import { clearAnnouncerCache } from '../js/utils.js';
 
 describe('Navigation Functions', () => {
     beforeEach(() => {
         setupFullDOM();
         resetState(state);
         resetElements(elements);
+        clearAnnouncerCache();
     });
 
     describe('renderNavigation', () => {

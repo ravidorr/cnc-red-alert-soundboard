@@ -22,6 +22,8 @@ import {
     createFocusTrap,
     setupFocusTrap,
     FOCUSABLE_SELECTOR,
+    announce,
+    clearAnnouncerCache,
 } from '../js/utils.js';
 import { SOUNDS, CATEGORIES } from '../js/constants.js';
 
@@ -585,10 +587,95 @@ describe('Pure Functions', () => {
         test('cleanup should remove keydown listener', () => {
             const removeEventListenerSpy = jest.spyOn(localThis.container, 'removeEventListener');
             const { cleanup } = setupFocusTrap(localThis.container);
-            
+
             cleanup();
-            
+
             expect(removeEventListenerSpy).toHaveBeenCalledWith('keydown', expect.any(Function));
+        });
+    });
+
+    describe('announce', () => {
+        beforeEach(() => {
+            clearAnnouncerCache();
+            // Remove any existing announcers
+            document.querySelectorAll('[aria-live]').forEach(el => el.remove());
+        });
+
+        test('should create announcer element if it does not exist', () => {
+            announce('Test message');
+
+            const announcer = document.getElementById('sr-announcer');
+            expect(announcer).not.toBeNull();
+            expect(announcer.getAttribute('aria-live')).toBe('polite');
+            expect(announcer.getAttribute('aria-atomic')).toBe('true');
+            expect(announcer.className).toBe('visually-hidden');
+        });
+
+        test('should set the message text', () => {
+            announce('Hello screen reader');
+
+            const announcer = document.getElementById('sr-announcer');
+            expect(announcer.textContent).toBe('Hello screen reader');
+        });
+
+        test('should reuse existing announcer element', () => {
+            announce('First message');
+            const firstAnnouncer = document.getElementById('sr-announcer');
+
+            announce('Second message');
+            const secondAnnouncer = document.getElementById('sr-announcer');
+
+            expect(secondAnnouncer).toBe(firstAnnouncer);
+            expect(secondAnnouncer.textContent).toBe('Second message');
+        });
+
+        test('should use custom id when provided', () => {
+            announce('Custom message', { id: 'custom-announcer' });
+
+            const announcer = document.getElementById('custom-announcer');
+            expect(announcer).not.toBeNull();
+            expect(announcer.textContent).toBe('Custom message');
+        });
+
+        test('should use assertive priority when specified', () => {
+            announce('Urgent message', { priority: 'assertive' });
+
+            const announcer = document.getElementById('sr-announcer');
+            expect(announcer.getAttribute('aria-live')).toBe('assertive');
+        });
+
+        test('should not set aria-atomic when atomic is false', () => {
+            announce('Message', { atomic: false });
+
+            const announcer = document.getElementById('sr-announcer');
+            expect(announcer.hasAttribute('aria-atomic')).toBe(false);
+        });
+
+        test('should return the announcer element', () => {
+            const result = announce('Test');
+
+            expect(result).toBe(document.getElementById('sr-announcer'));
+        });
+    });
+
+    describe('clearAnnouncerCache', () => {
+        test('should clear the cache forcing new element creation', () => {
+            // Create an announcer with custom id
+            announce('First', { id: 'test-announcer' });
+            const firstAnnouncer = document.getElementById('test-announcer');
+
+            // Remove it from DOM
+            firstAnnouncer.remove();
+
+            // Without clearing cache, it would try to use the removed element
+            clearAnnouncerCache();
+
+            // Now it should create a new one
+            announce('Second', { id: 'test-announcer' });
+            const secondAnnouncer = document.getElementById('test-announcer');
+
+            expect(secondAnnouncer).not.toBeNull();
+            expect(secondAnnouncer).not.toBe(firstAnnouncer);
         });
     });
 });

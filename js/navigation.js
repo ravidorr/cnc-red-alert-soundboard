@@ -4,7 +4,7 @@
 
 import { SOUNDS, CATEGORIES } from './constants.js';
 import { state, elements } from './state.js';
-import { getSortedCategories, getSoundsByCategory, calculateScrollOffset } from './utils.js';
+import { getSortedCategories, getSoundsByCategory, calculateScrollOffset, announce } from './utils.js';
 
 const COLLAPSED_CATEGORIES_KEY = 'cnc-collapsed-categories';
 
@@ -139,16 +139,7 @@ export function applyCollapsedStates() {
 
 // Announce message to screen readers
 function announceToScreenReader(message) {
-    let announcer = document.getElementById('category-announcer');
-    if (!announcer) {
-        announcer = document.createElement('div');
-        announcer.id = 'category-announcer';
-        announcer.setAttribute('aria-live', 'polite');
-        announcer.setAttribute('aria-atomic', 'true');
-        announcer.className = 'visually-hidden';
-        document.body.appendChild(announcer);
-    }
-    announcer.textContent = message;
+    announce(message, { id: 'category-announcer' });
 }
 
 // Scroll to category

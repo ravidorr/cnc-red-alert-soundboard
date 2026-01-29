@@ -10,6 +10,7 @@ import {
     toggleFavoriteInArray,
     isFavorite,
     reorderFavoritesArray,
+    announce,
 } from './utils.js';
 import { showToast, renderFavoritesSection } from './ui.js';
 import { renderNavigation } from './navigation.js';
@@ -139,17 +140,7 @@ function announceReorder(soundFile, direction) {
     const total = state.favorites.length;
     const message = `${soundName} moved ${direction}, now ${index} of ${total}`;
 
-    // Use aria-live region if it exists, otherwise create temporary one
-    let liveRegion = document.getElementById('reorder-announcer');
-    if (!liveRegion) {
-        liveRegion = document.createElement('div');
-        liveRegion.id = 'reorder-announcer';
-        liveRegion.setAttribute('aria-live', 'polite');
-        liveRegion.setAttribute('aria-atomic', 'true');
-        liveRegion.className = 'visually-hidden';
-        document.body.appendChild(liveRegion);
-    }
-    liveRegion.textContent = message;
+    announce(message, { id: 'reorder-announcer' });
 }
 
 // Focus a favorite item after reorder
@@ -246,14 +237,5 @@ function ensureDragInstructions() {
 
 // Announce drag action to screen readers
 function announceDragAction(message) {
-    let announcer = document.getElementById('drag-action-announcer');
-    if (!announcer) {
-        announcer = document.createElement('div');
-        announcer.id = 'drag-action-announcer';
-        announcer.setAttribute('aria-live', 'assertive');
-        announcer.setAttribute('aria-atomic', 'true');
-        announcer.className = 'visually-hidden';
-        document.body.appendChild(announcer);
-    }
-    announcer.textContent = message;
+    announce(message, { id: 'drag-action-announcer', priority: 'assertive' });
 }
