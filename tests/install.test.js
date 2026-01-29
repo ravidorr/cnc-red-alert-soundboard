@@ -159,7 +159,7 @@ describe('Install Functions', () => {
             expect(mockEvent.preventDefault).toHaveBeenCalled();
         });
 
-        test('should show install prompt after delay when not dismissed', (done) => {
+        test('should show install prompt after delay when not dismissed', () => {
             jest.useFakeTimers();
             window.matchMedia = jest.fn().mockReturnValue({ matches: false });
             localStorage.removeItem('installPromptDismissed');
@@ -175,7 +175,6 @@ describe('Install Functions', () => {
 
             expect(elements.installPrompt.classList.contains('visible')).toBe(true);
             jest.useRealTimers();
-            done();
         });
 
         test('should not show install prompt when recently dismissed', () => {
