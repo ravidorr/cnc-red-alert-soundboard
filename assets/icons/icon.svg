@@ -1,23 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
   <defs>
-    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" style="stop-color:#001a00"/>
-      <stop offset="100%" style="stop-color:#000a00"/>
-    </linearGradient>
-    <linearGradient id="borderGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#00ff00"/>
-      <stop offset="50%" style="stop-color:#00cc00"/>
-      <stop offset="100%" style="stop-color:#00ff00"/>
-    </linearGradient>
-    <filter id="glow">
-      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
-      <feMerge>
-        <feMergeNode in="coloredBlur"/>
-        <feMergeNode in="SourceGraphic"/>
-      </feMerge>
-    </filter>
-    <filter id="innerGlow">
-      <feGaussianBlur stdDeviation="2" result="blur"/>
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="blur"/>
       <feMerge>
         <feMergeNode in="blur"/>
         <feMergeNode in="SourceGraphic"/>
@@ -25,74 +9,15 @@
     </filter>
   </defs>
   
-  <!-- Background -->
-  <rect width="512" height="512" fill="url(#bgGrad)"/>
+  <rect width="512" height="512" fill="#070f07"/>
   
-  <!-- Corner brackets (military HUD style) -->
-  <g stroke="#00aa00" stroke-width="4" fill="none">
-    <!-- Top left -->
-    <path d="M20,80 L20,20 L80,20"/>
-    <!-- Top right -->
-    <path d="M432,20 L492,20 L492,80"/>
-    <!-- Bottom left -->
-    <path d="M20,432 L20,492 L80,492"/>
-    <!-- Bottom right -->
-    <path d="M432,492 L492,492 L492,432"/>
-  </g>
-  
-  <!-- Inner border -->
-  <rect x="40" y="40" width="432" height="432" fill="none" stroke="#006600" stroke-width="2"/>
-  
-  <!-- Grid pattern -->
-  <g stroke="#003300" stroke-width="1">
-    <line x1="128" y1="40" x2="128" y2="472"/>
-    <line x1="256" y1="40" x2="256" y2="472"/>
-    <line x1="384" y1="40" x2="384" y2="472"/>
-    <line x1="40" y1="128" x2="472" y2="128"/>
-    <line x1="40" y1="256" x2="472" y2="256"/>
-    <line x1="40" y1="384" x2="472" y2="384"/>
-  </g>
-  
-  <!-- Main C&C text -->
-  <g filter="url(#glow)">
-    <text x="256" y="240" 
-          font-family="Arial Black, Arial, sans-serif" 
-          font-size="140" 
-          font-weight="bold"
-          fill="#00ff00" 
-          text-anchor="middle"
-          dominant-baseline="middle">C&amp;C</text>
-  </g>
-  
-  <!-- Subtitle -->
-  <g filter="url(#innerGlow)">
-    <text x="256" y="340" 
-          font-family="Courier New, monospace" 
-          font-size="36" 
-          fill="#00cc00" 
-          text-anchor="middle">RED ALERT</text>
-  </g>
-  
-  <!-- Bottom label -->
-  <text x="256" y="400" 
-        font-family="Courier New, monospace" 
-        font-size="24" 
-        fill="#008800" 
-        text-anchor="middle">SOUNDBOARD</text>
-  
-  <!-- Decorative elements -->
-  <g fill="#00ff00" opacity="0.8">
-    <!-- Top indicator -->
-    <polygon points="256,60 266,80 246,80"/>
-    <!-- Bottom indicator -->
-    <polygon points="256,452 266,432 246,432"/>
-  </g>
-  
-  <!-- Status bars -->
-  <g fill="#00aa00">
-    <rect x="80" y="460" width="80" height="8"/>
-    <rect x="180" y="460" width="60" height="8"/>
-    <rect x="260" y="460" width="40" height="8"/>
-    <rect x="320" y="460" width="112" height="8"/>
-  </g>
+  <text x="256" y="276" 
+        font-family="Arial Black, sans-serif" 
+        font-size="155" 
+        font-weight="900"
+        font-style="italic"
+        fill="#00ff00" 
+        text-anchor="middle"
+        dominant-baseline="middle"
+        filter="url(#glow)">C&amp;C</text>
 </svg>
