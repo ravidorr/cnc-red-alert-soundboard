@@ -17,4 +17,5 @@ jobs:
       - uses: actions/setup-node@v5
         with:
           node-version: 22
+      - run: npm run test:security-policy
       - run: node scripts/validate-security-policy-version.mjs

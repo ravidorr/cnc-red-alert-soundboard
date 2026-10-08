@@ -31,29 +31,45 @@ export function validateSecurityPolicyVersion(packageJson, securityPolicy) {
   }
 
   const rows = [...table.groups.rows.matchAll(VERSION_ROW)];
-  const matchingRow = rows.find(([, rowVersion]) => rowVersion === version);
+  const matchingRows = rows.filter(([, rowVersion]) => rowVersion === version);
+  const supportedRows = rows.filter(([, , status]) => status.trim() === SUPPORTED_STATUS);
 
-  if (matchingRow?.[2].trim() === SUPPORTED_STATUS) {
+  if (
+    matchingRows.length === 1
+    && matchingRows[0][2].trim() === SUPPORTED_STATUS
+    && supportedRows.length === 1
+  ) {
     return { valid: true, version };
   }
 
-  if (matchingRow) {
+  if (matchingRows.length > 0 && matchingRows.every(([, , status]) => status.trim() !== SUPPORTED_STATUS)) {
     return {
       valid: false,
       error: `SECURITY.md declares ${version} as unsupported. Mark the package version as supported.`,
     };
   }
 
-  const supportedVersion = rows.find(([, , status]) => status.trim() === SUPPORTED_STATUS)?.[1];
+  if (supportedRows.length === 0) {
+    return { valid: false, error: "SECURITY.md has no enabled supported-version row." };
+  }
 
-  if (supportedVersion) {
+  if (supportedRows.length !== 1 || matchingRows.length > 1) {
+    return {
+      valid: false,
+      error: `SECURITY.md must declare exactly one supported version, matching ${version}.`,
+    };
+  }
+
+  const [[, supportedVersion]] = supportedRows;
+
+  if (supportedVersion !== version) {
     return {
       valid: false,
       error: `SECURITY.md supports ${supportedVersion}, but package.json declares ${version}. Update SECURITY.md.`,
     };
   }
 
-  return { valid: false, error: "SECURITY.md has no enabled supported-version row." };
+  return { valid: false, error: `SECURITY.md declares ${version} as unsupported. Mark the package version as supported.` };
 }
 
 export function validateSecurityPolicyFiles(

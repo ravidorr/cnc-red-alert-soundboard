@@ -5,10 +5,10 @@
   "type": "module",
   "main": "js/main.js",
   "scripts": {
-    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "test": "npm run test:security-policy && node --experimental-vm-modules node_modules/jest/bin/jest.js",
     "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --watch",
     "test:coverage": "node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage",
-    "test:coverage:check": "node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage --coverageThreshold='{\"global\":{\"statements\":90,\"branches\":85,\"functions\":90,\"lines\":90}}'",
+    "test:coverage:check": "npm run test:security-policy && node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage --coverageThreshold='{\"global\":{\"statements\":90,\"branches\":85,\"functions\":90,\"lines\":90}}'",
     "lint": "npm run lint:js && npm run lint:css && npm run lint:html",
     "lint:js": "eslint js/**/*.js tests/**/*.js scripts/**/*.js service-worker.js",
     "lint:css": "stylelint css/**/*.css",
