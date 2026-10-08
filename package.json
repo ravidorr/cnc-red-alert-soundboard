@@ -17,7 +17,9 @@
     "precommit": "npm run lint && npm run test:coverage:check",
     "prepare": "husky",
     "version": "node scripts/sync-version.js && git add js/version.js sitemap.xml index.html",
-    "build:css": "node scripts/build-css.js"
+    "build:css": "node scripts/build-css.js",
+    "validate:security-policy": "node scripts/validate-security-policy-version.mjs",
+    "test:security-policy": "node --test scripts/validate-security-policy-version.test.mjs"
   },
   "keywords": [
     "command-and-conquer",
