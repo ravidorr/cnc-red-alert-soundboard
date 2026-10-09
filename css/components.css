@@ -10,7 +10,7 @@
     height: 44px;
 }
 
-#search-input {
+.search-input {
     background: var(--bg-button);
     border: 1px solid var(--green-dark);
     color: var(--text-primary);
@@ -24,16 +24,16 @@
     transition: var(--transition-base);
 }
 
-#search-input::placeholder {
+.search-input::placeholder {
     color: var(--text-dim);
 }
 
-#search-input:focus {
+.search-input:focus {
     border-color: var(--green-primary);
     box-shadow: var(--border-glow);
 }
 
-#clear-search {
+.clear-search {
     position: absolute;
     right: 0;
     background: none;
@@ -52,11 +52,11 @@
     justify-content: center;
 }
 
-#search-input:not(:placeholder-shown) + #clear-search {
+.search-input:not(:placeholder-shown) + .clear-search {
     opacity: 1;
 }
 
-#clear-search:hover {
+.clear-search:hover {
     color: var(--green-primary);
 }
 
@@ -102,7 +102,7 @@
 }
 
 /* Volume slider with larger hit area - visual track drawn via pseudo-element */
-#volume-slider {
+.volume-slider {
     width: 80px;
     height: 100%;
     -webkit-appearance: none;
@@ -116,7 +116,7 @@
 }
 
 /* Create visual track with larger clickable area */
-#volume-slider::before {
+.volume-slider::before {
     content: '';
     position: absolute;
     top: 50%;
@@ -129,7 +129,7 @@
     pointer-events: none;
 }
 
-#volume-slider::-webkit-slider-thumb {
+.volume-slider::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
     width: 20px;
@@ -141,7 +141,7 @@
     box-shadow: var(--border-glow);
 }
 
-#volume-slider::-moz-range-thumb {
+.volume-slider::-moz-range-thumb {
     width: 20px;
     height: 36px;
     background: var(--green-primary);
@@ -150,7 +150,7 @@
     border: none;
 }
 
-#volume-slider:focus {
+.volume-slider:focus {
     outline: 2px solid var(--green-primary);
     outline-offset: 2px;
 }
@@ -177,7 +177,7 @@
 .btn-action:hover {
     background: var(--red-dim);
     color: var(--bg-primary);
-    box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+    box-shadow: 0 0 10px rgb(255, 0, 0, 0.5);
 }
 
 .btn-random {
@@ -347,7 +347,7 @@ button.category-header:focus-visible {
     text-align: left;
     position: relative;
     overflow: hidden;
-    word-break: break-word;
+    overflow-wrap: anywhere;
     line-height: 1.5;
 }
 
@@ -467,7 +467,7 @@ button.category-header:focus-visible {
 
 .favorite-btn.is-favorite:hover {
     color: var(--red-alert);
-    background: rgba(255, 0, 0, 0.1);
+    background: rgb(255, 0, 0, 0.1);
 }
 
 /* Empty State */
@@ -542,7 +542,7 @@ button.category-header:focus-visible {
     color: var(--text-secondary);
 }
 
-.search-result-indicator #search-result-text {
+.search-result-indicator .search-result-text {
     letter-spacing: 1px;
 }
 

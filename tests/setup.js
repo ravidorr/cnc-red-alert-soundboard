@@ -10,7 +10,7 @@ const localStorageMock = (function() {
             store[key] = value.toString();
         }),
         removeItem: jest.fn((key) => {
-            delete store[key];
+            Reflect.deleteProperty(store, key);
         }),
         clear: jest.fn(() => {
             store = {};
@@ -59,15 +59,13 @@ Object.defineProperty(navigator, 'serviceWorker', {
 });
 
 // Mock MessageChannel (not available in JSDOM)
-global.MessageChannel = class MockMessageChannel {
-    constructor() {
-        this.port1 = { onmessage: null };
-        this.port2 = {
-            onmessage: null,
-            // Store reference to port1 so we can trigger its onmessage
-            _port1: this.port1,
-        };
-    }
+global.MessageChannel = function MockMessageChannel() {
+    this.port1 = { onmessage: null };
+    this.port2 = {
+        onmessage: null,
+        // Store reference to port1 so we can trigger its onmessage
+        _port1: this.port1,
+    };
 };
 
 // Reset mocks before each test

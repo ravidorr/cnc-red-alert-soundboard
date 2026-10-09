@@ -77,7 +77,6 @@ export function setupInstallPrompt() {
 
     // Listen for successful install
     window.addEventListener('appinstalled', () => {
-        console.log('PWA was installed');
         hideInstallPrompt();
         hideInstallButton();
         state.deferredInstallPrompt = null;
@@ -93,11 +92,7 @@ export async function triggerInstall() {
     }
 
     state.deferredInstallPrompt.prompt();
-    const { outcome } = await state.deferredInstallPrompt.userChoice;
-
-    if (outcome === 'accepted') {
-        console.log('PWA installed');
-    }
+    await state.deferredInstallPrompt.userChoice;
 
     state.deferredInstallPrompt = null;
     hideInstallPrompt();
@@ -141,7 +136,7 @@ export function hideInstallButton() {
 // Manually refresh/verify sound cache (sounds are cached automatically on SW activation)
 export function cacheAllSoundsForOffline() {
     if (!('serviceWorker' in navigator) || !navigator.serviceWorker || !navigator.serviceWorker.controller) {
-        console.log('Service worker not available for caching');
+        showToast('SERVICE WORKER UNAVAILABLE', 'error');
         return;
     }
 
@@ -175,7 +170,6 @@ export function registerServiceWorker() {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('service-worker.js')
                 .then(registration => {
-                    console.log('SW registered:', registration.scope);
                     swRegistration = registration;
 
                     // Check for updates periodically (every hour)
@@ -196,9 +190,7 @@ export function registerServiceWorker() {
                         }
                     });
                 })
-                .catch(error => {
-                    console.log('SW registration failed:', error);
-                });
+                .catch(() => undefined);
         });
     }
 }

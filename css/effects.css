@@ -13,8 +13,8 @@
     z-index: 9999;
     background: repeating-linear-gradient(
         0deg,
-        rgba(0, 0, 0, 0.1) 0px,
-        rgba(0, 0, 0, 0.1) 1px,
+        rgb(0, 0, 0, 0.1) 0px,
+        rgb(0, 0, 0, 0.1) 1px,
         transparent 1px,
         transparent 2px
     );
@@ -31,7 +31,7 @@
     background: radial-gradient(
         ellipse at center,
         transparent 0%,
-        rgba(0, 0, 0, 0.3) 100%
+        rgb(0, 0, 0, 0.3) 100%
     );
 }
 
@@ -43,11 +43,11 @@
 
 @keyframes playingPulse {
     0%, 100% { 
-        box-shadow: 0 0 8px rgba(0, 255, 0, 0.6), 0 0 15px rgba(0, 255, 0, 0.3);
+        box-shadow: 0 0 8px rgb(0, 255, 0, 0.6), 0 0 15px rgb(0, 255, 0, 0.3);
         border-color: var(--green-primary);
     }
     50% { 
-        box-shadow: 0 0 20px rgba(0, 255, 0, 0.9), 0 0 35px rgba(0, 255, 0, 0.5);
+        box-shadow: 0 0 20px rgb(0, 255, 0, 0.9), 0 0 35px rgb(0, 255, 0, 0.5);
         border-color: var(--green-accent);
     }
 }

@@ -1,9 +1,15 @@
 # Changelog
 
-All notable changes to the C&C Red Alert Soundboard will be documented in this file.
+All notable changes to the C&C Red Alert Soundboard are documented here. The
+format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
+this project uses [Semantic Versioning](https://semver.org/).
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+## [3.1.2] - 2026-10-10
+
+### Changed
+
+- Added the GitHub project baseline: strict linters, automated quality checks,
+  a release gate, 100% coverage enforcement, and contributor documentation.
 
 ## [2.0.1] - 2026-01-27
 

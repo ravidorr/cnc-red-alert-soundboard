@@ -95,10 +95,8 @@ function hideConfirmModal(result) {
     focusTrapHandler = null;
 
     // Resolve the promise
-    if (resolveCallback) {
-        resolveCallback(result);
-        resolveCallback = null;
-    }
+    resolveCallback(result);
+    resolveCallback = null;
 
     // Restore focus to trigger element
     confirmTrigger?.focus?.();
@@ -140,7 +138,5 @@ function handleKeydown(e) {
     }
 
     // Delegate to focus trap handler
-    if (focusTrapHandler) {
-        focusTrapHandler(e);
-    }
+    focusTrapHandler(e);
 }

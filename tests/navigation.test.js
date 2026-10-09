@@ -5,6 +5,7 @@ import { jest } from '@jest/globals';
 import { setupFullDOM, resetState, resetElements, useFakeTimers, useRealTimers, advanceTimers } from './helpers.js';
 import { state, elements } from '../js/state.js';
 import { cacheElements, renderCategories } from '../js/ui.js';
+import { SOUNDS } from '../js/constants.js';
 import {
     renderNavigation,
     toggleCategory,
@@ -56,6 +57,17 @@ describe('Navigation Functions', () => {
                 expect(parseInt(count.textContent)).toBeGreaterThan(0);
             });
         });
+
+        test('should omit categories with no matching sounds', () => {
+            const localThis = {};
+            localThis.originalSounds = [...SOUNDS];
+            SOUNDS.length = 0;
+
+            renderNavigation();
+
+            expect(document.querySelectorAll('.nav-item:not(.favorites-nav):not(.recent-nav)')).toHaveLength(0);
+            SOUNDS.push(...localThis.originalSounds);
+        });
     });
 
     describe('toggleCategory', () => {
@@ -89,6 +101,30 @@ describe('Navigation Functions', () => {
 
             toggleCategory(section);
             expect(header.getAttribute('aria-expanded')).toBe('true');
+        });
+
+        test('should toggle a section without a header or category identifier', () => {
+            const localThis = {};
+            localThis.section = document.createElement('section');
+            localThis.section.className = 'category-section';
+
+            toggleCategory(localThis.section);
+
+            expect(localThis.section.classList.contains('collapsed')).toBe(true);
+        });
+
+        test('should toggle a header without a category name', () => {
+            const localThis = {};
+            localThis.section = document.createElement('section');
+            localThis.section.className = 'category-section';
+            localThis.section.dataset.category = 'test';
+            localThis.header = document.createElement('button');
+            localThis.header.className = 'category-header';
+            localThis.section.appendChild(localThis.header);
+
+            toggleCategory(localThis.section);
+
+            expect(localThis.header.getAttribute('aria-expanded')).toBe('false');
         });
     });
 
@@ -465,7 +501,9 @@ describe('Navigation Functions', () => {
             localStorage.setItem('cnc-collapsed-categories', 'not valid json {{{');
 
             // Mock console.error to verify error is logged
-            const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+            const consoleSpy = jest
+                .spyOn(console, 'error')
+                .mockImplementation(jest.fn());
 
             const result = loadCollapsedCategories();
 
@@ -483,7 +521,9 @@ describe('Navigation Functions', () => {
                 throw new Error('Storage quota exceeded');
             });
 
-            const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+            const consoleSpy = jest
+                .spyOn(console, 'error')
+                .mockImplementation(jest.fn());
 
             const section = document.querySelector('.category-section');
 
@@ -519,6 +559,28 @@ describe('Navigation Functions', () => {
             localStorage.setItem('cnc-collapsed-categories', JSON.stringify(['nonexistent']));
 
             expect(() => applyCollapsedStates()).not.toThrow();
+        });
+
+        test('applyCollapsedStates should leave an already collapsed section unchanged', () => {
+            const localThis = {};
+            localThis.section = document.getElementById('category-allies');
+            localThis.section.classList.add('collapsed');
+            localStorage.setItem('cnc-collapsed-categories', JSON.stringify(['allies']));
+
+            applyCollapsedStates();
+
+            expect(localThis.section.classList.contains('collapsed')).toBe(true);
+        });
+
+        test('applyCollapsedStates should collapse a section without a header', () => {
+            const localThis = {};
+            localThis.section = document.getElementById('category-allies');
+            localThis.section.querySelector('.category-header').remove();
+            localStorage.setItem('cnc-collapsed-categories', JSON.stringify(['allies']));
+
+            applyCollapsedStates();
+
+            expect(localThis.section.classList.contains('collapsed')).toBe(true);
         });
     });
 

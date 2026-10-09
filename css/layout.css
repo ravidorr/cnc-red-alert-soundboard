@@ -255,6 +255,7 @@
 
 .footer-version {
     color: var(--text-dim);
+    font-family: var(--font-secondary);
     font-size: 0.8rem;
 }
 
@@ -296,7 +297,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.85);
+    background: rgb(0, 0, 0, 0.85);
     display: none;
     justify-content: center;
     align-items: center;
@@ -454,7 +455,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.85);
+    background: rgb(0, 0, 0, 0.85);
     display: none;
     justify-content: center;
     align-items: center;

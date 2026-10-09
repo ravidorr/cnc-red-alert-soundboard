@@ -9,7 +9,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="C&C Sounds">
-    
+
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://ravidorr.github.io/cnc-red-alert-soundboard/">
@@ -18,30 +18,26 @@
     <meta property="og:image" content="https://ravidorr.github.io/cnc-red-alert-soundboard/assets/og-image.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-    
+
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:url" content="https://ravidorr.github.io/cnc-red-alert-soundboard/">
     <meta name="twitter:title" content="Free Red Alert Soundboard - 150+ Classic C&C Sound Effects Online">
     <meta name="twitter:description" content="Play 150+ Command & Conquer Red Alert sounds instantly. Tanya quotes, Allied & Soviet voices, Tesla coil, explosions. Free online, works offline. No download.">
     <meta name="twitter:image" content="https://ravidorr.github.io/cnc-red-alert-soundboard/assets/og-image.png">
-    
+
     <!-- Canonical URL -->
     <link rel="canonical" href="https://ravidorr.github.io/cnc-red-alert-soundboard/">
-    
-    <title>Free Red Alert Soundboard - 150+ Classic C&C Sound Effects Online</title>
-    
+
+    <title>Free Red Alert Soundboard - 150+ Classic C&amp;C Sound Effects Online</title>
+
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/svg+xml" href="assets/icons/icon.svg">
     <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/icon-192.png">
     <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&display=swap" rel="stylesheet">
-    
+
     <link rel="stylesheet" href="dist/css/bundle.css?v=32">
-    
+
     <!-- Structured Data - WebApplication -->
     <script type="application/ld+json">
     {
@@ -69,11 +65,11 @@
             "description": "Original creators of Command & Conquer Red Alert"
         },
         "datePublished": "2026-01-17",
-        "dateModified": "2026-01-30",
-        "softwareVersion": "3.1.1"
+        "dateModified": "2026-10-09",
+        "softwareVersion": "3.1.2"
     }
     </script>
-    
+
     <!-- Structured Data - FAQPage -->
     <script type="application/ld+json">
     {
@@ -163,7 +159,7 @@
         ]
     }
     </script>
-    
+
     <!-- Structured Data - ItemList for Sound Categories -->
     <script type="application/ld+json">
     {
@@ -188,7 +184,7 @@
         ]
     }
     </script>
-    
+
     <!-- Structured Data - BreadcrumbList -->
     <script type="application/ld+json">
     {
@@ -206,40 +202,40 @@
 <body>
     <a href="#content-area" class="skip-link">Skip to content</a>
     <div class="scanlines"></div>
-    
-    <header class="main-header" role="banner">
+
+    <header class="main-header">
         <div class="header-content">
-            <button class="mobile-menu-toggle" id="mobile-menu-toggle" aria-label="Open categories menu" aria-expanded="false">
+            <button type="button" class="mobile-menu-toggle" id="mobile-menu-toggle" aria-label="Open categories menu" aria-expanded="false">
                 <span class="hamburger-icon"></span>
             </button>
             <div class="logo">
                 <h1 class="logo-heading">
-                    <span class="logo-text">C&C</span>
+                    <span class="logo-text">C&amp;C</span>
                     <span class="logo-subtitle">RED ALERT SOUNDBOARD</span>
                 </h1>
             </div>
             <div class="header-controls">
                 <div class="search-container">
                     <label for="search-input" class="visually-hidden">Search sounds</label>
-                    <input type="search" id="search-input" placeholder="Search sounds..." autocomplete="off">
-                    <button id="clear-search" class="btn-icon" aria-label="Clear search" title="Clear search">&times;</button>
+                    <input type="search" id="search-input" class="search-input" placeholder="Search sounds..." autocomplete="off">
+                    <button type="button" id="clear-search" class="btn-icon clear-search" aria-label="Clear search" title="Clear search">&times;</button>
                 </div>
                 <div class="volume-container">
                     <label for="volume-slider" class="visually-hidden">Volume</label>
-                    <button id="volume-toggle" class="btn-icon btn-volume" aria-label="Toggle mute" title="Toggle mute">
+                    <button type="button" id="volume-toggle" class="btn-icon btn-volume" aria-label="Toggle mute" title="Toggle mute">
                         <svg id="volume-icon" viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
                             <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
                         </svg>
                     </button>
-                    <input type="range" id="volume-slider" min="0" max="100" value="100" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" aria-valuetext="100 percent">
+                    <input type="range" id="volume-slider" class="volume-slider" min="0" max="100" value="100" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" aria-valuetext="100 percent">
                 </div>
-                <button id="random-sound" class="btn-action btn-random" title="Play random sound">
+                <button type="button" id="random-sound" class="btn-action btn-random" title="Play random sound">
                     <svg class="random-icon" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">
                         <path d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"/>
                     </svg>
                     <span class="random-text">RANDOM</span>
                 </button>
-                <button id="install-btn" class="btn-action btn-install-header" title="Install App">
+                <button type="button" id="install-btn" class="btn-action btn-install-header" title="Install App">
                     <svg class="install-icon" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">
                         <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
                     </svg>
@@ -252,7 +248,7 @@
 
     <div class="mobile-menu-overlay" id="mobile-menu-overlay"></div>
 
-    <main class="main-content" role="main">
+    <main class="main-content">
         <aside class="sidebar" id="sidebar" aria-label="Categories menu">
             <nav class="category-nav" id="category-nav" aria-label="Sound categories">
                 <div class="nav-header">CATEGORIES</div>
@@ -263,10 +259,10 @@
         <div class="content-area" id="content-area">
             <!-- SEO intro content - visible to search engines, hidden visually after JS loads -->
             <section class="seo-intro" id="seo-intro">
-                <h2>Command & Conquer Red Alert Soundboard</h2>
+                <h2>Command &amp; Conquer Red Alert Soundboard</h2>
                 <p>A <strong>soundboard</strong> is a web application that plays audio clips on demand with a single click. This <strong>Red Alert soundboard</strong> lets you instantly play over 150 sound effects from the classic 1996 game - no downloads required, works offline after your first visit.</p>
-                <p>Relive the nostalgia of <strong>Command & Conquer: Red Alert</strong> with this free online soundboard featuring over 150 classic sound effects. Play iconic quotes from <strong>Tanya</strong>, hear Allied and Soviet unit voices, explosions, building sounds, and more from the legendary 1996 RTS game by Westwood Studios.</p>
-                
+                <p>Relive the nostalgia of <strong>Command &amp; Conquer: Red Alert</strong> with this free online soundboard featuring over 150 classic sound effects. Play iconic quotes from <strong>Tanya</strong>, hear Allied and Soviet unit voices, explosions, building sounds, and more from the legendary 1996 RTS game by Westwood Studios.</p>
+
                 <h3>Featured Sound Categories</h3>
                 <ul class="seo-sound-list">
                     <li><strong>Tanya Quotes</strong> (15 sounds) - Iconic commando voice lines: "Let's Rock", "Shake It Baby", "Chew On This", "Kiss It Bye Bye", "Give It To Me", "I'm There", "That's All You Got", "What's Up", and her signature laugh</li>
@@ -275,71 +271,71 @@
                     <li><strong>Special Units</strong> (20+ sounds) - Engineer: "Engineering", "Movin' Out"; Medic: "Reporting"; Spy: "For King and Country", "Indeed", "On My Way"; Thief: "Yeah", "OK"; Einstein: "Ah", "Yes", "Incredible"</li>
                     <li><strong>Combat Sounds</strong> (25+ sounds) - Minigun fire, pistol shots, explosions, water explosions, anti-personnel mines, anti-tank mines, air-to-air missiles, ground-to-air missiles, cruiser missiles, torpedoes, flame sounds</li>
                     <li><strong>Vehicles</strong> (10+ sounds) - Light Tank gun, Mammoth Tank gun, Artillery fire, Cruiser cannon, Destroyer shot, Submarine uncloaking, Paratrooper drops</li>
-                    <li><strong>Buildings & Defenses</strong> (20+ sounds) - Building placement, construction sounds, Tesla coil charge and shot, Pillbox, Flame turret, Power up/down, Selling, Building destroyed</li>
+                    <li><strong>Buildings &amp; Defenses</strong> (20+ sounds) - Building placement, construction sounds, Tesla coil charge and shot, Pillbox, Flame turret, Power up/down, Selling, Building destroyed</li>
                     <li><strong>Attack Dogs</strong> (6 sounds) - Barking, growling, combat sounds</li>
                     <li><strong>Superweapons</strong> - Chronosphere teleportation effect, Iron Curtain invincibility activation</li>
-                    <li><strong>UI & Map</strong> (15+ sounds) - Radar alert, Sonar pulse, Credit sounds, Map wipes, Briefing tones, Keystrokes</li>
+                    <li><strong>UI &amp; Map</strong> (15+ sounds) - Radar alert, Sonar pulse, Credit sounds, Map wipes, Briefing tones, Keystrokes</li>
                 </ul>
-                
+
                 <h3>Soundboard Features</h3>
                 <p>This <strong>Command and Conquer soundboard</strong> is a Progressive Web App (PWA) that works offline after your first visit. Features include: instant sound search, favorites system with keyboard shortcuts (press 1-9), volume control, random sound button, and mobile-friendly design. Install it on your device for quick access to all <strong>Red Alert voice lines</strong> and sound effects.</p>
-                
+
                 <h3>About Red Alert</h3>
-                <p><strong>Command & Conquer: Red Alert</strong> was released on October 31, 1996 by <a href="https://en.wikipedia.org/wiki/Westwood_Studios" target="_blank" rel="noopener">Westwood Studios</a> and published by Virgin Interactive. Set in an alternate timeline where Einstein prevents World War II by eliminating Hitler, the game pits the Allied Forces against the Soviet Union in a classic real-time strategy showdown.</p>
+                <p><strong>Command &amp; Conquer: Red Alert</strong> was released on October 31, 1996 by <a href="https://en.wikipedia.org/wiki/Westwood_Studios" target="_blank" rel="noopener">Westwood Studios</a> and published by Virgin Interactive. Set in an alternate timeline where Einstein prevents World War II by eliminating Hitler, the game pits the Allied Forces against the Soviet Union in a classic real-time strategy showdown.</p>
                 <p>Red Alert became one of the most influential <strong>RTS games</strong> ever made, selling over 10 million copies worldwide. The game's memorable unit voices - especially <strong>Tanya's one-liners</strong> like "Shake It Baby" and "Let's Rock," plus the satisfying "Acknowledged" and "Affirmative" responses - have become iconic in gaming culture and popular internet memes.</p>
-                <p>In 2020, <a href="https://www.ea.com/games/command-and-conquer/command-and-conquer-remastered-collection" target="_blank" rel="noopener">EA released a Remastered Collection</a> with updated graphics, but this soundboard preserves the original 1996 audio - the authentic sounds that 90s gamers remember. Westwood Studios was later acquired by EA in 1998, but their legacy lives on through these classic <strong>C&C Red Alert sounds</strong>.</p>
+                <p>In 2020, <a href="https://www.ea.com/games/command-and-conquer/command-and-conquer-remastered-collection" target="_blank" rel="noopener">EA released a Remastered Collection</a> with updated graphics, but this soundboard preserves the original 1996 audio - the authentic sounds that 90s gamers remember. Westwood Studios was later acquired by EA in 1998, but their legacy lives on through these classic <strong>C&amp;C Red Alert sounds</strong>.</p>
             </section>
-            
+
             <!-- Noscript fallback for search engines and non-JS browsers -->
             <noscript>
                 <section class="noscript-content">
                     <h2>Red Alert Sound Categories</h2>
                     <p>This soundboard requires JavaScript to play sounds. Below is a list of all available sound categories:</p>
-                    
+
                     <h3>Allied Forces (30+ sounds)</h3>
                     <p>Unit acknowledgment voices: Acknowledged, Affirmative, Yes Sir, Reporting, Vehicle Reporting, Waiting Orders, Ready and Waiting, Very Well, At Once, Of Course, As You Wish, Agreed.</p>
-                    
+
                     <h3>Soviet Forces (25+ sounds)</h3>
                     <p>Soviet unit voices with Russian accents: Acknowledged, Affirmative, Yes Sir, Reporting, Vehicle Reporting, Waiting Orders, Comrade, Ready and Waiting, Very Well, At Once, Of Course, As You Wish, Agreed.</p>
-                    
+
                     <h3>Tanya (15 sounds)</h3>
                     <p>Iconic Tanya quotes and sounds: Yeah, Yes Sir, Chew On This, Give It To Me, I'm There, Kiss It Bye Bye, Laugh, Let's Rock, Shake It Baby, That's All You Got, What's Up, Cha-Ching, Dart Shot, Death, Silenced Shot.</p>
-                    
+
                     <h3>Special Units (20+ sounds)</h3>
                     <p>Engineer: Affirmative, Engineering, Movin' Out, Yes Sir. Medic: Affirmative, Movin' Out, Reporting, Yes Sir, Heal Sound. Spy: Commander, For King and Country, Indeed, On My Way, Yes Sir. Thief: What, Affirmative, Movin' Out, Yeah, OK. Einstein: Ah, Yes, Incredible.</p>
-                    
+
                     <h3>Combat (25+ sounds)</h3>
                     <p>Weapons and explosions: Minigunner, Pistol, Rapid Fire, Ranger Fire, Flame sounds, Explosion, Water Explosion, Anti-Personnel Mine, Anti-Tank Mine, Mine Placed, Air-to-Air Missile, Ground-to-Air Missile, Cruiser Missile, Torpedoes.</p>
-                    
+
                     <h3>Vehicles (10+ sounds)</h3>
                     <p>Vehicle weapons: Light Tank Gun, Mammoth Tank Gun, Artillery, Cruiser Cannon, Destroyer Shot, Sub Uncloaking, Paratroops.</p>
-                    
+
                     <h3>Buildings and Defenses (20+ sounds)</h3>
                     <p>Construction and defense: Building Placed, Placement Sound, Building Destroyed, Building Damaged, Power Up, Power Down, Selling, Turret, Pillbox, Flame Turret Up/Down, Tesla Charge, Tesla Shot, Wall sounds, Fence Over, Barrier Over.</p>
-                    
+
                     <h3>Attack Dogs (6 sounds)</h3>
                     <p>Dog Angry, Dog Angry #2, Dog Die, Dog Suffering, Dog Woof, Dog Woof #2.</p>
-                    
+
                     <h3>Casualties (10 sounds)</h3>
                     <p>Infantry death sounds: Death #1-9, Squashed.</p>
-                    
+
                     <h3>Civilians (4 sounds)</h3>
                     <p>Civilian OK, Civilian Yeah, Girl OK, Girl Yeah.</p>
-                    
+
                     <h3>UI and Map (15+ sounds)</h3>
                     <p>Interface sounds: Alarm, Radar Alert, Radar Power On, Sonar Pulse, Credit In, Credit Out, Map sounds, Map Wipe, Briefing, Keystroke.</p>
-                    
+
                     <h3>Miscellaneous (15+ sounds)</h3>
                     <p>Special effects: Chronosphere, Iron Curtain, Appear, Clock, Country sounds, Scold, Beeps, Bleeps, Tones.</p>
-                    
+
                     <p><strong>Enable JavaScript to use the interactive soundboard with search, favorites, and offline support.</strong></p>
                 </section>
             </noscript>
-            
+
             <!-- Search result indicator -->
             <div class="search-result-indicator" id="search-result-indicator" style="display: none;">
-                <span id="search-result-text"></span>
-                <button class="btn-clear-filter" id="btn-clear-filter">CLEAR</button>
+                <span id="search-result-text" class="search-result-text"></span>
+                <button type="button" class="btn-clear-filter" id="btn-clear-filter">CLEAR</button>
             </div>
             <!-- Sound categories and buttons will be populated by JS -->
         </div>
@@ -352,20 +348,20 @@
             </div>
             <div class="empty-state-title">TARGET NOT FOUND</div>
             <div class="empty-state-text">No intel on "<span id="search-empty-term"></span>". Try "explosion", "Tanya", or browse by category.</div>
-            <button class="btn-action btn-clear-search" id="btn-clear-search">Clear Search</button>
+            <button type="button" class="btn-action btn-clear-search" id="btn-clear-search">Clear Search</button>
         </div>
     </main>
 
-    <footer class="main-footer" role="contentinfo">
+    <footer class="main-footer">
         <div class="footer-content">
             <span class="footer-text">ESTABLISHING BATTLEFIELD CONTROL... STAND BY.</span>
             <div class="footer-actions">
-                <button id="contact-btn" class="btn-contact" aria-label="Contact us" title="Contact us">
+                <button type="button" id="contact-btn" class="btn-contact" aria-label="Contact us" title="Contact us">
                     <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">
                         <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
                     </svg>
                 </button>
-                <button id="help-btn" class="btn-help" aria-label="Keyboard shortcuts" title="Keyboard shortcuts">?</button>
+                <button type="button" id="help-btn" class="btn-help" aria-label="Keyboard shortcuts" title="Keyboard shortcuts">?</button>
                 <span class="footer-version"></span>
             </div>
         </div>
@@ -403,8 +399,8 @@
                 </div>
             </div>
             <div class="shortcuts-actions">
-                <button class="btn-secondary" id="show-tips-btn">SHOW TIPS</button>
-                <button class="btn-dismiss" id="shortcuts-close">CLOSE</button>
+                <button type="button" class="btn-secondary" id="show-tips-btn">SHOW TIPS</button>
+                <button type="button" class="btn-dismiss" id="shortcuts-close">CLOSE</button>
             </div>
         </div>
     </div>
@@ -444,7 +440,7 @@
                 </a>
             </div>
             <div class="contact-actions">
-                <button class="btn-dismiss" id="contact-close">CLOSE</button>
+                <button type="button" class="btn-dismiss" id="contact-close">CLOSE</button>
             </div>
         </div>
     </div>
@@ -466,8 +462,8 @@
                 <div class="install-prompt-subtitle">Go offline-capable. Launch instantly. All sounds cached.</div>
             </div>
             <div class="install-prompt-actions">
-                <button class="btn-install" id="btn-install">INSTALL</button>
-                <button class="btn-dismiss" id="btn-dismiss">DISMISS</button>
+                <button type="button" class="btn-install" id="btn-install">INSTALL</button>
+                <button type="button" class="btn-dismiss" id="btn-dismiss">DISMISS</button>
             </div>
         </div>
     </div>
@@ -480,18 +476,18 @@
             <h2 id="confirm-title" class="confirm-title">CONFIRM OPERATION</h2>
             <p id="confirm-message" class="confirm-message"></p>
             <div class="confirm-actions">
-                <button class="btn-confirm-execute" id="confirm-execute">EXECUTE</button>
-                <button class="btn-confirm-abort" id="confirm-abort">ABORT</button>
+                <button type="button" class="btn-confirm-execute" id="confirm-execute">EXECUTE</button>
+                <button type="button" class="btn-confirm-abort" id="confirm-abort">ABORT</button>
             </div>
         </div>
     </div>
 
-    <button id="back-to-top" class="btn-back-to-top" aria-label="Back to top" title="Back to top">
+    <button type="button" id="back-to-top" class="btn-back-to-top" aria-label="Back to top" title="Back to top">
         <span aria-hidden="true">&#9650;</span>
     </button>
 
     <div class="toast-container" id="toast-container" aria-live="polite"></div>
-    
+
     <!-- Screen reader announcements -->
     <div id="search-announcer" class="visually-hidden" aria-live="polite" aria-atomic="true"></div>
 

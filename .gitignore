@@ -20,5 +20,11 @@ Thumbs.db
 # Test coverage
 coverage/
 
-# npm
-package-lock.json
+# Generated web and documentation outputs
+dist/
+.lighthouseci/
+storybook-static/
+
+# Environment files
+.env*
+!.env.example

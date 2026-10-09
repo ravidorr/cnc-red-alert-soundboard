@@ -18,6 +18,7 @@ const distCssDir = join(rootDir, 'dist', 'css');
 
 // CSS files in the correct order (matching the @import order in styles.css)
 const CSS_FILES = [
+    'fonts.css',
     'variables.css',
     'base.css',
     'accessibility.css',

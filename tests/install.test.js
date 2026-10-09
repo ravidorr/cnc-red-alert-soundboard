@@ -419,6 +419,19 @@ describe('Install Functions', () => {
     });
 
     describe('registerServiceWorker', () => {
+        test('should not register when service workers are unavailable', () => {
+            const localThis = {};
+            localThis.serviceWorkerDescriptor = Object.getOwnPropertyDescriptor(navigator, 'serviceWorker');
+            delete navigator.serviceWorker;
+
+            expect('serviceWorker' in navigator).toBe(false);
+            expect(() => registerServiceWorker()).not.toThrow();
+
+            if (localThis.serviceWorkerDescriptor) {
+                Object.defineProperty(navigator, 'serviceWorker', localThis.serviceWorkerDescriptor);
+            }
+        });
+
         test('should not throw', () => {
             expect(() => {
                 registerServiceWorker();
@@ -468,8 +481,6 @@ describe('Install Functions', () => {
         });
 
         test('should return early if serviceWorker not available', () => {
-            const localThis = {};
-            localThis.consoleSpy = jest.spyOn(console, 'log').mockImplementation();
             // Remove serviceWorker
             const originalServiceWorker = navigator.serviceWorker;
             delete navigator.serviceWorker;
@@ -481,8 +492,9 @@ describe('Install Functions', () => {
 
             cacheAllSoundsForOffline();
 
-            expect(localThis.consoleSpy).toHaveBeenCalledWith('Service worker not available for caching');
-            localThis.consoleSpy.mockRestore();
+            expect(document.querySelector('.toast-error').textContent).toContain(
+                'SERVICE WORKER UNAVAILABLE',
+            );
             // Restore
             Object.defineProperty(navigator, 'serviceWorker', {
                 value: originalServiceWorker,
@@ -492,8 +504,6 @@ describe('Install Functions', () => {
         });
 
         test('should return early if no controller', () => {
-            const localThis = {};
-            localThis.consoleSpy = jest.spyOn(console, 'log').mockImplementation();
             Object.defineProperty(navigator, 'serviceWorker', {
                 value: { controller: null },
                 writable: true,
@@ -502,8 +512,9 @@ describe('Install Functions', () => {
 
             cacheAllSoundsForOffline();
 
-            expect(localThis.consoleSpy).toHaveBeenCalledWith('Service worker not available for caching');
-            localThis.consoleSpy.mockRestore();
+            expect(document.querySelector('.toast-error').textContent).toContain(
+                'SERVICE WORKER UNAVAILABLE',
+            );
         });
 
         test('should send CACHE_ALL_SOUNDS message to service worker', () => {
@@ -545,12 +556,10 @@ describe('Install Functions', () => {
             localThis.capturedMessageChannel = null;
             // Override MessageChannel to capture the instance
             const OriginalMessageChannel = global.MessageChannel;
-            global.MessageChannel = class {
-                constructor() {
-                    this.port1 = { onmessage: null };
-                    this.port2 = {};
-                    localThis.capturedMessageChannel = this;
-                }
+            global.MessageChannel = function MockMessageChannel() {
+                this.port1 = { onmessage: null };
+                this.port2 = {};
+                localThis.capturedMessageChannel = this;
             };
             localThis.mockPostMessage = jest.fn();
             Object.defineProperty(navigator, 'serviceWorker', {
@@ -579,12 +588,10 @@ describe('Install Functions', () => {
             localThis.capturedMessageChannel = null;
             // Override MessageChannel to capture the instance
             const OriginalMessageChannel = global.MessageChannel;
-            global.MessageChannel = class {
-                constructor() {
-                    this.port1 = { onmessage: null };
-                    this.port2 = {};
-                    localThis.capturedMessageChannel = this;
-                }
+            global.MessageChannel = function MockMessageChannel() {
+                this.port1 = { onmessage: null };
+                this.port2 = {};
+                localThis.capturedMessageChannel = this;
             };
             localThis.mockPostMessage = jest.fn();
             Object.defineProperty(navigator, 'serviceWorker', {
@@ -613,12 +620,10 @@ describe('Install Functions', () => {
             localThis.capturedMessageChannel = null;
             // Override MessageChannel to capture the instance
             const OriginalMessageChannel = global.MessageChannel;
-            global.MessageChannel = class {
-                constructor() {
-                    this.port1 = { onmessage: null };
-                    this.port2 = {};
-                    localThis.capturedMessageChannel = this;
-                }
+            global.MessageChannel = function MockMessageChannel() {
+                this.port1 = { onmessage: null };
+                this.port2 = {};
+                localThis.capturedMessageChannel = this;
             };
             localThis.mockPostMessage = jest.fn();
             Object.defineProperty(navigator, 'serviceWorker', {
@@ -683,6 +688,27 @@ describe('Install Functions', () => {
             expect(notification.getAttribute('role')).toBe('alert');
         });
 
+        test('should show the notification when its optional action buttons are unavailable', () => {
+            const localThis = {};
+            localThis.originalQuerySelector = HTMLElement.prototype.querySelector;
+            localThis.querySelectorSpy = jest
+                .spyOn(HTMLElement.prototype, 'querySelector')
+                .mockImplementation(function(selector) {
+                    if (
+                        this.id === 'update-notification'
+                        && (selector === '#update-refresh-btn' || selector === '#update-dismiss-btn')
+                    ) {
+                        return null;
+                    }
+                    return localThis.originalQuerySelector.call(this, selector);
+                });
+
+            showUpdateAvailableNotification();
+
+            expect(document.getElementById('update-notification').classList.contains('visible')).toBe(true);
+            localThis.querySelectorSpy.mockRestore();
+        });
+
         test('hideUpdateNotification should hide notification', () => {
             showUpdateAvailableNotification();
             hideUpdateNotification();
@@ -705,21 +731,20 @@ describe('Install Functions', () => {
             expect(notification.classList.contains('visible')).toBe(false);
         });
 
-        test('refresh button should call window.location.reload', () => {
-            // Mock location.reload using Object.defineProperty
-            const reloadMock = jest.fn();
-            Object.defineProperty(window, 'location', {
-                value: { ...window.location, reload: reloadMock },
-                writable: true,
-                configurable: true,
-            });
+        test('refresh button should invoke the browser reload flow', () => {
+            const localThis = {
+                consoleErrorSpy: jest
+                    .spyOn(console, 'error')
+                    .mockImplementation(jest.fn()),
+            };
 
             showUpdateAvailableNotification();
 
             const refreshBtn = document.getElementById('update-refresh-btn');
             refreshBtn.click();
 
-            expect(reloadMock).toHaveBeenCalled();
+            expect(localThis.consoleErrorSpy).toHaveBeenCalled();
+            localThis.consoleErrorSpy.mockRestore();
         });
 
         test('showUpdateAvailableNotification should reuse existing notification element', () => {
@@ -773,6 +798,36 @@ describe('Install Functions', () => {
 
             expect(global.setInterval).toHaveBeenCalledWith(expect.any(Function), 60 * 60 * 1000);
             global.setInterval = originalSetInterval;
+        });
+
+        test('registerServiceWorker should invoke registration update on each interval', async () => {
+            const localThis = {};
+            localThis.intervalCallback = null;
+            localThis.mockRegistration = {
+                update: jest.fn(),
+                addEventListener: jest.fn(),
+            };
+            localThis.originalSetInterval = global.setInterval;
+            global.setInterval = jest.fn((callback) => {
+                localThis.intervalCallback = callback;
+            });
+            Object.defineProperty(navigator, 'serviceWorker', {
+                value: {
+                    register: jest.fn().mockResolvedValue(localThis.mockRegistration),
+                    controller: null,
+                },
+                writable: true,
+                configurable: true,
+            });
+
+            registerServiceWorker();
+            window.dispatchEvent(new Event('load'));
+            await Promise.resolve();
+            await Promise.resolve();
+            localThis.intervalCallback();
+
+            expect(localThis.mockRegistration.update).toHaveBeenCalledTimes(1);
+            global.setInterval = localThis.originalSetInterval;
         });
 
         test('registerServiceWorker should listen for updatefound event', async () => {

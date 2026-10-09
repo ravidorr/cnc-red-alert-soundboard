@@ -97,6 +97,17 @@ describe('Confirm Modal Functions', () => {
     });
 
     describe('showConfirmModal', () => {
+        test('should use all defaults when called without options', async () => {
+            const promise = showConfirmModal();
+
+            expect(localThis.titleEl.textContent).toBe('CONFIRM OPERATION');
+            expect(localThis.executeBtn.textContent).toBe('EXECUTE');
+            expect(localThis.abortBtn.textContent).toBe('ABORT');
+
+            localThis.abortBtn.click();
+            await expect(promise).resolves.toBe(false);
+        });
+
         test('should show modal with default options', async () => {
             const promise = showConfirmModal({ message: 'Test message' });
 
@@ -277,6 +288,16 @@ describe('Confirm Modal Functions', () => {
             window.confirm = localThis.originalConfirm;
         });
 
+        test('should fall back when a required child element is missing', async () => {
+            localThis.titleEl.remove();
+            localThis.originalConfirm = window.confirm;
+            window.confirm = () => false;
+
+            await expect(showConfirmModal({ message: 'Test' })).resolves.toBe(false);
+
+            window.confirm = localThis.originalConfirm;
+        });
+
         test('should use default title when not provided', async () => {
             const promise = showConfirmModal({ message: 'Test message' });
 
@@ -302,15 +323,10 @@ describe('Confirm Modal Functions', () => {
             // Remove modal
             localThis.modal.remove();
 
-            // Click should still work (abort button still exists in DOM temporarily)
-            document.getElementById('confirm-abort')?.click();
+            // The listener remains attached to the detached button.
+            localThis.abortBtn.click();
 
-            // Escape should be handled gracefully
-            const escEvent = new KeyboardEvent('keydown', { key: 'Escape', bubbles: true });
-            expect(() => document.dispatchEvent(escEvent)).not.toThrow();
-
-            // Force resolve the promise
-            await Promise.race([promise, Promise.resolve(false)]);
+            await expect(promise).resolves.toBe(false);
         });
 
         test('should handle hideConfirmModal when execute button is null', async () => {

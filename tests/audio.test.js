@@ -238,6 +238,31 @@ describe('Audio Functions', () => {
             }).not.toThrow();
         });
 
+        test('should update volume without a random sound button', () => {
+            const localThis = {};
+            localThis.volumeSlider = document.createElement('input');
+            localThis.volumeSlider.type = 'range';
+            localThis.volumeSlider.id = 'volume-slider';
+            document.body.appendChild(localThis.volumeSlider);
+
+            localThis.volumeToggle = document.createElement('button');
+            localThis.volumeToggle.id = 'volume-toggle';
+            document.body.appendChild(localThis.volumeToggle);
+
+            localThis.volumeIcon = document.createElement('svg');
+            localThis.volumeIcon.id = 'volume-icon';
+            localThis.volumeToggle.appendChild(localThis.volumeIcon);
+            document.getElementById('random-sound').remove();
+
+            cacheElements();
+            setupAudioPlayer();
+            localThis.volumeSlider.value = '0';
+            localThis.volumeSlider.dispatchEvent(new Event('input'));
+
+            expect(state.isMuted).toBe(true);
+            expect(localThis.volumeToggle.classList.contains('muted')).toBe(true);
+        });
+
         test('should show medium volume icon when volume is below 50', () => {
             const localThis = {};
             // Add volume control elements

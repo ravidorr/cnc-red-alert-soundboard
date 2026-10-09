@@ -4,7 +4,7 @@
 import { jest } from '@jest/globals';
 import { setupFullDOM, resetState, resetElements, useFakeTimers, useRealTimers, advanceTimers, mockClipboard, mockWebShare } from './helpers.js';
 import { state, elements } from '../js/state.js';
-import { SOUNDS, CATEGORIES } from '../js/constants.js';
+import { SOUNDS, CATEGORIES, POPULAR_SOUNDS } from '../js/constants.js';
 import {
     cacheElements,
     renderCategories,
@@ -72,6 +72,30 @@ describe('UI Rendering', () => {
                 const buttons = cat.querySelectorAll('.sound-btn');
                 expect(buttons.length).toBeGreaterThan(0);
             });
+        });
+
+        test('should omit categories when their sounds are unavailable', () => {
+            const localThis = {};
+            localThis.originalSounds = [...SOUNDS];
+            SOUNDS.length = 0;
+
+            renderCategories();
+
+            expect(document.querySelectorAll('.category-section')).toHaveLength(0);
+            SOUNDS.push(...localThis.originalSounds);
+        });
+
+        test('should use an unfavorited button when favorite state is undefined', () => {
+            const localThis = {};
+            localThis.originalFavorites = state.favorites;
+            state.favorites = {
+                includes: () => undefined,
+            };
+
+            renderCategories();
+
+            expect(document.querySelector('.favorite-btn').classList.contains('is-favorite')).toBe(false);
+            state.favorites = localThis.originalFavorites;
         });
     });
 
@@ -217,6 +241,12 @@ describe('UI Rendering', () => {
             expect(toast.textContent).toContain('Test message');
         });
 
+        test('should use the default toast type and duration', () => {
+            showToast('Test message');
+
+            expect(document.querySelector('.toast').classList.contains('toast-info')).toBe(true);
+        });
+
         test('toast should have dismiss button', () => {
             showToast('Test message', 'info');
 
@@ -233,6 +263,18 @@ describe('UI Rendering', () => {
 
             const toast = document.querySelector('.toast');
             expect(toast).toBeNull();
+        });
+
+        test('should safely dismiss an already removed toast', () => {
+            const localThis = {};
+            showToast('Test message', 'info');
+            localThis.toast = document.querySelector('.toast');
+            localThis.dismissButton = localThis.toast.querySelector('.toast-dismiss');
+
+            localThis.toast.remove();
+            localThis.dismissButton.click();
+
+            expect(document.querySelector('.toast')).toBeNull();
         });
 
         test('toast should have role alert', () => {
@@ -325,6 +367,46 @@ describe('UI Rendering', () => {
                 toast.dispatchEvent(new Event('mouseleave'));
             }).not.toThrow();
         });
+
+        test('should tolerate a removed toast when its resumed timer expires', () => {
+            const localThis = {};
+            useFakeTimers();
+            showToast('Test message', 'info', 100);
+            localThis.toast = document.querySelector('.toast');
+            localThis.toast.dispatchEvent(new Event('mouseenter'));
+            localThis.toast.remove();
+            localThis.toast.dispatchEvent(new Event('mouseleave'));
+            advanceTimers(2000);
+
+            expect(document.querySelector('.toast')).toBeNull();
+            useRealTimers();
+        });
+
+        test('should tolerate a removed toast when its original timer expires', () => {
+            const localThis = {};
+            useFakeTimers();
+            showToast('Test message', 'info', 100);
+            localThis.toast = document.querySelector('.toast');
+            localThis.toast.remove();
+            advanceTimers(100);
+
+            expect(document.querySelector('.toast')).toBeNull();
+            useRealTimers();
+        });
+
+        test('should tolerate a removed toast when its focus timer expires', () => {
+            const localThis = {};
+            useFakeTimers();
+            showToast('Test message', 'info', 100);
+            localThis.toast = document.querySelector('.toast');
+            localThis.toast.dispatchEvent(new Event('focusin'));
+            localThis.toast.remove();
+            localThis.toast.dispatchEvent(new Event('focusout'));
+            advanceTimers(2000);
+
+            expect(document.querySelector('.toast')).toBeNull();
+            useRealTimers();
+        });
     });
 
     describe('showSearchEmptyState / hideSearchEmptyState', () => {
@@ -354,6 +436,14 @@ describe('UI Rendering', () => {
 
             expect(() => showSearchEmptyState('test')).not.toThrow();
             expect(() => hideSearchEmptyState()).not.toThrow();
+        });
+
+        test('should show the empty state without an empty-term label', () => {
+            elements.searchEmptyTerm = null;
+
+            showSearchEmptyState('test');
+
+            expect(elements.searchEmptyState.style.display).toBe('block');
         });
     });
 
@@ -632,6 +722,37 @@ describe('UI Rendering', () => {
             expect(document.getElementById('drag-tooltip')).toBeNull();
         });
 
+        test('should continue when the drag tooltip dismiss button is unavailable', () => {
+            const localThis = {};
+            localThis.originalGetElementById = document.getElementById.bind(document);
+            localThis.getElementByIdSpy = jest
+                .spyOn(document, 'getElementById')
+                .mockImplementation((id) => {
+                    if (id === 'drag-tooltip-dismiss') {
+                        return null;
+                    }
+                    return localThis.originalGetElementById(id);
+                });
+            state.favorites = ['allies_1_achnoledged.wav', 'allies_1_affirmative.wav'];
+
+            renderFavoritesSection();
+
+            expect(document.getElementById('drag-tooltip')).not.toBeNull();
+            localThis.getElementByIdSpy.mockRestore();
+        });
+
+        test('should tolerate a tooltip removed before its dismiss handler runs', () => {
+            state.favorites = ['allies_1_achnoledged.wav', 'allies_1_affirmative.wav'];
+            renderFavoritesSection();
+
+            const localThis = {};
+            localThis.dismissButton = document.getElementById('drag-tooltip-dismiss');
+            document.getElementById('drag-tooltip').remove();
+            localThis.dismissButton.click();
+
+            expect(document.getElementById('drag-tooltip')).toBeNull();
+        });
+
         test('should not show tooltip if already seen', () => {
             // Set dragTooltipSeen
             localStorage.setItem('dragTooltipSeen', 'true');
@@ -665,6 +786,17 @@ describe('UI Rendering', () => {
 
             const section = document.getElementById('category-popular');
             expect(section).not.toBeNull();
+        });
+
+        test('should not render popular section when no configured sounds are available', () => {
+            const localThis = {};
+            localThis.originalPopularSounds = [...POPULAR_SOUNDS];
+            POPULAR_SOUNDS.length = 0;
+
+            renderPopularSection();
+
+            expect(document.getElementById('category-popular')).toBeNull();
+            POPULAR_SOUNDS.push(...localThis.originalPopularSounds);
         });
 
         test('should handle empty POPULAR_SOUNDS gracefully', () => {

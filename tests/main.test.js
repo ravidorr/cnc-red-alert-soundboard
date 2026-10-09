@@ -57,17 +57,15 @@ describe('Main.js Functions', () => {
         const localThis = {};
 
         beforeEach(() => {
-            // Store original location
-            localThis.originalLocation = window.location;
-
             // Mock history.replaceState
-            localThis.replaceStateSpy = jest.spyOn(window.history, 'replaceState').mockImplementation(() => {});
+            localThis.replaceStateSpy = jest
+                .spyOn(window.history, 'replaceState')
+                .mockImplementation(jest.fn());
         });
 
         afterEach(() => {
             localThis.replaceStateSpy.mockRestore();
-            // Restore original location to prevent test pollution
-            window.location = localThis.originalLocation;
+            window.history.replaceState({}, '', '/');
         });
 
         // Helper to load handleShortcutActions dynamically after DOM is set up
@@ -79,12 +77,7 @@ describe('Main.js Functions', () => {
 
         test('should do nothing when no action parameter', async () => {
             // No ?action parameter
-            delete window.location;
-            window.location = {
-                search: '',
-                pathname: '/',
-                hash: '',
-            };
+            window.history.pushState({}, '', '/');
 
             const handleShortcutActions = await getHandleShortcutActions();
             handleShortcutActions();
@@ -97,12 +90,7 @@ describe('Main.js Functions', () => {
             useFakeTimers();
 
             // Set up URL with action=random
-            delete window.location;
-            window.location = {
-                search: '?action=random',
-                pathname: '/',
-                hash: '',
-            };
+            window.history.pushState({}, '', '/?action=random');
 
             const handleShortcutActions = await getHandleShortcutActions();
             handleShortcutActions();
@@ -110,6 +98,7 @@ describe('Main.js Functions', () => {
             // Should clear URL parameter
             expect(localThis.replaceStateSpy).toHaveBeenCalledWith({}, '', '/');
 
+            expect(() => advanceTimers(500)).not.toThrow();
             useRealTimers();
         });
 
@@ -117,12 +106,7 @@ describe('Main.js Functions', () => {
             useFakeTimers();
 
             // Set up URL with action=search
-            delete window.location;
-            window.location = {
-                search: '?action=search',
-                pathname: '/',
-                hash: '',
-            };
+            window.history.pushState({}, '', '/?action=search');
 
             // Ensure search input is cached in elements
             const searchInput = document.getElementById('search-input');
@@ -143,14 +127,22 @@ describe('Main.js Functions', () => {
             useRealTimers();
         });
 
+        test('should tolerate a missing cached search input for search action', async () => {
+            const localThis = {};
+            useFakeTimers();
+            window.history.pushState({}, '', '/?action=search');
+            elements.searchInput = null;
+            localThis.handleShortcutActions = await getHandleShortcutActions();
+
+            localThis.handleShortcutActions();
+            expect(() => advanceTimers(300)).not.toThrow();
+
+            useRealTimers();
+        });
+
         test('should handle unknown action gracefully', async () => {
             // Set up URL with unknown action
-            delete window.location;
-            window.location = {
-                search: '?action=unknown',
-                pathname: '/',
-                hash: '',
-            };
+            window.history.pushState({}, '', '/?action=unknown');
 
             const handleShortcutActions = await getHandleShortcutActions();
 
@@ -162,12 +154,7 @@ describe('Main.js Functions', () => {
         });
 
         test('should preserve hash when clearing URL', async () => {
-            delete window.location;
-            window.location = {
-                search: '?action=random',
-                pathname: '/app',
-                hash: '#section',
-            };
+            window.history.pushState({}, '', '/app?action=random#section');
 
             const handleShortcutActions = await getHandleShortcutActions();
             handleShortcutActions();
@@ -208,6 +195,58 @@ describe('Main.js Functions', () => {
     });
 
     describe('init flow', () => {
+        test('should initialize the footer, network notifications, and onboarding timer', async () => {
+            const localThis = {};
+            useFakeTimers();
+            localThis.footerVersion = document.createElement('span');
+            localThis.footerVersion.className = 'footer-version';
+            document.body.appendChild(localThis.footerVersion);
+
+            const mainModule = await import('../js/main.js');
+            mainModule.init();
+
+            expect(localThis.footerVersion.textContent).toMatch(/^v/);
+
+            window.dispatchEvent(new Event('online'));
+            expect(document.querySelector('.toast').textContent).toContain('CONNECTION RESTORED');
+
+            window.dispatchEvent(new Event('offline'));
+            expect(document.querySelector('.toast').textContent).toContain('OPERATING OFFLINE MODE');
+
+            advanceTimers(1500);
+            expect(document.getElementById('onboarding-tooltip')).not.toBeNull();
+            useRealTimers();
+        });
+
+        test('should initialize successfully without a footer version element', async () => {
+            const localThis = {};
+            localThis.mainModule = await import('../js/main.js');
+
+            expect(() => localThis.mainModule.init()).not.toThrow();
+        });
+
+        test('should defer initialization until DOMContentLoaded while loading', async () => {
+            const localThis = {};
+            localThis.readyStateDescriptor = Object.getOwnPropertyDescriptor(document, 'readyState');
+            Object.defineProperty(document, 'readyState', {
+                value: 'loading',
+                configurable: true,
+            });
+            jest.resetModules();
+
+            await import('../js/main.js');
+            expect(document.getElementById('content-area').classList.contains('sounds-loaded')).toBe(false);
+
+            document.dispatchEvent(new Event('DOMContentLoaded'));
+
+            expect(document.getElementById('content-area').classList.contains('sounds-loaded')).toBe(true);
+            if (localThis.readyStateDescriptor) {
+                Object.defineProperty(document, 'readyState', localThis.readyStateDescriptor);
+            } else {
+                delete document.readyState;
+            }
+        });
+
         test('should have all required DOM elements for initialization', () => {
             // Verify setupFullDOM creates all needed elements
             expect(document.getElementById('content-area')).not.toBeNull();
