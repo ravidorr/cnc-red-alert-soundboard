@@ -26,7 +26,7 @@ indexHtml = indexHtml.replace(
     `<link rel="manifest" href="data:application/manifest+json,${encodeURIComponent(manifest)}">`,
 );
 indexHtml = indexHtml.replace(
-    '<script type="module" src="dist/js/main.js"></script>',
+    '<script type="module" src="js/main.js"></script>',
     `<script type="module">${javascript}</script>`,
 );
 const serviceWorker = readFileSync(sourceServiceWorkerPath, 'utf8')
