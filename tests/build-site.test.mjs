@@ -23,6 +23,7 @@ describe('build-site script', () => {
     const generatedIndex = readFileSync(localThis.indexPath, 'utf8');
 
     expect(generatedIndex).toContain('<style>');
+    expect(generatedIndex).not.toContain('@font-face');
     expect(generatedIndex).toContain('<script type="module">');
     expect(generatedIndex).toContain('data:application/manifest+json,');
     expect(generatedIndex).not.toContain('href="dist/css/bundle.css');

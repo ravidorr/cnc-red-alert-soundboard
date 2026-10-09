@@ -23,6 +23,7 @@ const bundlePath = join(distCssDir, 'bundle.css');
 
 // CSS files that should be included (matching build-css.js)
 const CSS_FILES = [
+    'fonts.css',
     'variables.css',
     'base.css',
     'accessibility.css',
@@ -105,6 +106,17 @@ describe('build-css script', () => {
         expect(bundle).toContain('--bg-primary:');
         expect(bundle).toContain('--green-primary:');
         expect(bundle).toContain('--font-primary:');
+    });
+
+    it('should preserve local font declarations with a swap display strategy', () => {
+        execSync('node scripts/build-css.js', { cwd: rootDir });
+
+        const bundle = readFileSync(bundlePath, 'utf8');
+
+        expect(bundle).toContain("@font-face {\n    font-family: 'VT323';");
+        expect(bundle).toContain('font-display: swap;');
+        expect(bundle).toContain('vt323-latin-400-normal.woff2');
+        expect(bundle).toContain('share-tech-mono-latin-400-normal.woff2');
     });
 
     it('should preserve media queries from responsive.css', () => {

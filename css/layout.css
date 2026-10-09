@@ -255,6 +255,7 @@
 
 .footer-version {
     color: var(--text-dim);
+    font-family: var(--font-secondary);
     font-size: 0.8rem;
 }
 

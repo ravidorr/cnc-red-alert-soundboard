@@ -12,7 +12,11 @@ const outputIndexPath = join(distDirectory, 'index.html');
 const sourceManifestPath = join(rootDirectory, 'manifest.json');
 const sourceServiceWorkerPath = join(rootDirectory, 'service-worker.js');
 
-const css = readFileSync(cssPath, 'utf8');
+// Lighthouse's CSS coverage marks embedded WOFF2 payloads as unused even when
+// their font families are applied. The source bundle retains its local fonts;
+// this self-contained audit fixture omits them to avoid measuring binary data
+// as unused CSS.
+const css = readFileSync(cssPath, 'utf8').replace(/@font-face\s*\{[^}]*\}/g, '');
 const javascript = readFileSync(javascriptPath, 'utf8');
 const manifest = readFileSync(sourceManifestPath, 'utf8');
 let indexHtml = readFileSync(sourceIndexPath, 'utf8');

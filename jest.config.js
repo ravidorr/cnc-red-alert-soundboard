@@ -8,6 +8,7 @@ export default {
     ],
     coverageDirectory: 'coverage',
     coverageReporters: ['text', 'lcov', 'json-summary'],
+    maxWorkers: 1,
     coverageThreshold: {
         global: {
             branches: 100,
