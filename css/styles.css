@@ -3,8 +3,8 @@
 /* Main stylesheet using CSS @import */
 
 @import url('./variables.css');
+@import url('./fonts.css');
 @import url('./base.css');
-@import url('./accessibility.css');
 @import url('./layout.css');
 @import url('./components.css');
 @import url('./navigation.css');
@@ -13,3 +13,4 @@
 @import url('./install.css');
 @import url('./effects.css');
 @import url('./responsive.css');
+@import url('./accessibility.css');

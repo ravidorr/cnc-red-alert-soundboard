@@ -4,6 +4,7 @@
  * - js/version.js (VERSION constant)
  * - sitemap.xml (lastmod date)
  * - index.html (WebApplication schema: dateModified, softwareVersion)
+ * - SECURITY.md (supported version)
  *
  * Run this after bumping version in package.json:
  *   node scripts/sync-version.js
@@ -62,3 +63,13 @@ indexHtml = indexHtml.replace(
 
 writeFileSync(indexPath, indexHtml);
 console.log(`WebApplication schema updated: v${version}, ${today}`);
+
+// 4. Update the security policy's supported version.
+const securityPath = join(rootDir, 'SECURITY.md');
+let securityPolicy = readFileSync(securityPath, 'utf8');
+securityPolicy = securityPolicy.replace(
+    /(\|\s*)[\d.]+(\s*\|\s*✓\s*\|)/,
+    `$1${version}$2`,
+);
+writeFileSync(securityPath, securityPolicy);
+console.log(`Security policy updated: v${version}`);

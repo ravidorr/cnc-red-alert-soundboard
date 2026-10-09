@@ -2,12 +2,12 @@
 
 Potential improvements identified from codebase review (January 2026).
 
-## Status: ALL COMPLETED (v3.0.0)
+## Status: ALL COMPLETED (v3.1.2)
 
 All 17 improvement items have been implemented across 5 phases:
 
 | Phase | Items | Status |
-|-------|-------|--------|
+| ------- | ------- | -------- |
 | Phase 1 | CSS variables, manifest updates, offline indicators | COMPLETED |
 | Phase 2 | Focus trap, PWA updates, event cleanup, CSS transitions | COMPLETED |
 | Phase 3 | Search optimization, button HTML extraction, rgba variables, manifest icons | COMPLETED |
@@ -15,8 +15,9 @@ All 17 improvement items have been implemented across 5 phases:
 | Phase 5 | Test improvements (fake timers, isolation, mocking, async/await) | COMPLETED |
 
 **Final metrics:**
-- 599 tests passing
-- 98.85% code coverage
+
+- 677 tests passing
+- 100% code coverage
 - All linting passing
 
 ---
@@ -218,6 +219,7 @@ export function createSoundButtonHTML(sound, options = {}) {
 **Issue:** Hardcoded `rgba(0, 255, 0, ...)` values scattered across files instead of using CSS variables.
 
 **Examples:**
+
 - `layout.css:220-221` - Grid background: `rgba(0, 255, 0, 0.03)`
 - `layout.css:404` - Box shadow: `rgba(0, 255, 0, 0.15)`
 - `navigation.css:63` - Background: `rgba(0, 255, 0, 0.05)`
@@ -239,7 +241,8 @@ export function createSoundButtonHTML(sound, options = {}) {
 
 **File:** `manifest.json`
 
-**Issue:** 
+**Issue:**
+
 - Icons have `"purpose": "any maskable"` (should be separate entries)
 - Missing `scope`, `id`, `shortcuts`, and `screenshots`
 
@@ -357,6 +360,7 @@ export function announceToScreenReader(message, id = 'default-announcer', live =
 **Issue:** Mixed transition durations (`0.2s`, `0.3s`, `0.15s`) without clear pattern.
 
 **Examples:**
+
 - `components.css:340` - `transition: all 0.15s ease`
 - `components.css:322` - `transition: max-height 0.3s ease`
 - Most buttons use `0.2s ease`
@@ -417,6 +421,7 @@ setTimeout(() => { /* assertions */ }, 100);
 **Files:** Various test files
 
 **Issue:** Some tests leak state between runs:
+
 - `resetElements()` sets elements to `null` but doesn't clear DOM
 - Global mocks modified without cleanup
 - Event listeners may persist between tests
@@ -480,7 +485,7 @@ test('should handle sound hash', async () => {
 ## Quick Wins - ALL COMPLETED
 
 | Item | File | Status |
-|------|------|--------|
+| ------ | ------ | -------- |
 | Add CSS transition timing variables | `variables.css` | DONE |
 | Add CSS green-alpha variables | `variables.css` | DONE |
 | Add offline/online event listeners | `main.js` | DONE |

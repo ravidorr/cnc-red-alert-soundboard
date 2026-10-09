@@ -14,6 +14,7 @@ import {
     getSortedCategories,
     calculateScrollOffset,
     shouldShowInstallPrompt,
+    debounce,
     loadRecentlyPlayedFromStorage,
     saveRecentlyPlayedToStorage,
     addToRecentlyPlayedArray,
@@ -210,6 +211,23 @@ describe('Pure Functions', () => {
             mockStorage.store.installPromptDismissed = tenDaysAgo.toString();
             const result = shouldShowInstallPrompt(mockStorage, 7);
             expect(result).toBe(true);
+        });
+    });
+
+    describe('debounce', () => {
+        test('should invoke the latest call after the delay', () => {
+            const localThis = {};
+            localThis.callback = jest.fn();
+            localThis.debouncedCallback = debounce(localThis.callback, 100);
+
+            jest.useFakeTimers();
+            localThis.debouncedCallback('first');
+            localThis.debouncedCallback('latest');
+            jest.advanceTimersByTime(100);
+
+            expect(localThis.callback).toHaveBeenCalledTimes(1);
+            expect(localThis.callback).toHaveBeenCalledWith('latest');
+            jest.useRealTimers();
         });
     });
 
@@ -431,6 +449,13 @@ describe('Pure Functions', () => {
             handler(event);
 
             expect(onEscape).toHaveBeenCalled();
+        });
+
+        test('should ignore Escape when no callback is provided', () => {
+            const handler = createFocusTrap(localThis.container);
+            const event = new KeyboardEvent('keydown', { key: 'Escape', bubbles: true });
+
+            expect(() => handler(event)).not.toThrow();
         });
 
         test('should stop propagation when stopPropagation option is true', () => {

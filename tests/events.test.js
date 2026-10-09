@@ -243,6 +243,29 @@ describe('Event Handlers', () => {
             expect(elements.searchInput.value).toBe('');
         });
 
+        test('keyboard activation should clear favorites', async () => {
+            const localThis = {};
+            localThis.confirmModal = document.createElement('div');
+            localThis.confirmModal.id = 'confirm-modal';
+            localThis.confirmModal.innerHTML = `
+                <h2 id="confirm-title"></h2>
+                <p id="confirm-message"></p>
+                <button id="confirm-execute">EXECUTE</button>
+                <button id="confirm-abort">ABORT</button>
+            `;
+            document.body.appendChild(localThis.confirmModal);
+            state.favorites = ['allies_1_achnoledged.wav'];
+            renderFavoritesSection();
+            setupEventListeners();
+
+            localThis.clearButton = document.getElementById('btn-clear-favorites');
+            localThis.clearButton.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }));
+            document.getElementById('confirm-execute').click();
+            await Promise.resolve();
+
+            expect(state.favorites).toEqual([]);
+        });
+
         test('random sound button should play a sound', () => {
             setupEventListeners();
 
@@ -304,6 +327,14 @@ describe('Event Handlers', () => {
 
             // Should not have changed
             expect(section.classList.contains('collapsed')).toBe(wasCollapsed);
+        });
+
+        test('keyboard activation should ignore a target outside the supported controls', () => {
+            setupEventListeners();
+            const localThis = {};
+            localThis.event = new KeyboardEvent('keydown', { key: 'Enter', bubbles: true });
+
+            expect(() => elements.contentArea.dispatchEvent(localThis.event)).not.toThrow();
         });
 
         test('keyboard handler should ignore non-Enter/Space keys on header', () => {
@@ -691,6 +722,12 @@ describe('Event Handlers', () => {
             setupEventListeners();
             const backToTop = document.getElementById('back-to-top');
             expect(backToTop).not.toBeNull();
+        });
+
+        test('should set up listeners without a back to top button', () => {
+            document.getElementById('back-to-top').remove();
+
+            expect(() => setupEventListeners()).not.toThrow();
         });
 
         test('clicking back to top should scroll to top', () => {

@@ -2,7 +2,7 @@
 
 A Progressive Web App (PWA) soundboard featuring 190 classic Command & Conquer Red Alert sound effects with an authentic Red Alert 1 themed UI.
 
-![C&C Red Alert Soundboard](assets/icons/icon-192.png)
+![C&C Red Alert Soundboard](assets/icons/icon.svg)
 
 ## Live Demo
 
@@ -11,6 +11,7 @@ A Progressive Web App (PWA) soundboard featuring 190 classic Command & Conquer R
 ## Features
 
 ### Core Features
+
 - **190 Sound Effects** - Unit voices, combat sounds, building effects, and more
 - **Red Alert 1 Theme** - Green terminal aesthetic with military HUD styling
 - **12 Categories** - Allied Forces, Soviet Forces, Tanya, Special Units, Civilians, Combat, Vehicles, Buildings & Defenses, Attack Dogs, Casualties, UI & Map, Miscellaneous
@@ -21,6 +22,7 @@ A Progressive Web App (PWA) soundboard featuring 190 classic Command & Conquer R
 - **Random Sound** - Play a random sound with one click
 
 ### PWA & Mobile
+
 - **PWA Support** - Install as an app, works offline
 - **Automatic Offline Caching** - All sounds are automatically downloaded when you install the app
 - **Install Button** - One-click installation from the header
@@ -28,10 +30,12 @@ A Progressive Web App (PWA) soundboard featuring 190 classic Command & Conquer R
 - **Mobile Navigation** - Hamburger menu with slide-out category drawer
 
 ### Sharing & Links
+
 - **Share Sounds** - Copy direct links to specific sounds
 - **URL Hash Support** - Share URLs that auto-play sounds (e.g., `#sound=tanya_yeah.wav`)
 
 ### Accessibility (WCAG 2.1 AA)
+
 - **Keyboard Navigation** - Full keyboard support with 3px visible focus indicators
 - **Screen Reader Support** - ARIA landmarks, labels, and live regions for playback announcements
 - **Semantic HTML** - Category headers use proper button elements with aria-expanded/aria-controls
@@ -46,6 +50,7 @@ A Progressive Web App (PWA) soundboard featuring 190 classic Command & Conquer R
 - **Responsive Sidebar** - aria-hidden dynamically managed based on viewport
 
 ### User Feedback
+
 - **Toast Notifications** - Dismissible notifications with keyboard support
 - **Now Playing Indicator** - Shows currently playing sound
 - **First-Time Onboarding** - Helpful tips for new users with 30s display time
@@ -79,7 +84,7 @@ Then visit `http://localhost:8080`
 
 ## Project Structure
 
-```
+```text
 cnc-red-alert-soundboard/
 ├── index.html          # Main HTML file
 ├── manifest.json       # PWA manifest
@@ -91,7 +96,7 @@ cnc-red-alert-soundboard/
 ├── js/
 │   └── main.js         # Application entry point (modular ES6+)
 ├── tests/
-│   ├── *.test.js       # Unit tests (557 tests, 95%+ coverage)
+│   ├── *.test.js       # Unit tests with 100% coverage enforcement
 │   └── helpers.js      # Jest test helpers
 ├── scripts/
 │   ├── sync-version.js # Auto-syncs version to version.js, sitemap, schema
@@ -106,7 +111,7 @@ cnc-red-alert-soundboard/
 
 ### Prerequisites
 
-- Node.js 22+ (see `.nvmrc`)
+- Node.js 24.21.0 (see `.nvmrc`)
 
 ### Setup
 
@@ -117,7 +122,7 @@ npm install
 ### Scripts
 
 | Command | Description |
-|---------|-------------|
+| --------- | ------------- |
 | `npm test` | Run tests |
 | `npm run test:watch` | Run tests in watch mode |
 | `npm run test:coverage` | Run tests with coverage report |
@@ -125,8 +130,11 @@ npm install
 | `npm run lint:js` | Run ESLint |
 | `npm run lint:css` | Run Stylelint |
 | `npm run lint:html` | Run HTMLHint |
+| `npm run lint:md` | Run Markdown linting |
 | `npm run lint:fix` | Auto-fix linting issues |
 | `npm run build:css` | Build CSS bundle from modular files |
+| `npm run test:coverage` | Run the 100% coverage gate |
+| `npm run storybook` | Open the design-system documentation |
 | `npm version patch` | Bump patch version (auto-updates version.js, sitemap, schema) |
 | `npm version minor` | Bump minor version |
 | `npm version major` | Bump major version |
@@ -135,7 +143,8 @@ npm install
 
 - **ESLint** - JavaScript linting
 - **Stylelint** - CSS linting
-- **HTMLHint** - HTML validation
+- **html-validate** - HTML validation
+- **markdownlint-cli2** - Markdown validation
 - **Jest** - Unit testing with jsdom
 - **Husky** - Pre-commit hooks
 
@@ -146,22 +155,19 @@ The following checks run automatically before each commit:
 1. JavaScript linting (no errors/warnings)
 2. CSS linting (no errors/warnings)
 3. HTML linting (no errors)
-4. Test coverage (90% minimum)
+4. Test coverage (100% minimum)
 
 ### Test Coverage
 
-Current coverage: **95%+** (452 tests)
+Coverage is enforced at **100%** for lines, functions, branches, and
+statements on every push and in CI.
 
-Coverage thresholds enforced by pre-commit hooks:
-- Statements: 90%
-- Branches: 85%
-- Functions: 90%
-- Lines: 90%
+Run `npm run test:coverage` before opening a pull request.
 
 ## Sound Categories
 
 | Category | Count | Description |
-|----------|-------|-------------|
+| ---------- | ------- | ------------- |
 | Allied Forces | 34 | Allied unit voice responses |
 | Soviet Forces | 26 | Soviet unit voice responses |
 | Tanya | 15 | Tanya's iconic voice lines |
@@ -178,7 +184,7 @@ Coverage thresholds enforced by pre-commit hooks:
 ## Keyboard Shortcuts
 
 | Key | Action |
-|-----|--------|
+| ----- | -------- |
 | `Tab` | Navigate between interactive elements |
 | `Enter` / `Space` | Activate buttons, toggle categories |
 | `Escape` | Stop all sounds, close modals/menus |
@@ -211,12 +217,14 @@ Press `Tab` on page load to reveal the "Skip to content" link, then `Enter` to b
 ## User Personas
 
 ### Primary: "The Nostalgic Commander"
+
 - **Role:** Gaming enthusiast, 25-45 years old
 - **Technical Level:** Moderate - comfortable with web apps
 - **Goals:** Quickly find and play nostalgic C&C sounds for entertainment, share with friends
 - **Context:** Casual use, often on mobile, low-stress environment
 
 ### Secondary: "The Content Creator"
+
 - **Role:** Streamer, YouTuber, meme creator
 - **Technical Level:** High - uses multiple tools
 - **Goals:** Quick access to sound clips for content, download/share functionality
@@ -233,3 +241,12 @@ This is a fan project for personal/educational use only. Command & Conquer and R
 MIT License - See [LICENSE](LICENSE) file for details.
 
 The sound files are property of Electronic Arts Inc. and are included for personal/educational use only.
+
+## Project Documentation
+
+- [Contributing](CONTRIBUTING.md)
+- [Changelog](CHANGELOG.md)
+- [Security](SECURITY.md)
+- [Privacy](PRIVACY.md)
+- [Support](SUPPORT.md)
+- [Design system](design-system/README.md)

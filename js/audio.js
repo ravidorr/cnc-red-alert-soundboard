@@ -80,7 +80,7 @@ function setupVolumeControl() {
             updateVolumeAria(volumeSlider, 0);
         } else {
             // Unmute
-            const restoreVolume = previousVolume > 0 ? previousVolume : 100;
+        const restoreVolume = previousVolume;
             volumeSlider.value = restoreVolume;
             state.audioPlayer.volume = restoreVolume / 100;
             localStorage.setItem('soundboardVolume', restoreVolume);
@@ -92,9 +92,6 @@ function setupVolumeControl() {
 
 // Update volume slider ARIA attributes for screen readers
 function updateVolumeAria(slider, volume) {
-    if (!slider) {
-        return;
-    }
     slider.setAttribute('aria-valuenow', volume);
     slider.setAttribute('aria-valuetext', `${volume} percent`);
 }

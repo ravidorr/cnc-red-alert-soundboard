@@ -4,10 +4,12 @@
  * Normalizes sound filenames to: lowercase, no spaces, no special characters
  */
 
-const fs = require('fs');
-const path = require('path');
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const SOUNDS_DIR = path.join(process.env.HOME, 'Desktop/sounds/sounds');
+const scriptDirectory = path.dirname(fileURLToPath(import.meta.url));
 
 // Helper to normalize a filename
 function normalizeFilename(filename) {
@@ -17,7 +19,7 @@ function normalizeFilename(filename) {
 
     const baseName = filename.slice(0, -4); // Remove .wav
 
-    let normalized = baseName
+    const normalized = baseName
         .toLowerCase()
         // Replace special patterns first
         .replace(/\s*#\s*/g, '_')           // # with optional spaces -> _
@@ -82,7 +84,7 @@ if (newNames.length !== uniqueNewNames.size) {
 }
 
 // Output JSON mapping for use in other scripts
-const mappingPath = path.join(__dirname, 'filename_mapping.json');
+const mappingPath = path.join(scriptDirectory, 'filename_mapping.json');
 fs.writeFileSync(mappingPath, JSON.stringify(mapping, null, 2));
 console.log(`\nMapping saved to: ${mappingPath}`);
 

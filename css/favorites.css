@@ -101,7 +101,7 @@
 
 /* Red accents for Soviet and Combat categories */
 .category-section[data-category="soviets"] .category-header {
-    background: linear-gradient(90deg, rgba(200, 0, 0, 0.15) 0%, var(--bg-panel) 100%);
+    background: linear-gradient(90deg, rgb(200, 0, 0, 0.15) 0%, var(--bg-panel) 100%);
 }
 
 .category-section[data-category="soviets"] .category-name {
@@ -109,7 +109,7 @@
 }
 
 .category-section[data-category="combat"] .category-header {
-    background: linear-gradient(90deg, rgba(200, 0, 0, 0.1) 0%, var(--bg-panel) 100%);
+    background: linear-gradient(90deg, rgb(200, 0, 0, 0.1) 0%, var(--bg-panel) 100%);
 }
 
 .category-section[data-category="combat"] .category-name {

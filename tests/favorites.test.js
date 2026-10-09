@@ -207,7 +207,7 @@ describe('Favorites Functions', () => {
             const dragEvent = new Event('dragstart', { bubbles: true });
             dragEvent.dataTransfer = {
                 effectAllowed: '',
-                setData: () => {},
+                setData: () => undefined,
             };
 
             wrapper.dispatchEvent(dragEvent);
@@ -258,7 +258,7 @@ describe('Favorites Functions', () => {
 
             // Simulate dragstart on wrapper1
             const dragStartEvent = new Event('dragstart', { bubbles: true });
-            dragStartEvent.dataTransfer = { effectAllowed: '', setData: () => {} };
+            dragStartEvent.dataTransfer = { effectAllowed: '', setData: () => undefined };
             wrapper1.dispatchEvent(dragStartEvent);
 
             // Simulate drop on wrapper2
@@ -278,7 +278,7 @@ describe('Favorites Functions', () => {
 
             // Simulate dragstart on the wrapper
             const dragStartEvent = new Event('dragstart', { bubbles: true });
-            dragStartEvent.dataTransfer = { effectAllowed: '', setData: () => {} };
+            dragStartEvent.dataTransfer = { effectAllowed: '', setData: () => undefined };
             wrapper.dispatchEvent(dragStartEvent);
 
             // Simulate dragover on the same wrapper
@@ -299,7 +299,7 @@ describe('Favorites Functions', () => {
 
             // Simulate dragstart on the wrapper
             const dragStartEvent = new Event('dragstart', { bubbles: true });
-            dragStartEvent.dataTransfer = { effectAllowed: '', setData: () => {} };
+            dragStartEvent.dataTransfer = { effectAllowed: '', setData: () => undefined };
             wrapper.dispatchEvent(dragStartEvent);
 
             // Simulate drop on the same wrapper
@@ -339,7 +339,7 @@ describe('Favorites Functions', () => {
 
             // Simulate dragstart - should use fallback name "Sound"
             const dragStartEvent = new Event('dragstart', { bubbles: true });
-            dragStartEvent.dataTransfer = { effectAllowed: '', setData: () => {} };
+            dragStartEvent.dataTransfer = { effectAllowed: '', setData: () => undefined };
 
             // Should not throw
             expect(() => wrapper.dispatchEvent(dragStartEvent)).not.toThrow();
@@ -355,7 +355,7 @@ describe('Favorites Functions', () => {
 
             // Start dragging first wrapper
             const dragStartEvent = new Event('dragstart', { bubbles: true });
-            dragStartEvent.dataTransfer = { effectAllowed: '', setData: () => {} };
+            dragStartEvent.dataTransfer = { effectAllowed: '', setData: () => undefined };
             firstWrapper.dispatchEvent(dragStartEvent);
 
             // Remove the sound button from the dragged element to test edge case
@@ -631,6 +631,18 @@ describe('Favorites Functions', () => {
             useRealTimers();
         });
 
+        test('moveFavoriteUp should continue when the moved favorite has no rendered wrapper', () => {
+            useFakeTimers();
+            state.favorites = ['allies_1_achnoledged.wav', 'nonexistent.wav'];
+            renderFavoritesSection();
+
+            moveFavoriteUp('nonexistent.wav');
+            advanceTimers(100);
+
+            expect(state.favorites).toEqual(['nonexistent.wav', 'allies_1_achnoledged.wav']);
+            useRealTimers();
+        });
+
         test('moveFavoriteUp should focus sound button after move', () => {
             useFakeTimers();
             state.favorites = ['allies_1_achnoledged.wav', 'allies_1_affirmative.wav'];
@@ -722,6 +734,23 @@ describe('Favorites Functions', () => {
             expect(() => moveFavoriteUp('allies_1_affirmative.wav')).not.toThrow();
 
             advanceTimers(100);
+            useRealTimers();
+        });
+
+        test('moveFavoriteUp should handle a button removed before focus restoration', () => {
+            const localThis = {};
+            useFakeTimers();
+            state.favorites = ['allies_1_achnoledged.wav', 'allies_1_affirmative.wav'];
+            renderFavoritesSection();
+
+            moveFavoriteUp('allies_1_affirmative.wav');
+            localThis.wrapper = document.querySelector(
+                `.favorites-section .sound-btn-wrapper[data-file="${encodeURIComponent('allies_1_affirmative.wav')}"]`,
+            );
+            localThis.wrapper.querySelector('.sound-btn').remove();
+            advanceTimers(100);
+
+            expect(state.favorites[0]).toBe('allies_1_affirmative.wav');
             useRealTimers();
         });
     });

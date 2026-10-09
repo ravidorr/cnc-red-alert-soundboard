@@ -18,7 +18,7 @@ const __dirname = dirname(__filename);
 const rootDir = join(__dirname, '..');
 
 describe('sync-version script', () => {
-    /** @type {{ versionJs: string, sitemap: string, indexHtml: string, packageJson: string }} */
+    /** @type {{ versionJs: string, sitemap: string, indexHtml: string, security: string, packageJson: string }} */
     let localThis;
 
     beforeEach(() => {
@@ -27,6 +27,7 @@ describe('sync-version script', () => {
         localThis.versionJs = readFileSync(join(rootDir, 'js', 'version.js'), 'utf8');
         localThis.sitemap = readFileSync(join(rootDir, 'sitemap.xml'), 'utf8');
         localThis.indexHtml = readFileSync(join(rootDir, 'index.html'), 'utf8');
+        localThis.security = readFileSync(join(rootDir, 'SECURITY.md'), 'utf8');
         localThis.packageJson = readFileSync(join(rootDir, 'package.json'), 'utf8');
     });
 
@@ -35,6 +36,7 @@ describe('sync-version script', () => {
         writeFileSync(join(rootDir, 'js', 'version.js'), localThis.versionJs);
         writeFileSync(join(rootDir, 'sitemap.xml'), localThis.sitemap);
         writeFileSync(join(rootDir, 'index.html'), localThis.indexHtml);
+        writeFileSync(join(rootDir, 'SECURITY.md'), localThis.security);
     });
 
     it('should update js/version.js with correct version', () => {
@@ -89,6 +91,15 @@ describe('sync-version script', () => {
         expect(indexHtml).toMatch(new RegExp(`"softwareVersion":\\s*"${packageJson.version}"`));
     });
 
+    it('should update the supported version in SECURITY.md', () => {
+        execSync('node scripts/sync-version.js', { cwd: rootDir });
+
+        const security = readFileSync(join(rootDir, 'SECURITY.md'), 'utf8');
+        const packageJson = JSON.parse(localThis.packageJson);
+
+        expect(security).toContain(`| ${packageJson.version} | ✓ |`);
+    });
+
     it('should preserve other content in sitemap.xml', () => {
         // Run the script
         execSync('node scripts/sync-version.js', { cwd: rootDir });
@@ -132,5 +143,6 @@ describe('sync-version script', () => {
         expect(output).toContain(`Version synced: ${packageJson.version}`);
         expect(output).toContain(`Sitemap lastmod updated: ${today}`);
         expect(output).toContain(`WebApplication schema updated: v${packageJson.version}, ${today}`);
+        expect(output).toContain(`Security policy updated: v${packageJson.version}`);
     });
 });
