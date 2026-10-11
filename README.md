@@ -1,5 +1,15 @@
 # C&C Red Alert Soundboard
 
+[![CI](https://github.com/ravidorr/cnc-red-alert-soundboard/actions/workflows/ci.yml/badge.svg)](https://github.com/ravidorr/cnc-red-alert-soundboard/actions/workflows/ci.yml)
+[![Release](https://github.com/ravidorr/cnc-red-alert-soundboard/actions/workflows/release.yml/badge.svg)](https://github.com/ravidorr/cnc-red-alert-soundboard/actions/workflows/release.yml)
+
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/ravidorr/cnc-red-alert-soundboard/pulls)
+[![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://github.com/ravidorr/cnc-red-alert-soundboard/graphs/commit-activity)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Node.js](https://img.shields.io/badge/Node.js-24-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
+[![ESLint](https://img.shields.io/badge/ESLint-10-4B32C3?logo=eslint&logoColor=white)](https://eslint.org/)
+[![PWA](https://img.shields.io/badge/PWA-enabled-5A0FC8?logo=pwa&logoColor=white)](https://web.dev/progressive-web-apps/)
+
 A Progressive Web App (PWA) soundboard featuring 190 classic Command & Conquer Red Alert sound effects with an authentic Red Alert 1 themed UI.
 
 ![C&C Red Alert Soundboard](assets/icons/icon.svg)
