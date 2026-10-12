@@ -225,17 +225,70 @@ describe('Main.js Functions', () => {
             expect(() => localThis.mainModule.init()).not.toThrow();
         });
 
-        test('should initialize Pendo once with an anonymous visitor when the snippet is loaded', async () => {
+        test('should initialize the queued Pendo agent once when the document is ready', async () => {
             const localThis = {};
-            localThis.mainModule = await import('../js/main.js');
-            localThis.initialize = jest.fn();
-            window.pendo = { initialize: localThis.initialize };
+            localThis.readyStateDescriptor = Object.getOwnPropertyDescriptor(document, 'readyState');
+            Object.defineProperty(document, 'readyState', {
+                value: 'complete',
+                configurable: true,
+            });
+            localThis.pendo = {
+                _q: [],
+            };
+            localThis.initialize = jest.fn((configuration) => {
+                localThis.pendo._q.unshift(['initialize', configuration]);
+            });
+            localThis.pendo.initialize = localThis.initialize;
+            window.pendo = localThis.pendo;
+            jest.resetModules();
 
-            localThis.mainModule.init();
-            delete window.pendo;
+            await import('../js/main.js');
 
             expect(localThis.initialize).toHaveBeenCalledTimes(1);
             expect(localThis.initialize).toHaveBeenCalledWith({ visitor: { id: '' } });
+            expect(localThis.pendo._q).toEqual([
+                ['initialize', { visitor: { id: '' } }],
+            ]);
+            delete window.pendo;
+            if (localThis.readyStateDescriptor) {
+                Object.defineProperty(document, 'readyState', localThis.readyStateDescriptor);
+            } else {
+                delete document.readyState;
+            }
+        });
+
+        test('should initialize the queued Pendo agent after DOMContentLoaded', async () => {
+            const localThis = {};
+            localThis.readyStateDescriptor = Object.getOwnPropertyDescriptor(document, 'readyState');
+            Object.defineProperty(document, 'readyState', {
+                value: 'loading',
+                configurable: true,
+            });
+            localThis.pendo = {
+                _q: [],
+            };
+            localThis.initialize = jest.fn((configuration) => {
+                localThis.pendo._q.unshift(['initialize', configuration]);
+            });
+            localThis.pendo.initialize = localThis.initialize;
+            window.pendo = localThis.pendo;
+            jest.resetModules();
+
+            await import('../js/main.js');
+
+            expect(localThis.initialize).not.toHaveBeenCalled();
+            document.dispatchEvent(new Event('DOMContentLoaded'));
+            expect(localThis.initialize).toHaveBeenCalledTimes(1);
+            expect(localThis.initialize).toHaveBeenCalledWith({ visitor: { id: '' } });
+            expect(localThis.pendo._q).toEqual([
+                ['initialize', { visitor: { id: '' } }],
+            ]);
+            delete window.pendo;
+            if (localThis.readyStateDescriptor) {
+                Object.defineProperty(document, 'readyState', localThis.readyStateDescriptor);
+            } else {
+                delete document.readyState;
+            }
         });
 
         test('should defer initialization until DOMContentLoaded while loading', async () => {
