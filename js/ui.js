@@ -6,6 +6,7 @@ import { SOUNDS, CATEGORIES, POPULAR_SOUNDS } from './constants.js';
 import { state, elements } from './state.js';
 import { getSortedCategories, getSoundsByCategory, isFavorite } from './utils.js';
 import { setupFavoritesDragAndDrop } from './favorites.js';
+import { trackEvent } from './analytics.js';
 
 // Cache DOM elements
 export function cacheElements() {
@@ -362,9 +363,19 @@ export function hideSearchEmptyState() {
 }
 
 // Share a sound using Web Share API (with file) or fallback to clipboard
-export async function shareSound(soundFile, soundName) {
+// sourceSection is the section the share button was used in, for analytics
+export async function shareSound(soundFile, soundName, sourceSection = null) {
     const soundUrl = `sounds/${soundFile}`;
     const pageUrl = `${window.location.origin}${window.location.pathname}#sound=${encodeURIComponent(soundFile)}`;
+    const sound = SOUNDS.find(s => s.file === soundFile);
+    const trackedProperties = {
+        sound_file: soundFile,
+        sound_name: sound ? sound.name : null,
+        sound_category: sound ? sound.category : null,
+        source_section: sourceSection,
+    };
+    // Name of a non-cancel Web Share failure that sent the share to the clipboard fallback
+    let webShareErrorName = null;
 
     // Try Web Share API with file (works on mobile)
     if (navigator.share) {
@@ -383,6 +394,11 @@ export async function shareSound(soundFile, soundName) {
                     files: [file],
                 });
                 showToast('INTEL TRANSMITTED', 'success');
+                trackEvent('sound_shared', {
+                    ...trackedProperties,
+                    share_method: 'web_share_file',
+                    web_share_fallback_used: false,
+                });
                 return;
             }
 
@@ -393,12 +409,18 @@ export async function shareSound(soundFile, soundName) {
                 url: pageUrl,
             });
             showToast('INTEL TRANSMITTED', 'success');
+            trackEvent('sound_shared', {
+                ...trackedProperties,
+                share_method: 'web_share_link',
+                web_share_fallback_used: false,
+            });
             return;
         } catch (err) {
             // User cancelled or share failed - try clipboard fallback
             if (err.name === 'AbortError') {
                 return; // User cancelled, no message needed
             }
+            webShareErrorName = err.name;
         }
     }
 
@@ -406,7 +428,20 @@ export async function shareSound(soundFile, soundName) {
     try {
         await navigator.clipboard.writeText(pageUrl);
         showToast('LINK ACQUIRED', 'success');
-    } catch {
+        trackEvent('sound_shared', {
+            ...trackedProperties,
+            share_method: 'clipboard_link',
+            web_share_fallback_used: webShareErrorName !== null,
+        });
+    } catch (err) {
         showToast('SHARE FAILED. Try again.', 'error');
+        trackEvent('sound_share_failed', {
+            sound_file: soundFile,
+            sound_name: trackedProperties.sound_name,
+            error_name: err.name,
+            web_share_supported: Boolean(navigator.share),
+            web_share_error_name: webShareErrorName,
+            source_section: sourceSection,
+        });
     }
 }

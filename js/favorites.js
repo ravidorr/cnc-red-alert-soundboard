@@ -15,6 +15,7 @@ import {
 import { showToast, renderFavoritesSection } from './ui.js';
 import { renderNavigation } from './navigation.js';
 import { showConfirmModal } from './confirm-modal.js';
+import { trackEvent } from './analytics.js';
 
 // Load favorites from localStorage (wrapper for DOM context)
 export function loadFavorites() {
@@ -53,11 +54,14 @@ export async function clearAllFavorites() {
     renderNavigation();
     updateFavoriteButtons();
     showToast('ALL TARGETS CLEARED', 'info');
+    trackEvent('favorites_cleared', { cleared_count: count });
 }
 
 // Toggle a sound as favorite
-export function toggleFavorite(soundFile) {
+// sourceSection is the section the star was used in, for analytics
+export function toggleFavorite(soundFile, sourceSection = null) {
     const wasAdded = !state.favorites.includes(soundFile);
+    const previousSlot = state.favorites.indexOf(soundFile) + 1;
     state.favorites = toggleFavoriteInArray(state.favorites, soundFile);
     saveFavorites();
     renderFavoritesSection();
@@ -67,10 +71,23 @@ export function toggleFavorite(soundFile) {
     // Show toast feedback with themed copy
     const sound = SOUNDS.find(s => s.file === soundFile);
     const soundName = sound ? sound.name : 'Sound';
+    const trackedProperties = {
+        sound_file: soundFile,
+        sound_name: sound ? sound.name : null,
+        sound_category: sound ? sound.category : null,
+        favorites_count: state.favorites.length,
+        source_section: sourceSection,
+    };
     if (wasAdded) {
         showToast(`Target marked: ${soundName}`, 'success');
+        // Only slots 1-9 can be played with the number-key hotkeys
+        trackEvent('sound_favorited', {
+            ...trackedProperties,
+            favorite_slot: state.favorites.indexOf(soundFile) + 1,
+        });
     } else {
         showToast(`Target unmarked: ${soundName}`, 'info');
+        trackEvent('sound_unfavorited', { ...trackedProperties, previous_slot: previousSlot });
     }
 }
 
@@ -91,9 +108,11 @@ export function updateFavoriteButtons() {
 
 // Reorder favorites by moving draggedFile to targetFile's position
 export function reorderFavorites(draggedFile, targetFile) {
+    const fromIndex = state.favorites.indexOf(draggedFile);
     state.favorites = reorderFavoritesArray(state.favorites, draggedFile, targetFile);
     saveFavorites();
     renderFavoritesSection();
+    trackFavoritesReordered('drag_and_drop', draggedFile, fromIndex, state.favorites.indexOf(draggedFile));
 }
 
 // Move favorite up in the list (keyboard accessible)
@@ -108,6 +127,7 @@ export function moveFavoriteUp(soundFile) {
     state.favorites = newFavorites;
     saveFavorites();
     renderFavoritesSection();
+    trackFavoritesReordered('keyboard', soundFile, index, index - 1);
     // Announce change to screen readers
     announceReorder(soundFile, 'up');
     // Re-focus the moved item
@@ -126,10 +146,27 @@ export function moveFavoriteDown(soundFile) {
     state.favorites = newFavorites;
     saveFavorites();
     renderFavoritesSection();
+    trackFavoritesReordered('keyboard', soundFile, index, index + 1);
     // Announce change to screen readers
     announceReorder(soundFile, 'down');
     // Re-focus the moved item
     focusFavoriteItem(soundFile);
+}
+
+// Report a favorites reorder, which also changes what each 1-9 hotkey plays
+function trackFavoritesReordered(method, soundFile, fromIndex, toIndex) {
+    if (fromIndex === toIndex) {
+        return; // Order unchanged
+    }
+    const sound = SOUNDS.find(s => s.file === soundFile);
+    trackEvent('favorites_reordered', {
+        method,
+        sound_file: soundFile,
+        sound_name: sound ? sound.name : null,
+        from_position: fromIndex + 1,
+        to_position: toIndex + 1,
+        favorites_count: state.favorites.length,
+    });
 }
 
 // Announce reorder to screen readers

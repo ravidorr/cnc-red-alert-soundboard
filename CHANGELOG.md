@@ -8,6 +8,26 @@ this project uses [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+## [3.2.1] - 2026-10-12
+
+### Added
+
+- Pendo Track Events for sound playback (including how it was triggered),
+  playback failures, plays blocked by mute, volume changes, searches, favorites
+  (add, remove, reorder, clear), sharing, shared-link visits, PWA installs and
+  app-shortcut launches, reconnecting after offline use, keyboard shortcuts, and
+  onboarding dismissal. Events are sent only when the Pendo agent is loaded.
+
+### Fixed
+
+- Space on a focused sound button, category header, or the favorites CLEAR
+  button no longer also triggers the global Space replay shortcut. On a
+  Favorites sound, that replay stopped the sound it had just started.
+
+## [3.2.0] - 2026-10-12
+
+### Added
+
 - Novus by Pendo product analytics: `index.html` loads the Pendo agent, and
   the app initializes it once per page load for an anonymous visitor before
   the soundboard renders.

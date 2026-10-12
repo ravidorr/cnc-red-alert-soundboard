@@ -11,6 +11,9 @@ export const state = {
     favorites: [],
     recentlyPlayed: [],
     isMuted: false,
+    // Offline period summarized by the app_connection_restored event
+    offlineSince: null,
+    soundsPlayedWhileOffline: 0,
 };
 
 // DOM Elements
