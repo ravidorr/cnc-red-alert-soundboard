@@ -14,6 +14,17 @@ import { setupEventListeners } from './events.js';
 import { showOnboardingTooltip } from './onboarding.js';
 import { initSidebarAccessibility, setupViewportListener } from './mobile.js';
 
+// Start Novus by Pendo as an anonymous visitor. An empty id lets the agent
+// reuse the id it stored on a previous visit. window.pendo comes from the
+// snippet in index.html; the optional call keeps the app working without it.
+function initializePendo() {
+    window.pendo?.initialize({
+        visitor: {
+            id: '',
+        },
+    });
+}
+
 // Set the app version in the footer
 function setFooterVersion() {
     const versionElement = document.querySelector('.footer-version');
@@ -64,6 +75,7 @@ function handleShortcutActions() {
 
 // Initialize the application
 function init() {
+    initializePendo();
     cacheElements();
     setFooterVersion();
     loadFavorites();
