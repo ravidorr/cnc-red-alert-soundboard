@@ -25,6 +25,8 @@ describe('build-site script', () => {
     expect(generatedIndex).toContain('<style>');
     expect(generatedIndex).not.toContain('@font-face');
     expect(generatedIndex).toContain('<script type="module">');
+    expect(generatedIndex).toContain('cdn.pendo-dev.pendo-dev.com/agent/static/');
+    expect(generatedIndex).toContain("['pointerdown','keydown','touchstart']");
     expect(generatedIndex).toContain('data:application/manifest+json,');
     expect(generatedIndex).not.toContain('href="dist/css/bundle.css');
     expect(generatedIndex).not.toContain('src="dist/js/main.js"');
