@@ -8,8 +8,8 @@ this project uses [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
-- Pinned the development-only `smol-toml` dependency to the patched 1.9.1
-  release.
+- Pinned the development-only `smol-toml` and `katex` dependencies to their
+  patched 1.9.1 and 0.19.0 releases.
 
 ## [3.2.1] - 2026-10-12
 
