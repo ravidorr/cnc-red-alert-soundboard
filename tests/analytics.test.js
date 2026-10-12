@@ -1436,6 +1436,10 @@ describe('Pendo Track Events', () => {
             window.history.replaceState({}, '', '/');
         });
 
+        test('initializes safely when Pendo only exposes tracking', () => {
+            expect(() => localThis.mainModule.init()).not.toThrow();
+        });
+
         test('app_connection_restored summarizes the offline period', () => {
             useFakeTimers();
             window.dispatchEvent(new Event('offline'));

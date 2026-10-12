@@ -19,7 +19,7 @@ import { trackEvent, getDisplayMode, truncateText } from './analytics.js';
 // reuse the id it stored on a previous visit. window.pendo comes from the
 // snippet in index.html; the optional call keeps the app working without it.
 function initializePendo() {
-    window.pendo?.initialize({
+    window.pendo?.initialize?.({
         visitor: {
             id: '',
         },

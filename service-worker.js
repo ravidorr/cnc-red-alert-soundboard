@@ -1,5 +1,5 @@
 // C&C Red Alert Soundboard - Service Worker
-const CACHE_NAME = 'cnc-soundboard-v10';
+const CACHE_NAME = 'cnc-soundboard-v11';
 
 // Core assets to cache immediately
 const CORE_ASSETS = [

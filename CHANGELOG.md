@@ -4,10 +4,6 @@ All notable changes to the C&C Red Alert Soundboard are documented here. The
 format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 this project uses [Semantic Versioning](https://semver.org/).
 
-## [3.2.0] - 2026-10-12
-
-### Added
-
 ## [3.2.1] - 2026-10-12
 
 ### Added
@@ -23,6 +19,7 @@ this project uses [Semantic Versioning](https://semver.org/).
 - Space on a focused sound button, category header, or the favorites CLEAR
   button no longer also triggers the global Space replay shortcut. On a
   Favorites sound, that replay stopped the sound it had just started.
+- Refreshed the service-worker app-shell cache for the analytics module.
 
 ## [3.2.0] - 2026-10-12
 
