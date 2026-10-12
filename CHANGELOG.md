@@ -4,6 +4,13 @@ All notable changes to the C&C Red Alert Soundboard are documented here. The
 format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 this project uses [Semantic Versioning](https://semver.org/).
 
+## [3.2.3] - 2026-10-12
+
+### Changed
+
+- Pinned the development-only `katex` dependency to the patched 0.19.0
+  release.
+
 ## [3.2.2] - 2026-10-12
 
 ### Changed
