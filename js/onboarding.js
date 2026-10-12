@@ -3,6 +3,7 @@
 // ============================================
 
 import { createFocusTrap } from './utils.js';
+import { trackEvent } from './analytics.js';
 
 const ONBOARDING_KEY = 'cnc-onboarding-seen';
 
@@ -54,6 +55,7 @@ export function showOnboardingTooltip() {
     `;
 
     document.body.appendChild(tooltip);
+    const shownAt = Date.now();
 
     // Focus the dismiss button
     const dismissBtn = tooltip.querySelector('#onboarding-dismiss');
@@ -63,12 +65,12 @@ export function showOnboardingTooltip() {
 
     // Handle dismiss
     dismissBtn.addEventListener('click', () => {
-        dismissOnboarding(tooltip);
+        dismissOnboarding(tooltip, 'button', shownAt);
     });
 
     // Handle keyboard events (escape and focus trap)
     const focusTrapHandler = createFocusTrap(tooltip, {
-        onEscape: () => dismissOnboarding(tooltip),
+        onEscape: () => dismissOnboarding(tooltip, 'escape', shownAt),
         onEmptyFocusables: (e) => e.preventDefault(),
     });
     tooltip.addEventListener('keydown', focusTrapHandler);
@@ -76,7 +78,7 @@ export function showOnboardingTooltip() {
     // Auto-dismiss after 30 seconds (extended for accessibility)
     setTimeout(() => {
         if (document.body.contains(tooltip)) {
-            dismissOnboarding(tooltip);
+            dismissOnboarding(tooltip, 'auto_timeout', shownAt);
         }
     }, 30000);
 }
@@ -114,6 +116,7 @@ export function showOnboardingTooltipForced() {
     `;
 
     document.body.appendChild(tooltip);
+    const shownAt = Date.now();
 
     // Focus the dismiss button
     const dismissBtn = tooltip.querySelector('#onboarding-dismiss');
@@ -123,12 +126,12 @@ export function showOnboardingTooltipForced() {
 
     // Handle dismiss
     dismissBtn.addEventListener('click', () => {
-        dismissOnboardingForced(tooltip);
+        dismissOnboardingForced(tooltip, 'button', shownAt);
     });
 
     // Handle keyboard events (escape and focus trap)
     const focusTrapHandler = createFocusTrap(tooltip, {
-        onEscape: () => dismissOnboardingForced(tooltip),
+        onEscape: () => dismissOnboardingForced(tooltip, 'escape', shownAt),
         onEmptyFocusables: (e) => e.preventDefault(),
     });
     tooltip.addEventListener('keydown', focusTrapHandler);
@@ -136,16 +139,38 @@ export function showOnboardingTooltipForced() {
     // Auto-dismiss after 30 seconds
     setTimeout(() => {
         if (document.body.contains(tooltip)) {
-            dismissOnboardingForced(tooltip);
+            dismissOnboardingForced(tooltip, 'auto_timeout', shownAt);
         }
     }, 30000);
 }
 
 /**
+ * Report how the briefing was dismissed. A tooltip that is already hiding
+ * was reported by its first dismissal, so it isn't counted twice.
+ * @param {HTMLElement} tooltip - The tooltip element
+ * @param {string} dismissMethod - 'button', 'escape' or 'auto_timeout'
+ * @param {boolean} isReplay - Whether it was replayed from the shortcuts modal
+ * @param {number} shownAt - Timestamp when the tooltip was shown
+ */
+function trackOnboardingDismissed(tooltip, dismissMethod, isReplay, shownAt) {
+    if (tooltip.classList.contains('hiding')) {
+        return;
+    }
+    trackEvent('onboarding_dismissed', {
+        dismiss_method: dismissMethod,
+        is_replay: isReplay,
+        visible_duration_ms: Date.now() - shownAt,
+    });
+}
+
+/**
  * Dismiss the forced onboarding tooltip (doesn't mark as seen)
  * @param {HTMLElement} tooltip - The tooltip element
+ * @param {string} dismissMethod - 'button', 'escape' or 'auto_timeout'
+ * @param {number} shownAt - Timestamp when the tooltip was shown
  */
-function dismissOnboardingForced(tooltip) {
+function dismissOnboardingForced(tooltip, dismissMethod, shownAt) {
+    trackOnboardingDismissed(tooltip, dismissMethod, true, shownAt);
     tooltip.classList.add('hiding');
     setTimeout(() => {
         if (document.body.contains(tooltip)) {
@@ -157,8 +182,11 @@ function dismissOnboardingForced(tooltip) {
 /**
  * Dismiss the onboarding tooltip
  * @param {HTMLElement} tooltip - The tooltip element
+ * @param {string} dismissMethod - 'button', 'escape' or 'auto_timeout'
+ * @param {number} shownAt - Timestamp when the tooltip was shown
  */
-function dismissOnboarding(tooltip) {
+function dismissOnboarding(tooltip, dismissMethod, shownAt) {
+    trackOnboardingDismissed(tooltip, dismissMethod, false, shownAt);
     markOnboardingSeen(localStorage);
     tooltip.classList.add('hiding');
     setTimeout(() => {

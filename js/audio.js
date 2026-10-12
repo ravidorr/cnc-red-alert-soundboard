@@ -2,18 +2,26 @@
 // Audio - Audio playback functions
 // ============================================
 
-import { SOUNDS } from './constants.js';
+import { SOUNDS, POPULAR_SOUNDS } from './constants.js';
 import { state, elements } from './state.js';
 import { showToast } from './ui.js';
 import { addToRecentlyPlayed } from './recently-played.js';
 import { announce } from './utils.js';
+import { trackEvent, getDisplayMode, truncateText } from './analytics.js';
+import { hasSeenOnboarding } from './onboarding.js';
 
 // Volume state
 let previousVolume = 100;
+// Last volume level the user committed (slider release or mute toggle)
+let committedVolume = 100;
+
+// Latest playback attempt, so the <audio> 'error' listener knows which sound failed
+let currentPlayback = null;
 
 // Setup audio player
 export function setupAudioPlayer() {
     state.audioPlayer = elements.audioPlayer;
+    currentPlayback = null;
 
     state.audioPlayer.addEventListener('ended', () => {
         // Keep now playing visible for 1.5s after sound ends for better UX
@@ -29,6 +37,8 @@ export function setupAudioPlayer() {
 
     state.audioPlayer.addEventListener('error', (e) => {
         console.error('Audio error:', e);
+        const mediaError = state.audioPlayer.error;
+        trackPlaybackFailure(currentPlayback, 'MediaError', mediaError ? mediaError.message : '');
         clearPlayingState();
         showToast('SIGNAL LOST. Check connection and retry.', 'error');
     });
@@ -54,6 +64,7 @@ function setupVolumeControl() {
         updateVolumeIcon(parseInt(savedVolume, 10));
         updateVolumeAria(volumeSlider, parseInt(savedVolume, 10));
     }
+    committedVolume = parseInt(volumeSlider.value, 10);
 
     // Volume slider change
     volumeSlider.addEventListener('input', (e) => {
@@ -67,6 +78,11 @@ function setupVolumeControl() {
         }
     });
 
+    // Volume slider release: report the committed level, not every step while dragging
+    volumeSlider.addEventListener('change', (e) => {
+        trackVolumeChanged(parseInt(e.target.value, 10), 'slider');
+    });
+
     // Volume toggle (mute/unmute)
     volumeToggle.addEventListener('click', () => {
         const currentVolume = parseInt(volumeSlider.value, 10);
@@ -78,6 +94,7 @@ function setupVolumeControl() {
             localStorage.setItem('soundboardVolume', 0);
             updateVolumeIcon(0);
             updateVolumeAria(volumeSlider, 0);
+            trackVolumeChanged(0, 'mute_toggle');
         } else {
             // Unmute
         const restoreVolume = previousVolume;
@@ -86,8 +103,23 @@ function setupVolumeControl() {
             localStorage.setItem('soundboardVolume', restoreVolume);
             updateVolumeIcon(restoreVolume);
             updateVolumeAria(volumeSlider, restoreVolume);
+            trackVolumeChanged(restoreVolume, 'mute_toggle');
         }
     });
+}
+
+// Report a committed volume change; muting matters because it blocks all playback
+function trackVolumeChanged(volume, method) {
+    if (volume === committedVolume) {
+        return;
+    }
+    trackEvent('volume_changed', {
+        volume,
+        previous_volume: committedVolume,
+        is_muted: volume === 0,
+        method,
+    });
+    committedVolume = volume;
 }
 
 // Update volume slider ARIA attributes for screen readers
@@ -133,15 +165,18 @@ function updateVolumeIcon(volume) {
 }
 
 // Play a sound
-export function playSound(button) {
+// trigger tells analytics how playback was requested: 'click', 'keyboard', 'random_button',
+// 'replay_shortcut', 'favorite_hotkey', 'deep_link' or 'pwa_shortcut'
+export function playSound(button, trigger = 'click') {
+    const file = decodeURIComponent(button.dataset.file);
+    const name = button.dataset.name;
+
     // Don't play if muted
     if (state.isMuted) {
         showToast('COMMS SILENCED. Unmute to proceed.', 'info');
+        trackPlayBlockedMuted(trigger, file, name, button.dataset.category);
         return;
     }
-
-    const file = decodeURIComponent(button.dataset.file);
-    const name = button.dataset.name;
 
     // If same sound is playing, stop it
     if (state.currentlyPlaying === button) {
@@ -152,13 +187,24 @@ export function playSound(button) {
     // Clear previous playing state
     clearPlayingState();
 
+    // Capture analytics context now: state can change before play() settles
+    const playback = { file, name, trigger, failureTracked: false };
+    const playedProperties = getSoundPlayedProperties(button, file, name, trigger);
+    currentPlayback = playback;
+
     // Play new sound - encode the filename properly for URL
     const encodedFile = encodeURIComponent(file);
     state.audioPlayer.src = `sounds/${encodedFile}`;
-    state.audioPlayer.play().catch(err => {
+    state.audioPlayer.play().then(() => {
+        trackSoundPlayed(playedProperties);
+    }, err => {
         console.error('Playback failed:', err);
         clearPlayingState();
         showToast('SIGNAL LOST. Check audio settings and retry.', 'error');
+        // AbortError only means the user switched or stopped sounds quickly
+        if (err.name !== 'AbortError') {
+            trackPlaybackFailure(playback, err.name, err.message);
+        }
     });
 
     // Update state
@@ -174,6 +220,64 @@ export function playSound(button) {
 
     // Add to recently played
     addToRecentlyPlayed(file);
+}
+
+// Describe a play for sound_played
+function getSoundPlayedProperties(button, file, name, trigger) {
+    const sound = SOUNDS.find(s => s.file === file) ?? {};
+    const favoriteIndex = state.favorites.indexOf(file);
+    return {
+        sound_file: file,
+        sound_name: name,
+        sound_category: sound.category ?? null,
+        source_section: button.dataset.category,
+        trigger,
+        favorite_slot: favoriteIndex === -1 ? null : favoriteIndex + 1,
+        is_favorite: favoriteIndex !== -1,
+        is_popular: POPULAR_SOUNDS.includes(file),
+        active_search_term: truncateText(state.searchTerm),
+        volume: Math.round(state.audioPlayer.volume * 100),
+        sound_tags: sound.tags ?? [],
+    };
+}
+
+// Report a sound that actually started playing
+function trackSoundPlayed(properties) {
+    // Offline plays are summarized by app_connection_restored once back online
+    if (!navigator.onLine) {
+        state.soundsPlayedWhileOffline += 1;
+    }
+    trackEvent('sound_played', properties);
+}
+
+// Report a failed playback once: the <audio> 'error' event and the play()
+// rejection usually describe the same failure
+function trackPlaybackFailure(playback, errorName, errorMessage) {
+    if (!playback || playback.failureTracked) {
+        return;
+    }
+    playback.failureTracked = true;
+    const mediaError = state.audioPlayer.error;
+    trackEvent('sound_playback_failed', {
+        sound_file: playback.file,
+        sound_name: playback.name,
+        trigger: playback.trigger,
+        error_name: errorName,
+        error_message: truncateText(errorMessage),
+        media_error_code: mediaError ? mediaError.code : null,
+        is_online: navigator.onLine,
+        display_mode: getDisplayMode(),
+    });
+}
+
+// Report a play request that the mute guard turned away
+function trackPlayBlockedMuted(trigger, file, name, sourceSection) {
+    trackEvent('sound_play_blocked_muted', {
+        trigger,
+        sound_file: file,
+        sound_name: name,
+        source_section: sourceSection,
+    });
 }
 
 // Announce playback status to screen readers
@@ -199,10 +303,12 @@ export function clearPlayingState() {
 }
 
 // Play a random sound
-export function playRandomSound() {
+// trigger is 'random_button' for the RANDOM button or 'pwa_shortcut' for the app shortcut
+export function playRandomSound(trigger = 'random_button') {
     // Don't play if muted
     if (state.isMuted) {
         showToast('COMMS SILENCED. Unmute to proceed.', 'info');
+        trackPlayBlockedMuted(trigger, null, null, null);
         return;
     }
 
@@ -211,7 +317,7 @@ export function playRandomSound() {
     // Find the button for this sound and simulate click
     const btn = document.querySelector(`.sound-btn[data-file="${encodeURIComponent(sound.file)}"]`);
     if (btn) {
-        playSound(btn);
+        playSound(btn, trigger);
     }
 }
 
@@ -220,6 +326,9 @@ export function replayLastSound() {
     // Don't play if muted
     if (state.isMuted) {
         showToast('COMMS SILENCED. Unmute to proceed.', 'info');
+        const lastFile = state.recentlyPlayed?.[0] ?? null;
+        const lastSound = SOUNDS.find(s => s.file === lastFile);
+        trackPlayBlockedMuted('replay_shortcut', lastFile, lastSound ? lastSound.name : null, null);
         return;
     }
 
@@ -228,7 +337,7 @@ export function replayLastSound() {
         const lastFile = state.recentlyPlayed[0];
         const btn = document.querySelector(`.sound-btn[data-file="${encodeURIComponent(lastFile)}"]`);
         if (btn) {
-            playSound(btn);
+            playSound(btn, 'replay_shortcut');
         }
     }
 }
@@ -239,6 +348,7 @@ export function checkUrlHash() {
     if (hash.startsWith('#sound=')) {
         const soundFile = decodeURIComponent(hash.substring(7));
         const sound = SOUNDS.find(s => s.file === soundFile);
+        trackSharedLinkOpened(soundFile, sound);
         if (sound) {
             setTimeout(() => {
                 const btn = document.querySelector(`.sound-btn[data-file="${encodeURIComponent(soundFile)}"]`);
@@ -246,9 +356,22 @@ export function checkUrlHash() {
                     // Scroll to the button
                     btn.scrollIntoView({ behavior: 'smooth', block: 'center' });
                     // Play the sound (will show toast if muted)
-                    playSound(btn);
+                    playSound(btn, 'deep_link');
                 }
             }, 500);
         }
     }
+}
+
+// Report a visit from a shared #sound= link; sound_found is false for stale or mistyped links
+function trackSharedLinkOpened(soundFile, sound) {
+    trackEvent('shared_sound_link_opened', {
+        sound_file: truncateText(soundFile),
+        sound_found: Boolean(sound),
+        sound_name: sound ? sound.name : null,
+        sound_category: sound ? sound.category : null,
+        is_first_visit: !hasSeenOnboarding(localStorage),
+        blocked_by_mute: state.isMuted,
+        display_mode: getDisplayMode(),
+    });
 }
