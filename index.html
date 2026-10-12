@@ -38,14 +38,15 @@
 
     <link rel="stylesheet" href="dist/css/bundle.css?v=32">
 
-    <!-- Novus by Pendo - agent loader (pendo.initialize runs in js/main.js) -->
+    <!-- Novus by Pendo - initialize queues on startup; agent loads after engagement -->
     <script>
     (function(apiKey){
         (function(p,e,n,d,o){var v,w,x,y,z;o=p[d]=p[d]||{};o._q=o._q||[];
         v=['initialize','identify','updateOptions','pageLoad','track', 'trackAgent'];for(w=0,x=v.length;w<x;++w)(function(m){
         o[m]=o[m]||function(){o._q[m===v[0]?'unshift':'push']([m].concat([].slice.call(arguments,0)));};})(v[w]);
-        y=e.createElement(n);y.async=!0;y.src='https://cdn.pendo-dev.pendo-dev.com/agent/static/'+apiKey+'/pendo.js';
-        z=e.getElementsByTagName(n)[0];z.parentNode.insertBefore(y,z);})(window,document,'script','pendo');
+        y=function(){if(o._loaded)return;o._loaded=!0;z=e.createElement(n);z.async=!0;z.src='https://cdn.pendo-dev.pendo-dev.com/agent/static/'+apiKey+'/pendo.js';
+        e.head.appendChild(z);};if(navigator.doNotTrack==='1'||p.doNotTrack==='1')return;
+        ['pointerdown','keydown','touchstart'].forEach(function(eventName){p.addEventListener(eventName,y,{capture:true,once:true,passive:true});});})(window,document,'script','pendo');
     })('b7f7bac7-3fc2-4972-8f2d-88b6c6e165f0');
     </script>
 
