@@ -5,9 +5,14 @@
 import { state, elements } from './state.js';
 import { shouldShowInstallPrompt, createFocusTrap } from './utils.js';
 import { showToast } from './ui.js';
+import { VERSION } from './version.js';
+import { trackEvent } from './analytics.js';
 
 // Track the element that triggered the modal for focus return
 let previouslyFocusedElement = null;
+
+// Whether an install came from the in-app prompt rather than the browser's own install UI
+let installStartedInApp = false;
 
 // Setup PWA install prompt
 export function setupInstallPrompt() {
@@ -34,14 +39,14 @@ export function setupInstallPrompt() {
 
     // Handle modal install button click
     elements.btnInstall.addEventListener('click', async () => {
-        await triggerInstall();
+        await triggerInstall('install_modal');
     });
 
     // Handle header install button click
     if (elements.installBtn) {
         elements.installBtn.addEventListener('click', async () => {
             previouslyFocusedElement = document.activeElement;
-            await triggerInstall();
+            await triggerInstall('header_button');
         });
     }
 
@@ -82,17 +87,38 @@ export function setupInstallPrompt() {
         state.deferredInstallPrompt = null;
         // Sound caching now happens automatically via service worker activation
         showToast('APP INSTALLED. SOUNDS CACHING IN BACKGROUND...', 'success');
+        trackEvent('pwa_installed', {
+            install_source: installStartedInApp ? 'in_app_prompt' : 'browser_ui',
+            favorites_count: state.favorites.length,
+            recently_played_count: state.recentlyPlayed.length,
+            app_version: VERSION,
+        });
+        installStartedInApp = false;
     });
 }
 
 // Trigger the install prompt
-export async function triggerInstall() {
+// promptSource is the button that opened it ('install_modal' or 'header_button'), for analytics
+export async function triggerInstall(promptSource = null) {
     if (!state.deferredInstallPrompt) {
         return;
     }
 
+    // Set before prompting: 'appinstalled' can fire before userChoice settles
+    installStartedInApp = true;
     state.deferredInstallPrompt.prompt();
-    await state.deferredInstallPrompt.userChoice;
+    const choice = await state.deferredInstallPrompt.userChoice;
+    if (choice.outcome !== 'accepted') {
+        installStartedInApp = false;
+    }
+    trackEvent('pwa_install_prompt_responded', {
+        outcome: choice.outcome,
+        platform: choice.platform,
+        prompt_source: promptSource,
+        previously_dismissed: localStorage.getItem('installPromptDismissed') !== null,
+        favorites_count: state.favorites.length,
+        recently_played_count: state.recentlyPlayed.length,
+    });
 
     state.deferredInstallPrompt = null;
     hideInstallPrompt();

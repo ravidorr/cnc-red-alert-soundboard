@@ -25,6 +25,7 @@ const CORE_ASSETS = [
     '/js/mobile.js',
     '/js/install.js',
     '/js/events.js',
+    '/js/analytics.js',
 ];
 
 // Sound files to cache (generated list)
