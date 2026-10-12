@@ -12,6 +12,7 @@ import { shareSound } from './ui.js';
 import { debounce, createFocusTrap } from './utils.js';
 import { showOnboardingTooltipForced } from './onboarding.js';
 import { showContactModal, hideContactModal } from './contact-modal.js';
+import { trackEvent } from './analytics.js';
 
 // Debounced search function (200ms delay for performance)
 const debouncedFilterSounds = debounce(filterSounds, 200);
@@ -25,6 +26,15 @@ const cleanupFunctions = [];
  */
 function registerCleanup(cleanupFn) {
     cleanupFunctions.push(cleanupFn);
+}
+
+/**
+ * Get the section a control sits in, for analytics
+ * @param {HTMLElement} element - Control inside a category section
+ * @returns {string|null} Category id, 'favorites', 'recent', 'popular', or null
+ */
+function getSourceSection(element) {
+    return element.closest('.category-section')?.dataset.category ?? null;
 }
 
 /**
@@ -46,7 +56,7 @@ export function setupEventListeners() {
             e.stopPropagation();
             const file = decodeURIComponent(shareBtn.dataset.file);
             const name = shareBtn.dataset.name;
-            shareSound(file, name);
+            shareSound(file, name, getSourceSection(shareBtn));
             return;
         }
 
@@ -55,7 +65,7 @@ export function setupEventListeners() {
         if (favBtn) {
             e.stopPropagation();
             const file = decodeURIComponent(favBtn.dataset.file);
-            toggleFavorite(file);
+            toggleFavorite(file, getSourceSection(favBtn));
             return;
         }
 
@@ -70,7 +80,7 @@ export function setupEventListeners() {
         // Handle sound button click
         const btn = e.target.closest('.sound-btn');
         if (btn) {
-            playSound(btn);
+            playSound(btn, 'click');
         }
 
         // Handle category header click
@@ -90,7 +100,7 @@ export function setupEventListeners() {
                 e.stopPropagation();
                 const file = decodeURIComponent(shareBtn.dataset.file);
                 const name = shareBtn.dataset.name;
-                shareSound(file, name);
+                shareSound(file, name, getSourceSection(shareBtn));
                 return;
             }
 
@@ -100,15 +110,17 @@ export function setupEventListeners() {
                 e.preventDefault();
                 e.stopPropagation();
                 const file = decodeURIComponent(favBtn.dataset.file);
-                toggleFavorite(file);
+                toggleFavorite(file, getSourceSection(favBtn));
                 return;
             }
 
-            // Handle sound button keyboard activation
+            // Handle sound button keyboard activation. Like the controls below, stop
+            // propagation so Space doesn't also trigger the global replay shortcut.
             const soundBtn = e.target.closest('.sound-btn');
             if (soundBtn) {
                 e.preventDefault();
-                playSound(soundBtn);
+                e.stopPropagation();
+                playSound(soundBtn, 'keyboard');
                 return;
             }
 
@@ -116,6 +128,7 @@ export function setupEventListeners() {
             const header = e.target.closest('.category-header');
             if (header) {
                 e.preventDefault();
+                e.stopPropagation();
                 toggleCategory(header.closest('.category-section'));
                 return;
             }
@@ -124,6 +137,7 @@ export function setupEventListeners() {
             const clearFavBtn = e.target.closest('.btn-clear-favorites');
             if (clearFavBtn) {
                 e.preventDefault();
+                e.stopPropagation();
                 clearAllFavorites();
                 return;
             }
@@ -201,7 +215,7 @@ export function setupEventListeners() {
 
     // Random sound button
     if (elements.randomSoundBtn) {
-        elements.randomSoundBtn.addEventListener('click', playRandomSound);
+        elements.randomSoundBtn.addEventListener('click', () => playRandomSound('random_button'));
     }
 
     // Back to top button
@@ -229,11 +243,15 @@ export function setupEventListeners() {
             const contactModal = document.getElementById('contact-modal');
             if (shortcutsModal?.classList.contains('visible')) {
                 hideShortcutsModal();
+                trackShortcutUsed(e, 'escape', 'close_shortcuts_modal', true);
             } else if (contactModal?.classList.contains('visible')) {
                 hideContactModal();
+                trackShortcutUsed(e, 'escape', 'close_contact_modal', true);
             } else {
                 // Stop any playing sound
+                const wasPlaying = state.currentlyPlaying !== null;
                 stopAllSounds();
+                trackShortcutUsed(e, 'escape', 'stop_playback', wasPlaying);
             }
         }
 
@@ -242,29 +260,35 @@ export function setupEventListeners() {
             e.preventDefault();
             elements.searchInput.focus();
             elements.searchInput.select();
+            trackShortcutUsed(e, 'ctrl_cmd_f', 'focus_search', true);
         }
 
         // ? to show shortcuts (when not in input)
         if (e.key === '?' && !isInInput) {
             showShortcutsModal();
+            trackShortcutUsed(e, 'question_mark', 'open_shortcuts_help', true);
         }
 
         // Space to replay last sound (when not in input)
         if (e.key === ' ' && !isInInput) {
             e.preventDefault();
+            const playingBefore = state.currentlyPlaying;
             replayLastSound();
+            trackShortcutUsed(e, 'space', 'replay_last_sound', state.currentlyPlaying !== playingBefore);
         }
 
         // Number keys 1-9 to play corresponding favorite
         if (e.key >= '1' && e.key <= '9' && !isInInput) {
             const index = parseInt(e.key) - 1;
+            const playingBefore = state.currentlyPlaying;
             if (state.favorites[index]) {
                 const file = state.favorites[index];
                 const btn = document.querySelector(`.sound-btn[data-file="${encodeURIComponent(file)}"]`);
                 if (btn) {
-                    playSound(btn);
+                    playSound(btn, 'favorite_hotkey');
                 }
             }
+            trackShortcutUsed(e, 'number_key', 'play_favorite', state.currentlyPlaying !== playingBefore, index + 1);
         }
     });
 
@@ -320,6 +344,27 @@ export function setupEventListeners() {
             }
         });
     }
+}
+
+/**
+ * Report a global keyboard shortcut. Auto-repeat from a held key is skipped
+ * so each press counts once; no-ops are reported with had_effect false.
+ * @param {KeyboardEvent} e - The keydown event
+ * @param {string} shortcut - Shortcut id
+ * @param {string} action - What the shortcut does
+ * @param {boolean} hadEffect - Whether the shortcut changed anything
+ * @param {number|null} [favoriteSlot] - Favorite slot for number keys
+ */
+function trackShortcutUsed(e, shortcut, action, hadEffect, favoriteSlot = null) {
+    if (e.repeat) {
+        return;
+    }
+    trackEvent('keyboard_shortcut_used', {
+        shortcut,
+        action,
+        favorite_slot: favoriteSlot,
+        had_effect: hadEffect,
+    });
 }
 
 // Shortcuts modal functions

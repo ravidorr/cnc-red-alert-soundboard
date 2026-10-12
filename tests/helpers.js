@@ -58,6 +58,8 @@ export function resetState(state) {
     state.favorites = [];
     state.recentlyPlayed = [];
     state.isMuted = false;
+    state.offlineSince = null;
+    state.soundsPlayedWhileOffline = 0;
 }
 
 // Reset elements

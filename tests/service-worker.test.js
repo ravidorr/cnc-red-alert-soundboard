@@ -14,7 +14,7 @@ const serviceWorkerSource = readFileSync(
 describe('service worker cache activation', () => {
     test('replaces the previous app-shell cache during activation', async () => {
         const localThis = {
-            cacheName: 'cnc-soundboard-v10',
+            cacheName: 'cnc-soundboard-v11',
             eventHandlers: new Map(),
         };
         localThis.cache = {
@@ -23,7 +23,7 @@ describe('service worker cache activation', () => {
         localThis.caches = {
             delete: jest.fn().mockResolvedValue(true),
             keys: jest.fn().mockResolvedValue([
-                'cnc-soundboard-v9',
+                'cnc-soundboard-v10',
                 localThis.cacheName,
             ]),
             open: jest.fn().mockResolvedValue(localThis.cache),
@@ -59,7 +59,7 @@ describe('service worker cache activation', () => {
         expect(serviceWorkerSource).toContain(
             `const CACHE_NAME = '${localThis.cacheName}';`,
         );
-        expect(localThis.caches.delete).toHaveBeenCalledWith('cnc-soundboard-v9');
+        expect(localThis.caches.delete).toHaveBeenCalledWith('cnc-soundboard-v10');
         expect(localThis.caches.delete).not.toHaveBeenCalledWith(localThis.cacheName);
         expect(localThis.clients.claim).toHaveBeenCalledTimes(1);
     });
