@@ -225,6 +225,19 @@ describe('Main.js Functions', () => {
             expect(() => localThis.mainModule.init()).not.toThrow();
         });
 
+        test('should initialize Pendo once with an anonymous visitor when the snippet is loaded', async () => {
+            const localThis = {};
+            localThis.mainModule = await import('../js/main.js');
+            localThis.initialize = jest.fn();
+            window.pendo = { initialize: localThis.initialize };
+
+            localThis.mainModule.init();
+            delete window.pendo;
+
+            expect(localThis.initialize).toHaveBeenCalledTimes(1);
+            expect(localThis.initialize).toHaveBeenCalledWith({ visitor: { id: '' } });
+        });
+
         test('should defer initialization until DOMContentLoaded while loading', async () => {
             const localThis = {};
             localThis.readyStateDescriptor = Object.getOwnPropertyDescriptor(document, 'readyState');
