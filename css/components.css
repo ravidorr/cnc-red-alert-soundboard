@@ -33,6 +33,11 @@
     box-shadow: var(--border-glow);
 }
 
+.search-input::-webkit-search-cancel-button {
+    -webkit-appearance: none;
+    appearance: none;
+}
+
 .clear-search {
     position: absolute;
     right: 0;
