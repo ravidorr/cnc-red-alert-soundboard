@@ -245,9 +245,9 @@ describe('Main.js Functions', () => {
             await import('../js/main.js');
 
             expect(localThis.initialize).toHaveBeenCalledTimes(1);
-            expect(localThis.initialize).toHaveBeenCalledWith({ visitor: { id: '' } });
+            expect(localThis.initialize).toHaveBeenCalledWith({ visitor: { id: '', favorites_count: 0, uses_keyboard_shortcuts: false } });
             expect(localThis.pendo._q).toEqual([
-                ['initialize', { visitor: { id: '' } }],
+                ['initialize', { visitor: { id: '', favorites_count: 0, uses_keyboard_shortcuts: false } }],
             ]);
             delete window.pendo;
             if (localThis.readyStateDescriptor) {
@@ -279,9 +279,9 @@ describe('Main.js Functions', () => {
             expect(localThis.initialize).not.toHaveBeenCalled();
             document.dispatchEvent(new Event('DOMContentLoaded'));
             expect(localThis.initialize).toHaveBeenCalledTimes(1);
-            expect(localThis.initialize).toHaveBeenCalledWith({ visitor: { id: '' } });
+            expect(localThis.initialize).toHaveBeenCalledWith({ visitor: { id: '', favorites_count: 0, uses_keyboard_shortcuts: false } });
             expect(localThis.pendo._q).toEqual([
-                ['initialize', { visitor: { id: '' } }],
+                ['initialize', { visitor: { id: '', favorites_count: 0, uses_keyboard_shortcuts: false } }],
             ]);
             delete window.pendo;
             if (localThis.readyStateDescriptor) {

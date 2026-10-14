@@ -6,7 +6,7 @@ import { state, elements } from './state.js';
 import { shouldShowInstallPrompt, createFocusTrap } from './utils.js';
 import { showToast } from './ui.js';
 import { VERSION } from './version.js';
-import { trackEvent } from './analytics.js';
+import { trackEvent, getDisplayMode } from './analytics.js';
 
 // Track the element that triggered the modal for focus return
 let previouslyFocusedElement = null;
@@ -18,6 +18,10 @@ let installStartedInApp = false;
 export function setupInstallPrompt() {
     // Check if already installed
     if (window.matchMedia('(display-mode: standalone)').matches) {
+        trackEvent('pwa_standalone_launched', {
+            display_mode: getDisplayMode(),
+            app_version: VERSION,
+        });
         return;
     }
 
