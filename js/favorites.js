@@ -50,6 +50,7 @@ export async function clearAllFavorites() {
 
     state.favorites = [];
     saveFavorites();
+    window.pendo?.updateOptions?.({ visitor: { favorites_count: 0 } });
     renderFavoritesSection();
     renderNavigation();
     updateFavoriteButtons();
@@ -64,6 +65,7 @@ export function toggleFavorite(soundFile, sourceSection = null) {
     const previousSlot = state.favorites.indexOf(soundFile) + 1;
     state.favorites = toggleFavoriteInArray(state.favorites, soundFile);
     saveFavorites();
+    window.pendo?.updateOptions?.({ visitor: { favorites_count: state.favorites.length } });
     renderFavoritesSection();
     renderNavigation();
     updateFavoriteButtons();

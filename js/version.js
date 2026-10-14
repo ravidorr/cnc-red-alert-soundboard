@@ -1,3 +1,3 @@
 // Auto-generated from package.json - do not edit manually
 // Run: node scripts/sync-version.js
-export const VERSION = '3.2.4';
+export const VERSION = '3.2.5';
