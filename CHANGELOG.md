@@ -4,6 +4,20 @@ All notable changes to the C&C Red Alert Soundboard are documented here. The
 format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 this project uses [Semantic Versioning](https://semver.org/).
 
+## [3.2.5] - 2026-10-14
+
+### Added
+
+- Visitor metadata `favorites_count` (integer) set in `pendo.initialize` from
+  localStorage and updated via `pendo.updateOptions` whenever favorites change.
+- Visitor metadata `uses_keyboard_shortcuts` (boolean) initialized to `false`
+  and flipped to `true` via `pendo.updateOptions` on the first keyboard
+  shortcut use.
+- Track event `pwa_standalone_launched` fires once per session when the app
+  loads in standalone display mode, capturing Safari/iOS "Add to Home Screen"
+  and macOS "Add to Dock" installs that the Chromium-only `pwa_installed`
+  event cannot detect.
+
 ## [3.2.4] - 2026-10-14
 
 ### Fixed
