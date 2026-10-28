@@ -359,6 +359,7 @@ function trackShortcutUsed(e, shortcut, action, hadEffect, favoriteSlot = null) 
     if (e.repeat) {
         return;
     }
+    window.pendo?.updateOptions?.({ visitor: { uses_keyboard_shortcuts: true } });
     trackEvent('keyboard_shortcut_used', {
         shortcut,
         action,

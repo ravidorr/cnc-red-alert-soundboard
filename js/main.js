@@ -14,14 +14,18 @@ import { setupEventListeners } from './events.js';
 import { showOnboardingTooltip } from './onboarding.js';
 import { initSidebarAccessibility, setupViewportListener } from './mobile.js';
 import { trackEvent, getDisplayMode, truncateText } from './analytics.js';
+import { loadFavoritesFromStorage } from './utils.js';
 
 // Start Novus by Pendo as an anonymous visitor. An empty id lets the agent
 // reuse the id it stored on a previous visit. window.pendo comes from the
 // snippet in index.html; the optional call keeps the app working without it.
 function initializePendo() {
+    const favoritesCount = loadFavoritesFromStorage(localStorage).length;
     window.pendo?.initialize?.({
         visitor: {
             id: '',
+            favorites_count: favoritesCount,
+            uses_keyboard_shortcuts: false,
         },
     });
 }
