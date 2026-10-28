@@ -4,6 +4,14 @@ All notable changes to the C&C Red Alert Soundboard are documented here. The
 format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 this project uses [Semantic Versioning](https://semver.org/).
 
+## [3.2.6] - 2026-10-28
+
+### Changed
+
+- Updated development dependencies: `@storybook/html-vite` and `storybook` to
+  10.6.3, `eslint` to 10.13.0, `html-validate` to 11.17.0, `ts-jest` to
+  29.4.15 and `typescript-eslint` to 8.72.0.
+
 ## [3.2.5] - 2026-10-14
 
 ### Added
