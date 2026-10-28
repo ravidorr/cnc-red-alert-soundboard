@@ -4,6 +4,13 @@ All notable changes to the C&C Red Alert Soundboard are documented here. The
 format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 this project uses [Semantic Versioning](https://semver.org/).
 
+## [3.2.7] - 2026-10-28
+
+### Changed
+
+- Updated development dependencies: `markdown-it` to 15.0.3 and
+  `markdownlint-cli2` to 0.24.0.
+
 ## [3.2.6] - 2026-10-28
 
 ### Changed
