@@ -4,6 +4,16 @@ All notable changes to the C&C Red Alert Soundboard are documented here. The
 format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 this project uses [Semantic Versioning](https://semver.org/).
 
+## [3.2.11] - 2026-11-01
+
+### Fixed
+
+- The `minimatch` 11 override from 3.2.10 made `glob` 10 (pulled in by
+  `test-exclude` 7 through `babel-plugin-istanbul`) silently match no files.
+  Added a `test-exclude` override to 8.0.0, which uses `glob` 13 (works with
+  minimatch 11), so only one `glob` copy remains. `npm ci`, build, lint,
+  typecheck and the full test suite pass with 100% coverage on Node 24.21.0.
+
 ## [3.2.10] - 2026-11-01
 
 ### Security
