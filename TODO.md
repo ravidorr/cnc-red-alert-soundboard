@@ -507,7 +507,8 @@ test('should handle sound hash', async () => {
 
 - Remove the `re2js` override in `package.json` once `markdownlint` no longer
   pins `re2js` to a vulnerable version.
-- Dependabot alert for `minimatch` (dev, transitive) stays open: the only
-  patched line is 11.x, outside the ranges required by `eslint`, `jest` and
-  `glob`. Revisit when those tools move to `minimatch` 11, or dismiss it as a
-  tolerable development-only risk.
+- Remove the `minimatch` override in `package.json` once every consumer
+  (`@eslint/config-array`, `@typescript-eslint/typescript-estree`, `glob` 13 via
+  `jest` and `htmlhint`, and `glob` 10 via `test-exclude`) accepts `minimatch`
+  11 on its own. `test-exclude` stays on `glob` 10, which requires
+  `minimatch` 9, until it moves to a newer `glob`.
