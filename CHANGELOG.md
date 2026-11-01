@@ -4,6 +4,15 @@ All notable changes to the C&C Red Alert Soundboard are documented here. The
 format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 this project uses [Semantic Versioning](https://semver.org/).
 
+## [3.2.9] - 2026-11-01
+
+### Security
+
+- Pinned the transitive development dependency `re2js` to 2.9.1 through an npm
+  override to fix a high severity vulnerability (Dependabot alert 46). The
+  `minimatch` alert (48) remains open because its only patched line, 11.x, is
+  outside the version ranges required by `eslint`, `jest` and `glob`.
+
 ## [3.2.8] - 2026-10-31
 
 ### Changed
