@@ -4,6 +4,16 @@ All notable changes to the C&C Red Alert Soundboard are documented here. The
 format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 this project uses [Semantic Versioning](https://semver.org/).
 
+## [3.2.10] - 2026-11-01
+
+### Security
+
+- Forced the transitive development dependency `minimatch` to 11.0.3 through an
+  npm override to fix a medium severity vulnerability (Dependabot alert 48).
+  None of its parents (`eslint`, `glob`, `test-exclude`) yet allow the 11.x
+  line, so the override is required. Build, lint, typecheck and the full test
+  suite pass unchanged with 100% coverage.
+
 ## [3.2.9] - 2026-11-01
 
 ### Security
