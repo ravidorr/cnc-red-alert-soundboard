@@ -507,5 +507,8 @@ test('should handle sound hash', async () => {
 
 - Remove the `re2js` override in `package.json` once `markdownlint` no longer
   pins `re2js` to a vulnerable version.
-- Remove the `minimatch` override in `package.json` once `eslint`, `glob` and
-  `test-exclude` accept `minimatch` 11 on their own.
+- Remove the `minimatch` override in `package.json` once every consumer
+  (`@eslint/config-array`, `@typescript-eslint/typescript-estree`, `glob` 13 via
+  `jest` and `htmlhint`, and `glob` 10 via `test-exclude`) accepts `minimatch`
+  11 on its own. `test-exclude` stays on `glob` 10, which requires
+  `minimatch` 9, until it moves to a newer `glob`.

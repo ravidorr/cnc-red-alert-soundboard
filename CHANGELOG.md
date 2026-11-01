@@ -10,9 +10,13 @@ this project uses [Semantic Versioning](https://semver.org/).
 
 - Forced the transitive development dependency `minimatch` to 11.0.3 through an
   npm override to fix a medium severity vulnerability (Dependabot alert 48).
-  None of its parents (`eslint`, `glob`, `test-exclude`) yet allow the 11.x
-  line, so the override is required. Build, lint, typecheck and the full test
-  suite pass unchanged with 100% coverage.
+  No current parent allows the 11.x line (`@eslint/config-array`,
+  `@typescript-eslint/typescript-estree`, `glob` 10 and 13, `test-exclude`),
+  so the override is required. It also adds the transitive development
+  dependency `@isaacs/nonrecursive-glob-match` required by minimatch 11.
+  `npm ci`, build, lint, typecheck and the full test suite pass with 100%
+  coverage on Node 24.21.0, including `test-exclude` coverage instrumentation
+  running on `glob` 10 with minimatch 11.
 
 ## [3.2.9] - 2026-11-01
 
