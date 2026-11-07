@@ -4,6 +4,15 @@ All notable changes to the C&C Red Alert Soundboard are documented here. The
 format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 this project uses [Semantic Versioning](https://semver.org/).
 
+## [3.2.12] - 2026-11-08
+
+### Changed
+
+- Bumped `stylelint` to 18.0.0 and `stylelint-config-standard` to 41.0.0
+  together, since each requires the other as a peer dependency. Removed the
+  `declaration-block-single-line-max-declarations` entry from
+  `.stylelintrc.json`, as stylelint 18 no longer ships that rule.
+
 ## [3.2.11] - 2026-11-01
 
 ### Fixed
