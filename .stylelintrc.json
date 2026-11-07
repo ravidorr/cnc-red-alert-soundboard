@@ -24,7 +24,6 @@
     "length-zero-no-unit": null,
     "no-duplicate-selectors": null,
     "rule-empty-line-before": null,
-    "declaration-block-single-line-max-declarations": null,
     "color-hex-length": null,
     "color-no-invalid-hex": true,
     "declaration-no-important": true,
