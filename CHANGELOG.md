@@ -4,6 +4,14 @@ All notable changes to the C&C Red Alert Soundboard are documented here. The
 format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 this project uses [Semantic Versioning](https://semver.org/).
 
+## [3.2.14] - 2026-11-17
+
+### Fixed
+
+- Search now matches the category names shown in the navigation, such as
+  "Allied", "Casualties" or "Defenses", so searching for a visible category
+  label returns that category's sounds instead of the empty state.
+
 ## [3.2.13] - 2026-11-14
 
 ### Changed
