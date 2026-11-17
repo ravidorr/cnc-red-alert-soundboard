@@ -4,6 +4,17 @@ All notable changes to the C&C Red Alert Soundboard are documented here. The
 format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 this project uses [Semantic Versioning](https://semver.org/).
 
+## [3.2.14] - 2026-11-17
+
+### Changed
+
+- Added search tags to every sound in `js/constants.js`. Previously only 35 of
+  190 sounds had tags, so descriptive searches such as "nuke", "scream",
+  "bark", "money" or "rocket" found nothing. Existing tags are unchanged,
+  except that both explosions gain "boom", "blast", "bomb" and "nuke", the
+  water explosion gains "boom", "splash" and "depth charge", and Tanya's death
+  gains "scream".
+
 ## [3.2.13] - 2026-11-14
 
 ### Changed

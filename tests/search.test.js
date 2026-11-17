@@ -101,6 +101,20 @@ describe('Search Functions', () => {
             expect(visible.length).toBeGreaterThan(0);
         });
 
+        test('should hide a sound without tags when only tags would match', () => {
+            // Every catalog sound has tags, so use a button that is not in the catalog
+            const contentArea = document.getElementById('content-area');
+            const untaggedWrapper = document.createElement('div');
+            untaggedWrapper.className = 'sound-btn-wrapper';
+            untaggedWrapper.innerHTML = '<button class="sound-btn" data-file="custom.wav" data-name="Custom">Custom</button>';
+            contentArea.appendChild(untaggedWrapper);
+
+            state.searchTerm = 'voice';
+            filterSounds();
+
+            expect(untaggedWrapper.style.display).toBe('none');
+        });
+
         test('should handle null contentArea gracefully', () => {
             elements.contentArea = null;
             state.searchTerm = 'test';
