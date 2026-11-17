@@ -393,7 +393,7 @@ export async function shareSound(soundFile, soundName, sourceSection = null) {
                     text: `Check out this C&C Red Alert sound: ${displayName}`,
                     files: [file],
                 });
-                showToast('INTEL TRANSMITTED', 'success');
+                showToast('INTEL TRANSMITTED. Sound sent.', 'success');
                 trackEvent('sound_shared', {
                     ...trackedProperties,
                     share_method: 'web_share_file',
@@ -408,7 +408,7 @@ export async function shareSound(soundFile, soundName, sourceSection = null) {
                 text: `Check out this C&C Red Alert sound: ${displayName}`,
                 url: pageUrl,
             });
-            showToast('INTEL TRANSMITTED', 'success');
+            showToast('INTEL TRANSMITTED. Link to the sound sent.', 'success');
             trackEvent('sound_shared', {
                 ...trackedProperties,
                 share_method: 'web_share_link',
@@ -427,7 +427,7 @@ export async function shareSound(soundFile, soundName, sourceSection = null) {
     // Fallback: copy link to clipboard
     try {
         await navigator.clipboard.writeText(pageUrl);
-        showToast('LINK ACQUIRED', 'success');
+        showToast('LINK ACQUIRED. Link copied. Paste it to share.', 'success');
         trackEvent('sound_shared', {
             ...trackedProperties,
             share_method: 'clipboard_link',
