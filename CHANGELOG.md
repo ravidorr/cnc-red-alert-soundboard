@@ -4,6 +4,14 @@ All notable changes to the C&C Red Alert Soundboard are documented here. The
 format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 this project uses [Semantic Versioning](https://semver.org/).
 
+## [3.2.14] - 2026-11-17
+
+### Fixed
+
+- Search typo forgiveness now ignores punctuation and compares each typed word
+  with the words in a sound name, so near-miss phrases such as "yes sri" or
+  "lets rock" find "Yes Sir" and "Let's Rock" instead of showing no results.
+
 ## [3.2.13] - 2026-11-14
 
 ### Changed
