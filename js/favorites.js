@@ -81,7 +81,7 @@ export function toggleFavorite(soundFile, sourceSection = null) {
         source_section: sourceSection,
     };
     if (wasAdded) {
-        showToast(`Target marked: ${soundName}`, 'success');
+        showToast(`Target marked: ${soundName} added to FAVORITES`, 'success');
         // Only slots 1-9 can be played with the number-key hotkeys
         trackEvent('sound_favorited', {
             ...trackedProperties,

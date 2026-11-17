@@ -79,6 +79,7 @@ describe('Favorites Functions', () => {
             const toast = document.querySelector('.toast');
             expect(toast).not.toBeNull();
             expect(toast.textContent).toContain('Target marked');
+            expect(toast.textContent).toContain('added to FAVORITES');
         });
 
         test('should show toast when removing valid sound', () => {
