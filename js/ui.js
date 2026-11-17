@@ -362,9 +362,41 @@ export function hideSearchEmptyState() {
     }
 }
 
+// True while a share is getting ready or the share sheet is open
+let shareInProgress = false;
+
+// Show or clear the busy state on the share buttons for a sound
+function setShareButtonsBusy(soundFile, busy) {
+    const selector = `.share-btn[data-file="${encodeURIComponent(soundFile)}"]`;
+    document.querySelectorAll(selector).forEach(btn => {
+        if (busy) {
+            btn.setAttribute('aria-busy', 'true');
+            btn.setAttribute('aria-disabled', 'true');
+        } else {
+            btn.removeAttribute('aria-busy');
+            btn.removeAttribute('aria-disabled');
+        }
+    });
+}
+
 // Share a sound using Web Share API (with file) or fallback to clipboard
 // sourceSection is the section the share button was used in, for analytics
+// The share button shows a busy state and ignores repeat taps until the attempt ends
 export async function shareSound(soundFile, soundName, sourceSection = null) {
+    if (shareInProgress) {
+        return;
+    }
+    shareInProgress = true;
+    setShareButtonsBusy(soundFile, true);
+    try {
+        await runShare(soundFile, soundName, sourceSection);
+    } finally {
+        shareInProgress = false;
+        setShareButtonsBusy(soundFile, false);
+    }
+}
+
+async function runShare(soundFile, soundName, sourceSection) {
     const soundUrl = `sounds/${soundFile}`;
     const pageUrl = `${window.location.origin}${window.location.pathname}#sound=${encodeURIComponent(soundFile)}`;
     const sound = SOUNDS.find(s => s.file === soundFile);

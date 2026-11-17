@@ -654,6 +654,41 @@ describe('UI Rendering', () => {
             // Should NOT fall back to clipboard when user cancels
             expect(clipboardMock).not.toHaveBeenCalled();
         });
+
+        test('should mark share button busy and ignore repeat taps until the share ends', async () => {
+            const localThis = {};
+            localThis.button = document.createElement('button');
+            localThis.button.className = 'share-btn';
+            localThis.button.dataset.file = encodeURIComponent('test.wav');
+            document.body.appendChild(localThis.button);
+
+            global.fetch = jest.fn().mockReturnValue(new Promise(resolve => {
+                localThis.resolveFetch = resolve;
+            }));
+            Object.assign(navigator, {
+                share: jest.fn().mockResolvedValue(),
+                canShare: jest.fn().mockReturnValue(true),
+            });
+
+            localThis.firstShare = shareSound('test.wav', 'Test Sound');
+
+            expect(localThis.button.getAttribute('aria-busy')).toBe('true');
+            expect(localThis.button.getAttribute('aria-disabled')).toBe('true');
+
+            // Repeat tap while the sound file downloads is ignored
+            await shareSound('test.wav', 'Test Sound');
+            expect(global.fetch).toHaveBeenCalledTimes(1);
+
+            localThis.resolveFetch({
+                blob: () => Promise.resolve(new Blob(['audio data'], { type: 'audio/wav' })),
+            });
+            await localThis.firstShare;
+
+            expect(navigator.share).toHaveBeenCalledTimes(1);
+            expect(localThis.button.hasAttribute('aria-busy')).toBe(false);
+            expect(localThis.button.hasAttribute('aria-disabled')).toBe(false);
+            localThis.button.remove();
+        });
     });
 
     describe('createNavHeader', () => {
