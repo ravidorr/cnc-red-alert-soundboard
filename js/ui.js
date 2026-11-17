@@ -270,10 +270,14 @@ export function renderPopularSection() {
  * @param {string} message - The message to display
  * @param {string} type - Type: 'info', 'success', or 'error'
  * @param {number} duration - How long to show the toast in ms (default 7s to match CSS)
+ * @param {object} [action] - Optional action button; the toast then stays open until used or dismissed
+ * @param {string} action.label - Visible button text
+ * @param {string} [action.ariaLabel] - Accessible name for the button
+ * @param {Function} action.onClick - Called after the toast closes when the button is clicked
  */
 const MAX_TOASTS = 3;
 
-export function showToast(message, type = 'info', duration = 7000) {
+export function showToast(message, type = 'info', duration = 7000, action = null) {
     if (!elements.toastContainer) {
         return;
     }
@@ -295,6 +299,21 @@ export function showToast(message, type = 'info', duration = 7000) {
     messageSpan.textContent = message;
     toast.appendChild(messageSpan);
 
+    // Create optional action button (e.g. retry)
+    if (action) {
+        const actionBtn = document.createElement('button');
+        actionBtn.className = 'toast-action';
+        actionBtn.textContent = action.label;
+        if (action.ariaLabel) {
+            actionBtn.setAttribute('aria-label', action.ariaLabel);
+        }
+        actionBtn.addEventListener('click', () => {
+            toast.remove();
+            action.onClick();
+        });
+        toast.appendChild(actionBtn);
+    }
+
     // Create dismiss button for keyboard accessibility
     const dismissBtn = document.createElement('button');
     dismissBtn.className = 'toast-dismiss';
@@ -308,6 +327,12 @@ export function showToast(message, type = 'info', duration = 7000) {
     toast.appendChild(dismissBtn);
 
     elements.toastContainer.appendChild(toast);
+
+    // Toasts with an action stay open so the visitor has time to use it
+    if (action) {
+        toast.classList.add('toast-persistent');
+        return;
+    }
 
     // Store timeout ID so we can cancel on hover
     let timeoutId = setTimeout(() => {
@@ -434,7 +459,11 @@ export async function shareSound(soundFile, soundName, sourceSection = null) {
             web_share_fallback_used: webShareErrorName !== null,
         });
     } catch (err) {
-        showToast('SHARE FAILED. Try again.', 'error');
+        showToast('SHARE FAILED. The link could not be copied.', 'error', undefined, {
+            label: 'RETRY',
+            ariaLabel: `Retry sharing ${soundName || 'C&C Sound'}`,
+            onClick: () => shareSound(soundFile, soundName, sourceSection),
+        });
         trackEvent('sound_share_failed', {
             sound_file: soundFile,
             sound_name: trackedProperties.sound_name,

@@ -394,6 +394,19 @@ describe('UI Rendering', () => {
             useRealTimers();
         });
 
+        test('should render an action button without a custom accessible name', () => {
+            const onClick = jest.fn();
+            showToast('Test message', 'info', 100, { label: 'ACT', onClick });
+
+            const actionBtn = document.querySelector('.toast-action');
+            expect(actionBtn.textContent).toBe('ACT');
+            expect(actionBtn.hasAttribute('aria-label')).toBe(false);
+
+            actionBtn.click();
+            expect(onClick).toHaveBeenCalledTimes(1);
+            expect(document.querySelector('.toast')).toBeNull();
+        });
+
         test('should tolerate a removed toast when its focus timer expires', () => {
             const localThis = {};
             useFakeTimers();
@@ -493,6 +506,45 @@ describe('UI Rendering', () => {
 
             const toast = document.querySelector('.toast-error');
             expect(toast).not.toBeNull();
+            clipboard.restore();
+        });
+
+        test('should offer a retry that stays open after a copy failure', async () => {
+            const localThis = {};
+            useFakeTimers();
+            localThis.clipboard = mockClipboard({ shouldFail: true });
+
+            await shareSound('test.wav', 'Test Sound');
+
+            localThis.toast = document.querySelector('.toast-error');
+            expect(localThis.toast.textContent).toContain('The link could not be copied');
+            expect(localThis.toast.classList.contains('toast-persistent')).toBe(true);
+            localThis.retryBtn = localThis.toast.querySelector('.toast-action');
+            expect(localThis.retryBtn.textContent).toBe('RETRY');
+            expect(localThis.retryBtn.getAttribute('aria-label')).toBe('Retry sharing Test Sound');
+
+            advanceTimers(10000);
+            expect(document.querySelector('.toast-error')).toBe(localThis.toast);
+
+            localThis.clipboard.restore();
+            localThis.clipboard = mockClipboard();
+            localThis.retryBtn.click();
+            await Promise.resolve();
+            await Promise.resolve();
+
+            expect(localThis.toast.parentNode).toBeNull();
+            expect(localThis.clipboard.writeText).toHaveBeenCalledTimes(1);
+            expect(document.querySelector('.toast-success').textContent).toContain('LINK ACQUIRED');
+            localThis.clipboard.restore();
+            useRealTimers();
+        });
+
+        test('should name the default sound in the retry label', async () => {
+            const clipboard = mockClipboard({ shouldFail: true });
+
+            await shareSound('test.wav');
+
+            expect(document.querySelector('.toast-action').getAttribute('aria-label')).toBe('Retry sharing C&C Sound');
             clipboard.restore();
         });
 
