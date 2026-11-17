@@ -4,6 +4,15 @@ All notable changes to the C&C Red Alert Soundboard are documented here. The
 format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 this project uses [Semantic Versioning](https://semver.org/).
 
+## [3.2.14] - 2026-11-17
+
+### Changed
+
+- The empty Favorites and Recently Played placeholders now read as static
+  information instead of a control. They show a dashed outline, a default
+  cursor, a smaller and more muted icon, and a smaller title, so they no
+  longer look like the clickable sound tiles around them.
+
 ## [3.2.13] - 2026-11-14
 
 ### Changed
