@@ -1,6 +1,7 @@
 /**
  * @jest-environment jsdom
  */
+import { jest } from '@jest/globals';
 import { setupFullDOM, resetState, resetElements, useFakeTimers, useRealTimers, advanceTimers } from './helpers.js';
 import { state, elements } from '../js/state.js';
 import { cacheElements, renderCategories, renderFavoritesSection } from '../js/ui.js';
@@ -79,6 +80,29 @@ describe('Favorites Functions', () => {
             const toast = document.querySelector('.toast');
             expect(toast).not.toBeNull();
             expect(toast.textContent).toContain('Target marked');
+        });
+
+        test('should offer a link to the saved sound in Favorites when adding', () => {
+            Element.prototype.scrollIntoView = jest.fn();
+            state.favorites = [];
+            toggleFavorite('allies_1_achnoledged.wav');
+
+            const actionBtn = document.querySelector('.toast .toast-action');
+            expect(actionBtn).not.toBeNull();
+            expect(actionBtn.textContent).toBe('VIEW IN FAVORITES');
+
+            actionBtn.click();
+
+            const wrapper = document.querySelector('#category-favorites .sound-btn-wrapper');
+            expect(Element.prototype.scrollIntoView).toHaveBeenCalled();
+            expect(wrapper.classList.contains('favorite-highlight')).toBe(true);
+        });
+
+        test('should not offer a Favorites link when removing', () => {
+            state.favorites = ['allies_1_achnoledged.wav'];
+            toggleFavorite('allies_1_achnoledged.wav');
+
+            expect(document.querySelector('.toast .toast-action')).toBeNull();
         });
 
         test('should show toast when removing valid sound', () => {

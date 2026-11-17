@@ -48,6 +48,12 @@
     outline-offset: 2px;
 }
 
+.sound-btn-wrapper.favorite-highlight {
+    outline: 2px solid var(--green-primary);
+    outline-offset: 2px;
+    box-shadow: var(--glow-green-intense);
+}
+
 .favorites-empty {
     padding: 30px;
     text-align: center;
