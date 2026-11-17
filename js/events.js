@@ -202,6 +202,19 @@ export function setupEventListeners() {
         });
     }
 
+    // Suggested search terms in empty state run that search
+    if (elements.searchEmptyState) {
+        elements.searchEmptyState.addEventListener('click', (e) => {
+            const suggestion = e.target.closest('[data-search-term]');
+            if (suggestion) {
+                elements.searchInput.value = suggestion.dataset.searchTerm;
+                state.searchTerm = suggestion.dataset.searchTerm.toLowerCase();
+                filterSounds();
+                elements.searchInput.focus();
+            }
+        });
+    }
+
     // Clear filter button in search result indicator
     const btnClearFilter = document.getElementById('btn-clear-filter');
     if (btnClearFilter) {
