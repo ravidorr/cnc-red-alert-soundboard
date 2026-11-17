@@ -4,6 +4,15 @@ All notable changes to the C&C Red Alert Soundboard are documented here. The
 format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 this project uses [Semantic Versioning](https://semver.org/).
 
+## [3.2.14] - 2026-11-17
+
+### Fixed
+
+- Choosing a category in the navigation while a search shows no results now
+  clears the search, so the category's sounds appear and the page scrolls to
+  them. Before, the search term and the empty screen stayed, so nothing visible
+  changed.
+
 ## [3.2.13] - 2026-11-14
 
 ### Changed
