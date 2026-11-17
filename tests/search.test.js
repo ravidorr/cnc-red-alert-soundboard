@@ -101,6 +101,44 @@ describe('Search Functions', () => {
             expect(visible.length).toBeGreaterThan(0);
         });
 
+        test('should match by visible category name', () => {
+            state.searchTerm = 'casualties';
+            filterSounds();
+
+            const visibleFiles = [...document.querySelectorAll('.sound-btn-wrapper:not([style*="display: none"]) .sound-btn')]
+                .map(btn => decodeURIComponent(btn.dataset.file));
+            const deathSounds = SOUNDS.filter(s => s.category === 'deaths');
+            expect(deathSounds.length).toBeGreaterThan(0);
+            deathSounds.forEach(sound => {
+                expect(visibleFiles).toContain(sound.file);
+            });
+            expect(document.getElementById('search-empty-state').style.display).not.toBe('block');
+        });
+
+        test('should match by a word inside a multi-word category name', () => {
+            state.searchTerm = 'defenses';
+            filterSounds();
+
+            const visibleFiles = [...document.querySelectorAll('.sound-btn-wrapper:not([style*="display: none"]) .sound-btn')]
+                .map(btn => decodeURIComponent(btn.dataset.file));
+            SOUNDS.filter(s => s.category === 'buildings').forEach(sound => {
+                expect(visibleFiles).toContain(sound.file);
+            });
+        });
+
+        test('should not match by category name for unknown sounds', () => {
+            const contentArea = document.getElementById('content-area');
+            const wrapper = document.createElement('div');
+            wrapper.className = 'sound-btn-wrapper';
+            wrapper.innerHTML = '<button class="sound-btn" data-name="Mystery" data-file="unknown_sound.wav">Mystery</button>';
+            contentArea.appendChild(wrapper);
+
+            state.searchTerm = 'allied';
+            filterSounds();
+
+            expect(wrapper.style.display).toBe('none');
+        });
+
         test('should handle null contentArea gracefully', () => {
             elements.contentArea = null;
             state.searchTerm = 'test';
