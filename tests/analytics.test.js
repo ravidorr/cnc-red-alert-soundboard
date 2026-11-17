@@ -943,12 +943,18 @@ describe('Pendo Track Events', () => {
             })]);
         });
 
-        test('neither event fires when the user cancels the share sheet', async () => {
+        test('sound_share_cancelled fires when the user cancels the share sheet', async () => {
             withMock(mockFetch({ blob: createMockBlob() }));
             withMock(mockWebShare({ shouldAbort: true }));
 
             await shareSound(ACKNOWLEDGED, 'Acknowledged', 'allies');
 
+            expect(trackedCalls('sound_share_cancelled')).toEqual([{
+                sound_file: ACKNOWLEDGED,
+                sound_name: 'Acknowledged',
+                sound_category: 'allies',
+                source_section: 'allies',
+            }]);
             expect(trackedCalls('sound_shared')).toEqual([]);
             expect(trackedCalls('sound_share_failed')).toEqual([]);
         });

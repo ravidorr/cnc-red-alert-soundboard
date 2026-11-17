@@ -418,7 +418,10 @@ export async function shareSound(soundFile, soundName, sourceSection = null) {
         } catch (err) {
             // User cancelled or share failed - try clipboard fallback
             if (err.name === 'AbortError') {
-                return; // User cancelled, no message needed
+                // User cancelled: confirm it so the attempt doesn't end silently
+                showToast('SHARE CANCELLED', 'info');
+                trackEvent('sound_share_cancelled', trackedProperties);
+                return;
             }
             webShareErrorName = err.name;
         }
