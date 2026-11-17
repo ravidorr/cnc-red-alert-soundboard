@@ -167,6 +167,30 @@ describe('UI Rendering', () => {
             expect(favSections.length).toBe(1);
         });
 
+        test('should keep a collapsed favorites section collapsed when it updates', () => {
+            state.favorites = ['allies_1_achnoledged.wav'];
+            renderFavoritesSection();
+            document.getElementById('category-favorites').classList.add('collapsed');
+
+            renderFavoritesSection();
+
+            const favSection = document.getElementById('category-favorites');
+            expect(favSection.classList.contains('collapsed')).toBe(true);
+            expect(favSection.querySelector('.category-header').getAttribute('aria-expanded')).toBe('false');
+        });
+
+        test('should keep a collapsed empty favorites section collapsed when it updates', () => {
+            state.favorites = [];
+            renderFavoritesSection();
+            document.getElementById('category-favorites').classList.add('collapsed');
+
+            renderFavoritesSection();
+
+            const favSection = document.getElementById('category-favorites');
+            expect(favSection.classList.contains('collapsed')).toBe(true);
+            expect(favSection.querySelector('.category-header').getAttribute('aria-expanded')).toBe('false');
+        });
+
         test('should filter out invalid favorite files', () => {
             state.favorites = ['allies_1_achnoledged.wav', 'nonexistent.wav'];
             renderFavoritesSection();

@@ -123,15 +123,18 @@ export function renderCategories() {
 export function renderFavoritesSection() {
     // Remove existing favorites section
     const existingSection = document.getElementById('category-favorites');
+    // Keep the expanded or collapsed state the visitor chose
+    const isCollapsed = existingSection ? existingSection.classList.contains('collapsed') : false;
     if (existingSection) {
         existingSection.remove();
     }
+    const collapsedClass = isCollapsed ? ' collapsed' : '';
 
     // Show empty state if no favorites
     if (state.favorites.length === 0) {
         const emptyHtml = `
-            <section class="category-section favorites-section" id="category-favorites" data-category="favorites">
-                <button type="button" class="category-header" aria-expanded="true" aria-controls="category-content-favorites">
+            <section class="category-section favorites-section${collapsedClass}" id="category-favorites" data-category="favorites">
+                <button type="button" class="category-header" aria-expanded="${!isCollapsed}" aria-controls="category-content-favorites">
                     <span class="category-title">
                         <span class="category-name">FAVORITES</span>
                         <span class="category-count">(0)</span>
@@ -176,9 +179,9 @@ export function renderFavoritesSection() {
     ` : '';
 
     const sectionHtml = `
-        <section class="category-section favorites-section" id="category-favorites" data-category="favorites">
+        <section class="category-section favorites-section${collapsedClass}" id="category-favorites" data-category="favorites">
             <div class="category-header-wrapper">
-                <button type="button" class="category-header" aria-expanded="true" aria-controls="category-content-favorites">
+                <button type="button" class="category-header" aria-expanded="${!isCollapsed}" aria-controls="category-content-favorites">
                     <span class="category-title">
                         <span class="category-name">FAVORITES</span>
                         <span class="category-count">(${favoriteSounds.length})</span>

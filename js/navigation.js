@@ -137,6 +137,22 @@ export function applyCollapsedStates() {
     });
 }
 
+/**
+ * Expand a category and persist the expanded state
+ * @param {string} categoryId - Category ID
+ */
+export function expandCategory(categoryId) {
+    const section = document.getElementById(`category-${categoryId}`);
+    if (section) {
+        section.classList.remove('collapsed');
+        const header = section.querySelector('.category-header');
+        if (header) {
+            header.setAttribute('aria-expanded', 'true');
+        }
+    }
+    saveCollapseState(categoryId, false);
+}
+
 // Announce message to screen readers
 function announceToScreenReader(message) {
     announce(message, { id: 'category-announcer' });
