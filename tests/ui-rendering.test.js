@@ -654,6 +654,74 @@ describe('UI Rendering', () => {
             // Should NOT fall back to clipboard when user cancels
             expect(clipboardMock).not.toHaveBeenCalled();
         });
+
+        test('should show busy state on share button while the file downloads', async () => {
+            const localThis = {};
+            localThis.shareBtn = document.createElement('button');
+            localThis.shareMock = jest.fn().mockImplementation(() => {
+                localThis.busyWhenShareOpened = localThis.shareBtn.getAttribute('aria-busy');
+                return Promise.resolve();
+            });
+            const mockBlob = new Blob(['audio data'], { type: 'audio/wav' });
+
+            global.fetch = jest.fn().mockImplementation(() => {
+                localThis.busyDuringFetch = localThis.shareBtn.classList.contains('is-sharing');
+                return Promise.resolve({ blob: () => Promise.resolve(mockBlob) });
+            });
+
+            Object.assign(navigator, {
+                share: localThis.shareMock,
+                canShare: jest.fn().mockReturnValue(true),
+            });
+
+            await shareSound('test.wav', 'Test Sound', null, localThis.shareBtn);
+
+            expect(localThis.busyDuringFetch).toBe(true);
+            expect(localThis.busyWhenShareOpened).toBe('false');
+            expect(localThis.shareBtn.classList.contains('is-sharing')).toBe(false);
+            expect(localThis.shareBtn.getAttribute('aria-busy')).toBe('false');
+        });
+
+        test('should clear busy state before clipboard fallback when download fails', async () => {
+            const localThis = {};
+            localThis.shareBtn = document.createElement('button');
+            localThis.clipboardMock = jest.fn().mockImplementation(() => {
+                localThis.busyWhenCopied = localThis.shareBtn.classList.contains('is-sharing');
+                return Promise.resolve();
+            });
+
+            global.fetch = jest.fn().mockRejectedValue(new TypeError('Network error'));
+
+            Object.assign(navigator, {
+                share: jest.fn().mockResolvedValue(),
+                canShare: jest.fn().mockReturnValue(true),
+                clipboard: { writeText: localThis.clipboardMock },
+            });
+
+            await shareSound('test.wav', 'Test Sound', null, localThis.shareBtn);
+
+            expect(localThis.clipboardMock).toHaveBeenCalled();
+            expect(localThis.busyWhenCopied).toBe(false);
+            expect(localThis.shareBtn.getAttribute('aria-busy')).toBe('false');
+        });
+
+        test('should ignore repeat taps while a share is preparing', async () => {
+            const localThis = {};
+            localThis.shareBtn = document.createElement('button');
+            localThis.shareBtn.setAttribute('aria-busy', 'true');
+            localThis.shareMock = jest.fn().mockResolvedValue();
+            global.fetch = jest.fn();
+
+            Object.assign(navigator, {
+                share: localThis.shareMock,
+                canShare: jest.fn().mockReturnValue(true),
+            });
+
+            await shareSound('test.wav', 'Test Sound', null, localThis.shareBtn);
+
+            expect(global.fetch).not.toHaveBeenCalled();
+            expect(localThis.shareMock).not.toHaveBeenCalled();
+        });
     });
 
     describe('createNavHeader', () => {

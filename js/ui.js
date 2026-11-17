@@ -362,9 +362,23 @@ export function hideSearchEmptyState() {
     }
 }
 
+// Show or clear the busy state on a share button while the audio file downloads
+function setShareBusy(shareBtn, isBusy) {
+    if (!shareBtn) {
+        return;
+    }
+    shareBtn.classList.toggle('is-sharing', isBusy);
+    shareBtn.setAttribute('aria-busy', String(isBusy));
+}
+
 // Share a sound using Web Share API (with file) or fallback to clipboard
 // sourceSection is the section the share button was used in, for analytics
-export async function shareSound(soundFile, soundName, sourceSection = null) {
+// shareBtn is the button that started the share, used to show a busy state
+export async function shareSound(soundFile, soundName, sourceSection = null, shareBtn = null) {
+    // Ignore repeat taps while a share is already preparing
+    if (shareBtn && shareBtn.getAttribute('aria-busy') === 'true') {
+        return;
+    }
     const soundUrl = `sounds/${soundFile}`;
     const pageUrl = `${window.location.origin}${window.location.pathname}#sound=${encodeURIComponent(soundFile)}`;
     const sound = SOUNDS.find(s => s.file === soundFile);
@@ -379,11 +393,14 @@ export async function shareSound(soundFile, soundName, sourceSection = null) {
 
     // Try Web Share API with file (works on mobile)
     if (navigator.share) {
+        // Show a busy state until the share sheet opens or the fallback runs
+        setShareBusy(shareBtn, true);
         try {
             // Fetch the audio file
             const response = await fetch(soundUrl);
             const blob = await response.blob();
             const file = new File([blob], soundFile, { type: 'audio/wav' });
+            setShareBusy(shareBtn, false);
 
             // Check if file sharing is supported
             const displayName = soundName || 'C&C Sound';
@@ -416,6 +433,7 @@ export async function shareSound(soundFile, soundName, sourceSection = null) {
             });
             return;
         } catch (err) {
+            setShareBusy(shareBtn, false);
             // User cancelled or share failed - try clipboard fallback
             if (err.name === 'AbortError') {
                 return; // User cancelled, no message needed

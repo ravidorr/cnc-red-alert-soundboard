@@ -460,6 +460,14 @@ button.category-header:focus-visible {
     height: 16px;
 }
 
+/* Busy state while the audio file downloads for the share sheet */
+.share-btn.is-sharing {
+    color: var(--green-primary);
+    background: var(--bg-button-hover);
+    cursor: progress;
+    animation: headerPulse 0.8s ease-in-out infinite;
+}
+
 /* Favorite button specific styles */
 .favorite-btn {
     padding: 6px 8px;

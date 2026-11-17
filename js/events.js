@@ -56,7 +56,7 @@ export function setupEventListeners() {
             e.stopPropagation();
             const file = decodeURIComponent(shareBtn.dataset.file);
             const name = shareBtn.dataset.name;
-            shareSound(file, name, getSourceSection(shareBtn));
+            shareSound(file, name, getSourceSection(shareBtn), shareBtn);
             return;
         }
 
@@ -100,7 +100,7 @@ export function setupEventListeners() {
                 e.stopPropagation();
                 const file = decodeURIComponent(shareBtn.dataset.file);
                 const name = shareBtn.dataset.name;
-                shareSound(file, name, getSourceSection(shareBtn));
+                shareSound(file, name, getSourceSection(shareBtn), shareBtn);
                 return;
             }
 

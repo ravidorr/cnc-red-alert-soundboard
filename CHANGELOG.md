@@ -4,6 +4,15 @@ All notable changes to the C&C Red Alert Soundboard are documented here. The
 format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 this project uses [Semantic Versioning](https://semver.org/).
 
+## [3.2.14] - 2026-11-17
+
+### Fixed
+
+- The Share button now shows a busy state while the audio file downloads on
+  devices with native sharing. The busy state clears when the share sheet
+  opens or the clipboard fallback runs, and repeat taps are ignored while it
+  shows.
+
 ## [3.2.13] - 2026-11-14
 
 ### Changed
