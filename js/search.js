@@ -2,7 +2,7 @@
 // Search - Search/filter functionality
 // ============================================
 
-import { SOUNDS } from './constants.js';
+import { SOUNDS, CATEGORIES } from './constants.js';
 import { state, elements } from './state.js';
 import { showSearchEmptyState, hideSearchEmptyState } from './ui.js';
 import { fuzzyMatch, announce } from './utils.js';
@@ -69,6 +69,15 @@ export function filterSounds() {
             if (soundData?.tags) {
                 matches = soundData.tags.some(tag => tag.toLowerCase().includes(state.searchTerm));
                 matchType = 'tag';
+            }
+        }
+
+        // Check the category name shown in the navigation (e.g. "ALLIED FORCES")
+        if (!matches) {
+            const categoryName = CATEGORIES[cache.get(file)?.category]?.name;
+            if (categoryName) {
+                matches = categoryName.toLowerCase().includes(state.searchTerm);
+                matchType = 'category';
             }
         }
 
