@@ -340,6 +340,34 @@ describe('Pure Functions', () => {
                 expect(fuzzyMatch('test', '')).toBe(false);
                 expect(fuzzyMatch(null, 'test')).toBe(false);
             });
+
+            test('should ignore punctuation in query and text', () => {
+                expect(fuzzyMatch('lets rock', "Let's Rock")).toBe(true);
+                expect(fuzzyMatch("let's rock!", 'Lets Rock')).toBe(true);
+            });
+
+            test('should return false when query is only punctuation', () => {
+                expect(fuzzyMatch("'!?", "Let's Rock")).toBe(false);
+                expect(fuzzyMatch(' - ', 'Yes Sir')).toBe(false);
+            });
+
+            test('should match multi-word typos word by word', () => {
+                expect(fuzzyMatch('yes sri', 'Yes Sir')).toBe(true);
+                expect(fuzzyMatch('lest rokc', "Let's Rock")).toBe(true);
+            });
+
+            test('should match multi-word queries that end with a partial word', () => {
+                expect(fuzzyMatch('medic yes s', 'Medic Yes Sir')).toBe(true);
+            });
+
+            test('should require every typed word to match', () => {
+                expect(fuzzyMatch('yes xyz', 'Yes Sir')).toBe(false);
+                expect(fuzzyMatch('qz sir', 'Yes Sir')).toBe(false);
+            });
+
+            test('should not fuzzy match words with very different lengths', () => {
+                expect(fuzzyMatch('acknowledgement', 'ack')).toBe(false);
+            });
         });
 
         describe('levenshteinDistance', () => {
