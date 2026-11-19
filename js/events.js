@@ -162,7 +162,17 @@ export function setupEventListeners() {
     elements.categoryNav.addEventListener('click', (e) => {
         const navItem = e.target.closest('.nav-item');
         if (navItem) {
-            scrollToCategory(navItem.dataset.category);
+            const categoryId = navItem.dataset.category;
+            // From the no-results state, clear the search so the category's sounds appear
+            if (state.searchTerm && elements.searchEmptyState?.style.display === 'block') {
+                elements.searchInput.value = '';
+                state.searchTerm = '';
+                filterSounds();
+                // Scroll after filterSounds shows the sections in its animation frame
+                requestAnimationFrame(() => scrollToCategory(categoryId));
+            } else {
+                scrollToCategory(categoryId);
+            }
             // Close mobile menu if open
             closeMobileMenu();
         }
