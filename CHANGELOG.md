@@ -4,6 +4,14 @@ All notable changes to the C&C Red Alert Soundboard are documented here. The
 format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 this project uses [Semantic Versioning](https://semver.org/).
 
+## [3.2.17] - 2026-11-19
+
+### Fixed
+
+- Closing the device share sheet no longer ends a share silently. The app now
+  shows a `SHARE CANCELLED` status and records a `sound_share_cancelled` event
+  with the sound and source section.
+
 ## [3.2.16] - 2026-11-19
 
 ### Changed

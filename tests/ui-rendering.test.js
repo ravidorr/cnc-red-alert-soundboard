@@ -522,6 +522,9 @@ describe('UI Rendering', () => {
 
         test('should handle Web Share API abort gracefully', async () => {
             // When user cancels share, no error toast should appear
+            global.fetch = jest.fn().mockResolvedValue({
+                blob: () => Promise.resolve(new Blob(['audio data'], { type: 'audio/wav' })),
+            });
             mockWebShare({ shouldAbort: true });
             mockClipboard();
 
@@ -533,6 +536,11 @@ describe('UI Rendering', () => {
             // No error toast should appear for abort
             const errorToast = document.querySelector('.toast-error');
             expect(errorToast).toBeNull();
+
+            // A neutral status confirms the cancel
+            const infoToast = document.querySelector('.toast-info');
+            expect(infoToast).not.toBeNull();
+            expect(infoToast.textContent).toContain('SHARE CANCELLED');
         });
 
         test('should use Web Share API with file when supported', async () => {
@@ -649,7 +657,7 @@ describe('UI Rendering', () => {
             expect(shareMock.mock.calls[0][0].title).toBe('Affirmative');
         });
 
-        test('should not show toast when user cancels share', async () => {
+        test('should not fall back to clipboard when user cancels share', async () => {
             const localThis = {};
             localThis.abortError = new Error('Share cancelled');
             localThis.abortError.name = 'AbortError';
