@@ -177,6 +177,62 @@ describe('Install Functions', () => {
             jest.useRealTimers();
         });
 
+        test('should hold install prompt until the mission briefing closes', async () => {
+            jest.useFakeTimers();
+            window.matchMedia = jest.fn().mockReturnValue({ matches: false });
+            setupInstallPrompt();
+
+            const briefing = document.createElement('div');
+            briefing.id = 'onboarding-tooltip';
+            document.body.appendChild(briefing);
+
+            const mockEvent = {
+                preventDefault: jest.fn(),
+            };
+            window.dispatchEvent(Object.assign(new Event('beforeinstallprompt'), mockEvent));
+            jest.advanceTimersByTime(2100);
+
+            // Held while the briefing is open
+            expect(elements.installPrompt.classList.contains('visible')).toBe(false);
+
+            // Unrelated DOM changes don't release it
+            const other = document.createElement('div');
+            document.body.appendChild(other);
+            await Promise.resolve();
+            expect(elements.installPrompt.classList.contains('visible')).toBe(false);
+
+            briefing.remove();
+            await Promise.resolve();
+
+            expect(elements.installPrompt.classList.contains('visible')).toBe(true);
+            other.remove();
+            jest.useRealTimers();
+        });
+
+        test('should not show held install prompt if install was already handled', async () => {
+            jest.useFakeTimers();
+            window.matchMedia = jest.fn().mockReturnValue({ matches: false });
+            setupInstallPrompt();
+
+            const briefing = document.createElement('div');
+            briefing.id = 'onboarding-tooltip';
+            document.body.appendChild(briefing);
+
+            const mockEvent = {
+                preventDefault: jest.fn(),
+            };
+            window.dispatchEvent(Object.assign(new Event('beforeinstallprompt'), mockEvent));
+            jest.advanceTimersByTime(2100);
+
+            // Install handled from the header button while the briefing was open
+            state.deferredInstallPrompt = null;
+            briefing.remove();
+            await Promise.resolve();
+
+            expect(elements.installPrompt.classList.contains('visible')).toBe(false);
+            jest.useRealTimers();
+        });
+
         test('should not show install prompt when recently dismissed', () => {
             jest.useFakeTimers();
             window.matchMedia = jest.fn().mockReturnValue({ matches: false });

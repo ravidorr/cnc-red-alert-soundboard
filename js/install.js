@@ -36,7 +36,7 @@ export function setupInstallPrompt() {
         // Show modal prompt after delay (only if not dismissed recently)
         if (shouldShowInstallPrompt(localStorage, 7)) {
             setTimeout(() => {
-                showInstallPrompt();
+                showInstallPromptAfterBriefing();
             }, 2000);
         }
     });
@@ -127,6 +127,27 @@ export async function triggerInstall(promptSource = null) {
     state.deferredInstallPrompt = null;
     hideInstallPrompt();
     hideInstallButton();
+}
+
+// Hold the install modal while the mission briefing is open, so it doesn't
+// cover the briefing or take focus from it. Show it once the briefing closes.
+function showInstallPromptAfterBriefing() {
+    if (!document.getElementById('onboarding-tooltip')) {
+        showInstallPrompt();
+        return;
+    }
+
+    const observer = new MutationObserver(() => {
+        if (document.getElementById('onboarding-tooltip')) {
+            return;
+        }
+        observer.disconnect();
+        // Skip if the install was already handled from the header button
+        if (state.deferredInstallPrompt) {
+            showInstallPrompt();
+        }
+    });
+    observer.observe(document.body, { childList: true });
 }
 
 export function showInstallPrompt() {
