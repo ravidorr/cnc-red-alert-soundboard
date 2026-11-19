@@ -167,6 +167,30 @@ describe('UI Rendering', () => {
             expect(favSections.length).toBe(1);
         });
 
+        test('should keep a collapsed favorites section collapsed when it updates', () => {
+            state.favorites = ['allies_1_achnoledged.wav'];
+            renderFavoritesSection();
+            document.getElementById('category-favorites').classList.add('collapsed');
+
+            renderFavoritesSection();
+
+            const favSection = document.getElementById('category-favorites');
+            expect(favSection.classList.contains('collapsed')).toBe(true);
+            expect(favSection.querySelector('.category-header').getAttribute('aria-expanded')).toBe('false');
+        });
+
+        test('should keep a collapsed empty favorites section collapsed when it updates', () => {
+            state.favorites = [];
+            renderFavoritesSection();
+            document.getElementById('category-favorites').classList.add('collapsed');
+
+            renderFavoritesSection();
+
+            const favSection = document.getElementById('category-favorites');
+            expect(favSection.classList.contains('collapsed')).toBe(true);
+            expect(favSection.querySelector('.category-header').getAttribute('aria-expanded')).toBe('false');
+        });
+
         test('should filter out invalid favorite files', () => {
             state.favorites = ['allies_1_achnoledged.wav', 'nonexistent.wav'];
             renderFavoritesSection();
@@ -479,7 +503,7 @@ describe('UI Rendering', () => {
 
             const toast = document.querySelector('.toast-success');
             expect(toast).not.toBeNull();
-            expect(toast.textContent).toContain('LINK ACQUIRED');
+            expect(toast.textContent).toContain('LINK ACQUIRED. Link copied. Paste it to share.');
             clipboard.restore();
         });
 
@@ -543,7 +567,7 @@ describe('UI Rendering', () => {
 
             const toast = document.querySelector('.toast-success');
             expect(toast).not.toBeNull();
-            expect(toast.textContent).toContain('INTEL TRANSMITTED');
+            expect(toast.textContent).toContain('INTEL TRANSMITTED. Sound sent.');
         });
 
         test('should share URL when file sharing not supported', async () => {
@@ -570,7 +594,7 @@ describe('UI Rendering', () => {
 
             const toast = document.querySelector('.toast-success');
             expect(toast).not.toBeNull();
-            expect(toast.textContent).toContain('INTEL TRANSMITTED');
+            expect(toast.textContent).toContain('INTEL TRANSMITTED. Link to the sound sent.');
         });
 
         test('should use default name when soundName not provided', async () => {

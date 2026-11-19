@@ -13,6 +13,7 @@ import {
     createNavHeader,
     loadCollapsedCategories,
     applyCollapsedStates,
+    expandCategory,
 } from '../js/navigation.js';
 import {
     toggleMobileMenu,
@@ -581,6 +582,37 @@ describe('Navigation Functions', () => {
             applyCollapsedStates();
 
             expect(localThis.section.classList.contains('collapsed')).toBe(true);
+        });
+
+        test('expandCategory should expand a collapsed section and persist it', () => {
+            const localThis = {};
+            localThis.section = document.getElementById('category-allies');
+            toggleCategory(localThis.section);
+
+            expandCategory('allies');
+
+            expect(localThis.section.classList.contains('collapsed')).toBe(false);
+            expect(localThis.section.querySelector('.category-header').getAttribute('aria-expanded')).toBe('true');
+            expect(loadCollapsedCategories()).not.toContain('allies');
+        });
+
+        test('expandCategory should expand a section without a header', () => {
+            const localThis = {};
+            localThis.section = document.getElementById('category-allies');
+            localThis.section.classList.add('collapsed');
+            localThis.section.querySelector('.category-header').remove();
+
+            expandCategory('allies');
+
+            expect(localThis.section.classList.contains('collapsed')).toBe(false);
+        });
+
+        test('expandCategory should persist the state for a nonexistent section', () => {
+            localStorage.setItem('cnc-collapsed-categories', JSON.stringify(['nonexistent']));
+
+            expandCategory('nonexistent');
+
+            expect(loadCollapsedCategories()).toEqual([]);
         });
     });
 
