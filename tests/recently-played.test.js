@@ -10,6 +10,7 @@ import {
     addToRecentlyPlayed,
     renderRecentlyPlayedSection,
 } from '../js/recently-played.js';
+import { setupAudioPlayer, playSound } from '../js/audio.js';
 
 describe('Recently Played Functions', () => {
     beforeEach(() => {
@@ -155,6 +156,37 @@ describe('Recently Played Functions', () => {
             const contentArea = document.getElementById('content-area');
             const recentSection = document.getElementById('category-recent');
             expect(contentArea.firstElementChild).toBe(recentSection);
+        });
+
+        test('should keep playing state on a sound replayed from recently played', () => {
+            setupAudioPlayer();
+            state.recentlyPlayed = ['allies_1_achnoledged.wav', 'allies_1_affirmative.wav'];
+            renderRecentlyPlayedSection();
+
+            const recentBtn = document.querySelector('#category-recent .sound-btn[data-file="allies_1_affirmative.wav"]');
+            playSound(recentBtn);
+
+            const redrawnBtn = document.querySelector('#category-recent .sound-btn');
+            expect(redrawnBtn.dataset.file).toBe('allies_1_affirmative.wav');
+            expect(redrawnBtn.classList.contains('playing')).toBe(true);
+            expect(state.currentlyPlaying).toBe(redrawnBtn);
+
+            // A second click stops playback instead of restarting it
+            playSound(redrawnBtn);
+            expect(redrawnBtn.classList.contains('playing')).toBe(false);
+            expect(state.currentlyPlaying).toBeNull();
+        });
+
+        test('should not move playing state from a button outside recently played', () => {
+            setupAudioPlayer();
+            state.recentlyPlayed = ['allies_1_achnoledged.wav'];
+            renderRecentlyPlayedSection();
+
+            const categoryBtn = document.querySelector('.category-section:not(#category-recent) .sound-btn');
+            playSound(categoryBtn);
+
+            expect(state.currentlyPlaying).toBe(categoryBtn);
+            expect(document.querySelector('#category-recent .sound-btn.playing')).toBeNull();
         });
 
         test('should mark favorite sounds', () => {

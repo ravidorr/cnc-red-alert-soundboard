@@ -75,12 +75,40 @@ export function showOnboardingTooltip() {
     });
     tooltip.addEventListener('keydown', focusTrapHandler);
 
-    // Auto-dismiss after 30 seconds (extended for accessibility)
-    setTimeout(() => {
-        if (document.body.contains(tooltip)) {
-            dismissOnboarding(tooltip, 'auto_timeout', shownAt);
+    // Auto-dismiss after 30 seconds (extended for accessibility). The countdown
+    // is paused while the pointer or focus is inside the briefing, and starts
+    // over once both leave, so it never closes while someone is reading it.
+    let autoDismissTimer = null;
+    let pointerInside = false;
+    let focusInside = false;
+    const scheduleAutoDismiss = () => {
+        clearTimeout(autoDismissTimer);
+        if (pointerInside || focusInside) {
+            return;
         }
-    }, 30000);
+        autoDismissTimer = setTimeout(() => {
+            if (document.body.contains(tooltip)) {
+                dismissOnboarding(tooltip, 'auto_timeout', shownAt);
+            }
+        }, 30000);
+    };
+    tooltip.addEventListener('pointerenter', () => {
+        pointerInside = true;
+        scheduleAutoDismiss();
+    });
+    tooltip.addEventListener('pointerleave', () => {
+        pointerInside = false;
+        scheduleAutoDismiss();
+    });
+    tooltip.addEventListener('focusin', () => {
+        focusInside = true;
+        scheduleAutoDismiss();
+    });
+    tooltip.addEventListener('focusout', (e) => {
+        focusInside = tooltip.contains(e.relatedTarget);
+        scheduleAutoDismiss();
+    });
+    scheduleAutoDismiss();
 }
 
 /**
@@ -180,14 +208,17 @@ function dismissOnboardingForced(tooltip, dismissMethod, shownAt) {
 }
 
 /**
- * Dismiss the onboarding tooltip
+ * Dismiss the onboarding tooltip. Only a deliberate dismissal marks it as
+ * seen, so a briefing that timed out is shown again on the next visit.
  * @param {HTMLElement} tooltip - The tooltip element
  * @param {string} dismissMethod - 'button', 'escape' or 'auto_timeout'
  * @param {number} shownAt - Timestamp when the tooltip was shown
  */
 function dismissOnboarding(tooltip, dismissMethod, shownAt) {
     trackOnboardingDismissed(tooltip, dismissMethod, false, shownAt);
-    markOnboardingSeen(localStorage);
+    if (dismissMethod !== 'auto_timeout') {
+        markOnboardingSeen(localStorage);
+    }
     tooltip.classList.add('hiding');
     setTimeout(() => {
         if (document.body.contains(tooltip)) {
