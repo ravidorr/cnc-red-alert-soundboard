@@ -4,6 +4,14 @@ All notable changes to the C&C Red Alert Soundboard are documented here. The
 format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 this project uses [Semantic Versioning](https://semver.org/).
 
+## [3.2.25] - 2026-11-19
+
+### Fixed
+
+- When sharing a sound fails and the link can't be copied, the error toast now
+  says the link could not be copied and offers a RETRY button. The toast stays
+  open until the visitor retries or dismisses it.
+
 ## [3.2.24] - 2026-11-19
 
 ### Changed

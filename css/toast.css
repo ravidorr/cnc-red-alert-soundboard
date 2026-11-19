@@ -85,6 +85,35 @@
     outline-offset: 2px;
 }
 
+.toast-action {
+    background: none;
+    border: 1px solid currentcolor;
+    color: inherit;
+    font-family: var(--font-primary);
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+    padding: var(--spacing-sm) var(--spacing-md);
+    cursor: pointer;
+    transition: var(--transition-base);
+    min-width: 44px;
+    min-height: 44px;
+}
+
+.toast-action:hover,
+.toast-action:focus {
+    background: var(--bg-button-hover);
+}
+
+.toast-action:focus-visible {
+    outline: 2px solid var(--green-primary);
+    outline-offset: 2px;
+}
+
+/* Toasts with an action stay visible until used or dismissed */
+.toast-persistent {
+    animation: toastSlideIn 0.3s ease;
+}
+
 /* Pause animation on hover for accessibility */
 .toast:hover {
     animation-play-state: paused;
