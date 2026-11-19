@@ -2,11 +2,12 @@
  * @jest-environment jsdom
  */
 import { jest } from '@jest/globals';
-import { setupFullDOM, resetState, resetElements, useFakeTimers, useRealTimers, advanceTimers, mockClipboard } from './helpers.js';
+import { setupFullDOM, resetState, resetElements, useFakeTimers, useRealTimers, advanceTimers, mockClipboard, mockRequestAnimationFrame } from './helpers.js';
 import { state, elements } from '../js/state.js';
 import { cacheElements, renderCategories, renderFavoritesSection } from '../js/ui.js';
 import { renderNavigation } from '../js/navigation.js';
 import { setupAudioPlayer, playSound } from '../js/audio.js';
+import { filterSounds } from '../js/search.js';
 import { setupEventListeners, cleanupEventListeners, handleShortcutsModalKeydown, showShortcutsModal, hideShortcutsModal, showContactModal } from '../js/events.js';
 
 describe('Event Handlers', () => {
@@ -47,6 +48,30 @@ describe('Event Handlers', () => {
             favBtn.click();
 
             expect(state.favorites.length).toBe(1);
+        });
+
+        test('starring a sound keeps the saved style until the pointer leaves', () => {
+            setupEventListeners();
+
+            const favBtn = document.querySelector('.favorite-btn');
+            favBtn.click();
+
+            expect(favBtn.classList.contains('just-favorited')).toBe(true);
+
+            favBtn.dispatchEvent(new Event('pointerleave'));
+
+            expect(favBtn.classList.contains('just-favorited')).toBe(false);
+        });
+
+        test('unstarring a sound does not mark it as just favorited', () => {
+            setupEventListeners();
+
+            const favBtn = document.querySelector('.favorite-btn');
+            favBtn.click();
+            favBtn.dispatchEvent(new Event('pointerleave'));
+            favBtn.click();
+
+            expect(favBtn.classList.contains('just-favorited')).toBe(false);
         });
 
         test('pressing Enter on favorite button should toggle favorite', () => {
@@ -189,6 +214,57 @@ describe('Event Handlers', () => {
             const navItem = document.querySelector('.nav-item:not(.favorites-nav):not(.recent-nav)');
             navItem.click();
 
+            expect(window.scrollTo).toHaveBeenCalled();
+        });
+
+        test('clicking nav item in the no-results state should clear the search and scroll', () => {
+            const restoreRAF = mockRequestAnimationFrame();
+            setupEventListeners();
+            window.scrollTo = jest.fn();
+
+            state.searchTerm = 'zzzzqqqq';
+            elements.searchInput.value = 'zzzzqqqq';
+            filterSounds();
+            expect(elements.searchEmptyState.style.display).toBe('block');
+
+            const navItem = document.querySelector('.nav-item:not(.favorites-nav):not(.recent-nav)');
+            const section = document.getElementById(`category-${navItem.dataset.category}`);
+            navItem.click();
+
+            expect(state.searchTerm).toBe('');
+            expect(elements.searchInput.value).toBe('');
+            expect(elements.searchEmptyState.style.display).toBe('none');
+            expect(section.style.display).toBe('');
+            expect(window.scrollTo).toHaveBeenCalled();
+            restoreRAF();
+        });
+
+        test('clicking nav item while search has results should keep the search', () => {
+            setupEventListeners();
+            window.scrollTo = jest.fn();
+
+            state.searchTerm = 'tanya';
+            elements.searchInput.value = 'tanya';
+
+            const navItem = document.querySelector('.nav-item:not(.favorites-nav):not(.recent-nav)');
+            navItem.click();
+
+            expect(state.searchTerm).toBe('tanya');
+            expect(elements.searchInput.value).toBe('tanya');
+            expect(window.scrollTo).toHaveBeenCalled();
+        });
+
+        test('clicking nav item with a search and no empty state element should keep the search', () => {
+            setupEventListeners();
+            window.scrollTo = jest.fn();
+
+            state.searchTerm = 'tanya';
+            elements.searchEmptyState = null;
+
+            const navItem = document.querySelector('.nav-item:not(.favorites-nav):not(.recent-nav)');
+            navItem.click();
+
+            expect(state.searchTerm).toBe('tanya');
             expect(window.scrollTo).toHaveBeenCalled();
         });
 

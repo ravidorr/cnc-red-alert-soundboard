@@ -460,6 +460,13 @@ button.category-header:focus-visible {
     height: 16px;
 }
 
+/* Busy while a share gets ready; repeat taps are ignored until it ends */
+.share-btn[aria-busy="true"] {
+    color: var(--green-primary);
+    cursor: progress;
+    animation: headerPulse 1s ease-in-out infinite;
+}
+
 /* Favorite button specific styles */
 .favorite-btn {
     padding: 6px 8px;
@@ -470,9 +477,13 @@ button.category-header:focus-visible {
     background: var(--green-darker);
 }
 
-.favorite-btn.is-favorite:hover {
-    color: var(--red-alert);
-    background: rgb(255, 0, 0, 0.1);
+/* Red remove hint only on a later, deliberate hover. Right after a save
+   (.just-favorited) and on touch screens, the star keeps its saved style. */
+@media (hover: hover) {
+    .favorite-btn.is-favorite:not(.just-favorited):hover {
+        color: var(--red-alert);
+        background: rgb(255, 0, 0, 0.1);
+    }
 }
 
 /* Empty State */

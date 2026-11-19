@@ -123,15 +123,18 @@ export function renderCategories() {
 export function renderFavoritesSection() {
     // Remove existing favorites section
     const existingSection = document.getElementById('category-favorites');
+    // Keep the expanded or collapsed state the visitor chose
+    const isCollapsed = existingSection ? existingSection.classList.contains('collapsed') : false;
     if (existingSection) {
         existingSection.remove();
     }
+    const collapsedClass = isCollapsed ? ' collapsed' : '';
 
     // Show empty state if no favorites
     if (state.favorites.length === 0) {
         const emptyHtml = `
-            <section class="category-section favorites-section" id="category-favorites" data-category="favorites">
-                <button type="button" class="category-header" aria-expanded="true" aria-controls="category-content-favorites">
+            <section class="category-section favorites-section${collapsedClass}" id="category-favorites" data-category="favorites">
+                <button type="button" class="category-header" aria-expanded="${!isCollapsed}" aria-controls="category-content-favorites">
                     <span class="category-title">
                         <span class="category-name">FAVORITES</span>
                         <span class="category-count">(0)</span>
@@ -140,10 +143,9 @@ export function renderFavoritesSection() {
                 </button>
                 <div class="category-content" id="category-content-favorites">
                     <div class="favorites-empty">
-                        <div class="favorites-empty-icon" aria-hidden="true">&#9734;</div>
                         <div class="favorites-empty-title">AWAITING ORDERS</div>
                         <div class="favorites-empty-text">
-                            Mark priority targets with the star icon for rapid deployment.
+                            Mark priority targets with the star icon on any sound tile for rapid deployment.
                         </div>
                     </div>
                 </div>
@@ -176,9 +178,9 @@ export function renderFavoritesSection() {
     ` : '';
 
     const sectionHtml = `
-        <section class="category-section favorites-section" id="category-favorites" data-category="favorites">
+        <section class="category-section favorites-section${collapsedClass}" id="category-favorites" data-category="favorites">
             <div class="category-header-wrapper">
-                <button type="button" class="category-header" aria-expanded="true" aria-controls="category-content-favorites">
+                <button type="button" class="category-header" aria-expanded="${!isCollapsed}" aria-controls="category-content-favorites">
                     <span class="category-title">
                         <span class="category-name">FAVORITES</span>
                         <span class="category-count">(${favoriteSounds.length})</span>
@@ -213,6 +215,45 @@ export function renderFavoritesSection() {
 
     // Setup drag and drop handlers
     setupFavoritesDragAndDrop();
+}
+
+// How long a newly revealed favorite stays highlighted
+const FAVORITE_HIGHLIGHT_DURATION = 2500;
+
+/**
+ * Bring a saved sound into view in the Favorites section and highlight it
+ * @param {string} soundFile - The favorited sound file
+ */
+export function revealFavorite(soundFile) {
+    const section = document.getElementById('category-favorites');
+    if (!section) {
+        return;
+    }
+
+    // Expand the section if it is collapsed
+    if (section.classList.contains('collapsed')) {
+        section.classList.remove('collapsed');
+        const header = section.querySelector('.category-header');
+        if (header) {
+            header.setAttribute('aria-expanded', 'true');
+        }
+    }
+
+    const wrapper = section.querySelector(`.sound-btn-wrapper[data-file="${encodeURIComponent(soundFile)}"]`);
+    if (!wrapper) {
+        return;
+    }
+
+    wrapper.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    wrapper.classList.add('favorite-highlight');
+    setTimeout(() => {
+        wrapper.classList.remove('favorite-highlight');
+    }, FAVORITE_HIGHLIGHT_DURATION);
+
+    const soundBtn = wrapper.querySelector('.sound-btn');
+    if (soundBtn) {
+        soundBtn.focus({ preventScroll: true });
+    }
 }
 
 // Render the popular sounds section
@@ -270,10 +311,11 @@ export function renderPopularSection() {
  * @param {string} message - The message to display
  * @param {string} type - Type: 'info', 'success', or 'error'
  * @param {number} duration - How long to show the toast in ms (default 7s to match CSS)
+ * @param {{label: string, onClick: Function}|null} [action] - Optional action button
  */
 const MAX_TOASTS = 3;
 
-export function showToast(message, type = 'info', duration = 7000) {
+export function showToast(message, type = 'info', duration = 7000, action = null) {
     if (!elements.toastContainer) {
         return;
     }
@@ -294,6 +336,19 @@ export function showToast(message, type = 'info', duration = 7000) {
     messageSpan.className = 'toast-message';
     messageSpan.textContent = message;
     toast.appendChild(messageSpan);
+
+    // Optional action button (closes the toast, then runs the action)
+    if (action) {
+        const actionBtn = document.createElement('button');
+        actionBtn.type = 'button';
+        actionBtn.className = 'toast-action';
+        actionBtn.textContent = action.label;
+        actionBtn.addEventListener('click', () => {
+            toast.remove();
+            action.onClick();
+        });
+        toast.appendChild(actionBtn);
+    }
 
     // Create dismiss button for keyboard accessibility
     const dismissBtn = document.createElement('button');
@@ -362,9 +417,41 @@ export function hideSearchEmptyState() {
     }
 }
 
+// True while a share is getting ready or the share sheet is open
+let shareInProgress = false;
+
+// Show or clear the busy state on the share buttons for a sound
+function setShareButtonsBusy(soundFile, busy) {
+    const selector = `.share-btn[data-file="${encodeURIComponent(soundFile)}"]`;
+    document.querySelectorAll(selector).forEach(btn => {
+        if (busy) {
+            btn.setAttribute('aria-busy', 'true');
+            btn.setAttribute('aria-disabled', 'true');
+        } else {
+            btn.removeAttribute('aria-busy');
+            btn.removeAttribute('aria-disabled');
+        }
+    });
+}
+
 // Share a sound using Web Share API (with file) or fallback to clipboard
 // sourceSection is the section the share button was used in, for analytics
+// The share button shows a busy state and ignores repeat taps until the attempt ends
 export async function shareSound(soundFile, soundName, sourceSection = null) {
+    if (shareInProgress) {
+        return;
+    }
+    shareInProgress = true;
+    setShareButtonsBusy(soundFile, true);
+    try {
+        await runShare(soundFile, soundName, sourceSection);
+    } finally {
+        shareInProgress = false;
+        setShareButtonsBusy(soundFile, false);
+    }
+}
+
+async function runShare(soundFile, soundName, sourceSection) {
     const soundUrl = `sounds/${soundFile}`;
     const pageUrl = `${window.location.origin}${window.location.pathname}#sound=${encodeURIComponent(soundFile)}`;
     const sound = SOUNDS.find(s => s.file === soundFile);
@@ -393,7 +480,7 @@ export async function shareSound(soundFile, soundName, sourceSection = null) {
                     text: `Check out this C&C Red Alert sound: ${displayName}`,
                     files: [file],
                 });
-                showToast('INTEL TRANSMITTED', 'success');
+                showToast('INTEL TRANSMITTED. Sound sent.', 'success');
                 trackEvent('sound_shared', {
                     ...trackedProperties,
                     share_method: 'web_share_file',
@@ -408,7 +495,7 @@ export async function shareSound(soundFile, soundName, sourceSection = null) {
                 text: `Check out this C&C Red Alert sound: ${displayName}`,
                 url: pageUrl,
             });
-            showToast('INTEL TRANSMITTED', 'success');
+            showToast('INTEL TRANSMITTED. Link to the sound sent.', 'success');
             trackEvent('sound_shared', {
                 ...trackedProperties,
                 share_method: 'web_share_link',
@@ -418,7 +505,10 @@ export async function shareSound(soundFile, soundName, sourceSection = null) {
         } catch (err) {
             // User cancelled or share failed - try clipboard fallback
             if (err.name === 'AbortError') {
-                return; // User cancelled, no message needed
+                // User cancelled: confirm it so the attempt doesn't end silently
+                showToast('SHARE CANCELLED', 'info');
+                trackEvent('sound_share_cancelled', trackedProperties);
+                return;
             }
             webShareErrorName = err.name;
         }
@@ -427,7 +517,7 @@ export async function shareSound(soundFile, soundName, sourceSection = null) {
     // Fallback: copy link to clipboard
     try {
         await navigator.clipboard.writeText(pageUrl);
-        showToast('LINK ACQUIRED', 'success');
+        showToast('LINK ACQUIRED. Link copied. Paste it to share.', 'success');
         trackEvent('sound_shared', {
             ...trackedProperties,
             share_method: 'clipboard_link',

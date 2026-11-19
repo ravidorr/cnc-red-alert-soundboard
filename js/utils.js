@@ -128,11 +128,42 @@ export function addToRecentlyPlayedArray(recentlyPlayed, soundFile, maxItems) {
 }
 
 /**
+ * Lowercase text and strip punctuation so "Let's Rock!" compares as "lets rock"
+ * @param {string} text - Text to normalize
+ * @returns {string} Normalized text
+ */
+function normalizeForMatch(text) {
+    return text.toLowerCase().replace(/[^\p{L}\p{N}\s_-]/gu, '');
+}
+
+/**
+ * Check if a single query word is "close enough" to a single text word
+ * @param {string} queryWord - Normalized query word
+ * @param {string} textWord - Normalized text word
+ * @param {number} threshold - Max allowed edit distance
+ * @returns {boolean} True if the words match
+ */
+function wordMatches(queryWord, textWord, threshold) {
+    if (textWord.includes(queryWord)) {
+        return true;
+    }
+    // For very short words, only allow exact matches
+    if (queryWord.length <= 2) {
+        return false;
+    }
+    // Only fuzzy match if query word and text word are similar in length
+    return Math.abs(textWord.length - queryWord.length) <= threshold &&
+        levenshteinDistance(queryWord, textWord) <= threshold;
+}
+
+/**
  * Simple fuzzy match function using Levenshtein distance
- * Returns true if the query is "close enough" to the text
+ * Returns true if the query is "close enough" to the text.
+ * Punctuation is ignored, and each typed word is compared with the words
+ * in the text, so multi-word typos like "yes sri" still match "Yes Sir".
  * @param {string} query - Search query
  * @param {string} text - Text to match against
- * @param {number} threshold - Max allowed edit distance (default: 2)
+ * @param {number} threshold - Max allowed edit distance per word (default: 2)
  * @returns {boolean} True if fuzzy match
  */
 export function fuzzyMatch(query, text, threshold = 2) {
@@ -140,32 +171,30 @@ export function fuzzyMatch(query, text, threshold = 2) {
         return false;
     }
 
-    const queryLower = query.toLowerCase();
-    const textLower = text.toLowerCase();
+    const queryNormalized = normalizeForMatch(query);
+    const textNormalized = normalizeForMatch(text);
+    const queryWords = queryNormalized.split(/[\s_-]+/).filter(Boolean);
+
+    // Nothing left to match after removing punctuation
+    if (queryWords.length === 0) {
+        return false;
+    }
 
     // Exact substring match (fastest check)
-    if (textLower.includes(queryLower)) {
+    if (textNormalized.includes(queryNormalized)) {
         return true;
     }
 
     // For very short queries, only allow exact matches
-    if (queryLower.length <= 2) {
+    if (queryNormalized.length <= 2) {
         return false;
     }
 
-    // Check if query is a fuzzy match for any word in the text
-    const words = textLower.split(/[\s_-]+/);
-    for (const word of words) {
-        // Only fuzzy match if query and word are similar in length
-        if (Math.abs(word.length - queryLower.length) <= threshold) {
-            const distance = levenshteinDistance(queryLower, word);
-            if (distance <= threshold) {
-                return true;
-            }
-        }
-    }
-
-    return false;
+    // Every typed word must be a substring or fuzzy match for some word in the text
+    const textWords = textNormalized.split(/[\s_-]+/);
+    return queryWords.every(queryWord =>
+        textWords.some(textWord => wordMatches(queryWord, textWord, threshold)),
+    );
 }
 
 /**
