@@ -324,6 +324,10 @@ describe('Onboarding Functions', () => {
             const tooltip = document.getElementById('onboarding-tooltip');
             expect(tooltip).not.toBeNull();
 
+            // Move focus out of the briefing once it has been focused
+            jest.advanceTimersByTime(100);
+            document.getElementById('onboarding-dismiss').blur();
+
             // Fast-forward past the 30 second timeout
             jest.advanceTimersByTime(30000);
 
@@ -332,6 +336,89 @@ describe('Onboarding Functions', () => {
 
             const tooltipAfter = document.getElementById('onboarding-tooltip');
             expect(tooltipAfter).toBeNull();
+
+            jest.useRealTimers();
+        });
+
+        test('auto-dismiss should not fire while focus is inside the tooltip', () => {
+            jest.useFakeTimers();
+
+            showOnboardingTooltip();
+
+            // The dismiss button receives focus after 100ms
+            jest.advanceTimersByTime(60000);
+
+            const tooltip = document.getElementById('onboarding-tooltip');
+            expect(tooltip).not.toBeNull();
+            expect(tooltip.classList.contains('hiding')).toBe(false);
+            expect(localThis.mockStorage.setItem).not.toHaveBeenCalled();
+
+            jest.useRealTimers();
+        });
+
+        test('auto-dismiss should stay paused when focus moves within the tooltip', () => {
+            jest.useFakeTimers();
+
+            showOnboardingTooltip();
+            jest.advanceTimersByTime(100);
+
+            const tooltip = document.getElementById('onboarding-tooltip');
+            const dismissBtn = document.getElementById('onboarding-dismiss');
+            tooltip.dispatchEvent(new FocusEvent('focusout', { relatedTarget: dismissBtn }));
+            jest.advanceTimersByTime(60000);
+
+            expect(tooltip.classList.contains('hiding')).toBe(false);
+
+            jest.useRealTimers();
+        });
+
+        test('auto-dismiss should not fire while the pointer is over the tooltip', () => {
+            jest.useFakeTimers();
+
+            showOnboardingTooltip();
+            jest.advanceTimersByTime(100);
+
+            const tooltip = document.getElementById('onboarding-tooltip');
+            tooltip.dispatchEvent(new Event('pointerenter'));
+            document.getElementById('onboarding-dismiss').blur();
+            jest.advanceTimersByTime(60000);
+
+            expect(tooltip.classList.contains('hiding')).toBe(false);
+
+            jest.useRealTimers();
+        });
+
+        test('auto-dismiss should restart the full timeout after the pointer leaves', () => {
+            jest.useFakeTimers();
+
+            showOnboardingTooltip();
+            jest.advanceTimersByTime(100);
+
+            const tooltip = document.getElementById('onboarding-tooltip');
+            tooltip.dispatchEvent(new Event('pointerenter'));
+            document.getElementById('onboarding-dismiss').blur();
+            jest.advanceTimersByTime(20000);
+            tooltip.dispatchEvent(new Event('pointerleave'));
+
+            jest.advanceTimersByTime(29999);
+            expect(tooltip.classList.contains('hiding')).toBe(false);
+
+            jest.advanceTimersByTime(1);
+            expect(tooltip.classList.contains('hiding')).toBe(true);
+            expect(localThis.mockStorage.setItem).not.toHaveBeenCalledWith('cnc-onboarding-seen', 'true');
+
+            jest.useRealTimers();
+        });
+
+        test('auto-dismiss should not mark onboarding as seen', () => {
+            jest.useFakeTimers();
+
+            showOnboardingTooltip();
+            jest.advanceTimersByTime(30300);
+
+            expect(localThis.mockStorage.setItem).not.toHaveBeenCalledWith('cnc-onboarding-seen', 'true');
+            expect(hasSeenOnboarding(localThis.mockStorage)).toBe(false);
+
 
             jest.useRealTimers();
         });

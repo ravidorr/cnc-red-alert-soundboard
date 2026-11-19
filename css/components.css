@@ -460,6 +460,13 @@ button.category-header:focus-visible {
     height: 16px;
 }
 
+/* Busy while a share gets ready; repeat taps are ignored until it ends */
+.share-btn[aria-busy="true"] {
+    color: var(--green-primary);
+    cursor: progress;
+    animation: headerPulse 1s ease-in-out infinite;
+}
+
 /* Favorite button specific styles */
 .favorite-btn {
     padding: 6px 8px;
