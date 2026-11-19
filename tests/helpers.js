@@ -24,6 +24,7 @@ export function setupFullDOM() {
         <div id="sidebar" class="sidebar" role="dialog" aria-label="Categories menu" aria-hidden="true"></div>
         <div id="search-empty-state" style="display: none;">
             <span id="search-empty-term"></span>
+            <button class="btn-search-suggestion" data-search-term="Tanya">Tanya</button>
         </div>
         <button id="btn-clear-search"></button>
         <button id="random-sound"></button>

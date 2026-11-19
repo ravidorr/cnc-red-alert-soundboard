@@ -545,6 +545,24 @@ button.category-header:focus-visible {
     margin-top: 12px;
 }
 
+.btn-search-suggestion {
+    background: none;
+    border: 1px solid var(--green-dark);
+    color: var(--green-primary);
+    padding: 0 8px;
+    font-family: var(--font-primary);
+    font-size: inherit;
+    cursor: pointer;
+    transition: var(--transition-base);
+    min-width: 44px;
+    min-height: 44px;
+    vertical-align: middle;
+}
+
+.btn-search-suggestion:hover {
+    border-color: var(--green-primary);
+}
+
 /* Search Result Indicator */
 .search-result-indicator {
     display: flex;

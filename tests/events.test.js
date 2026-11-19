@@ -319,6 +319,32 @@ describe('Event Handlers', () => {
             expect(elements.searchInput.value).toBe('');
         });
 
+        test('suggestion button in empty state should run that search', () => {
+            setupEventListeners();
+            const focusSpy = jest.spyOn(elements.searchInput, 'focus');
+
+            state.searchTerm = 'zzz';
+            elements.searchInput.value = 'zzz';
+
+            elements.searchEmptyState.querySelector('[data-search-term]').click();
+
+            expect(state.searchTerm).toBe('tanya');
+            expect(elements.searchInput.value).toBe('Tanya');
+            expect(focusSpy).toHaveBeenCalled();
+        });
+
+        test('clicking empty state outside a suggestion should not change search', () => {
+            setupEventListeners();
+
+            state.searchTerm = 'zzz';
+            elements.searchInput.value = 'zzz';
+
+            elements.searchEmptyState.click();
+
+            expect(state.searchTerm).toBe('zzz');
+            expect(elements.searchInput.value).toBe('zzz');
+        });
+
         test('keyboard activation should clear favorites', async () => {
             const localThis = {};
             localThis.confirmModal = document.createElement('div');
@@ -382,6 +408,11 @@ describe('Event Handlers', () => {
 
         test('should handle null btnClearSearch', () => {
             elements.btnClearSearch = null;
+            expect(() => setupEventListeners()).not.toThrow();
+        });
+
+        test('should handle null searchEmptyState', () => {
+            elements.searchEmptyState = null;
             expect(() => setupEventListeners()).not.toThrow();
         });
 

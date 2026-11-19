@@ -4,6 +4,14 @@ All notable changes to the C&C Red Alert Soundboard are documented here. The
 format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 this project uses [Semantic Versioning](https://semver.org/).
 
+## [3.2.24] - 2026-11-19
+
+### Changed
+
+- The "explosion" and "Tanya" suggestions in the search no-results state are
+  now buttons. Selecting one runs that search and moves focus to the search
+  field, so visitors reach playable sounds in one step.
+
 ## [3.2.23] - 2026-11-19
 
 ### Added
