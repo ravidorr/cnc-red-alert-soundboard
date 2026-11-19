@@ -50,6 +50,30 @@ describe('Event Handlers', () => {
             expect(state.favorites.length).toBe(1);
         });
 
+        test('starring a sound keeps the saved style until the pointer leaves', () => {
+            setupEventListeners();
+
+            const favBtn = document.querySelector('.favorite-btn');
+            favBtn.click();
+
+            expect(favBtn.classList.contains('just-favorited')).toBe(true);
+
+            favBtn.dispatchEvent(new Event('pointerleave'));
+
+            expect(favBtn.classList.contains('just-favorited')).toBe(false);
+        });
+
+        test('unstarring a sound does not mark it as just favorited', () => {
+            setupEventListeners();
+
+            const favBtn = document.querySelector('.favorite-btn');
+            favBtn.click();
+            favBtn.dispatchEvent(new Event('pointerleave'));
+            favBtn.click();
+
+            expect(favBtn.classList.contains('just-favorited')).toBe(false);
+        });
+
         test('pressing Enter on favorite button should toggle favorite', () => {
             setupEventListeners();
 

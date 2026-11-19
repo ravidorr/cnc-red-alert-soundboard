@@ -66,6 +66,12 @@ export function setupEventListeners() {
             e.stopPropagation();
             const file = decodeURIComponent(favBtn.dataset.file);
             toggleFavorite(file, getSourceSection(favBtn));
+            // Keep a fresh save in its calm saved state until the pointer leaves,
+            // so the red remove hover only shows on a later, deliberate hover
+            if (favBtn.classList.contains('is-favorite')) {
+                favBtn.classList.add('just-favorited');
+                favBtn.addEventListener('pointerleave', () => favBtn.classList.remove('just-favorited'), { once: true });
+            }
             return;
         }
 

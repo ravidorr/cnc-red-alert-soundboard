@@ -4,6 +4,15 @@ All notable changes to the C&C Red Alert Soundboard are documented here. The
 format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 this project uses [Semantic Versioning](https://semver.org/).
 
+## [3.2.22] - 2026-11-19
+
+### Fixed
+
+- A freshly starred sound no longer turns red (the remove hover style) while
+  the pointer is still on the star. The star keeps its saved style until the
+  pointer leaves, and the red remove style only shows on devices that support
+  hover, so a tap on a touch screen no longer leaves it stuck red.
+
 ## [3.2.21] - 2026-11-19
 
 ### Changed
