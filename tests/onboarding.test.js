@@ -405,7 +405,20 @@ describe('Onboarding Functions', () => {
 
             jest.advanceTimersByTime(1);
             expect(tooltip.classList.contains('hiding')).toBe(true);
-            expect(localThis.mockStorage.setItem).toHaveBeenCalledWith('cnc-onboarding-seen', 'true');
+            expect(localThis.mockStorage.setItem).not.toHaveBeenCalledWith('cnc-onboarding-seen', 'true');
+
+            jest.useRealTimers();
+        });
+
+        test('auto-dismiss should not mark onboarding as seen', () => {
+            jest.useFakeTimers();
+
+            showOnboardingTooltip();
+            jest.advanceTimersByTime(30300);
+
+            expect(localThis.mockStorage.setItem).not.toHaveBeenCalledWith('cnc-onboarding-seen', 'true');
+            expect(hasSeenOnboarding(localThis.mockStorage)).toBe(false);
+
 
             jest.useRealTimers();
         });
