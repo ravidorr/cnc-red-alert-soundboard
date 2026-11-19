@@ -34,6 +34,10 @@ export function addToRecentlyPlayed(soundFile) {
 export function renderRecentlyPlayedSection() {
     // Remove existing section
     const existingSection = document.getElementById('category-recent');
+    // Re-rendering detaches the playing button when it lives in this section
+    const playingFileInSection = existingSection?.contains(state.currentlyPlaying)
+        ? state.currentlyPlaying.dataset.file
+        : null;
     if (existingSection) {
         existingSection.remove();
     }
@@ -109,5 +113,12 @@ export function renderRecentlyPlayedSection() {
         favoritesSection.insertAdjacentHTML('afterend', sectionHtml);
     } else {
         elements.contentArea.insertAdjacentHTML('afterbegin', sectionHtml);
+    }
+
+    // Carry the playing state to the re-rendered button so a second click still stops playback
+    if (playingFileInSection) {
+        const playingButton = document.querySelector(`#category-recent .sound-btn[data-file="${playingFileInSection}"]`);
+        playingButton.classList.add('playing');
+        state.currentlyPlaying = playingButton;
     }
 }
