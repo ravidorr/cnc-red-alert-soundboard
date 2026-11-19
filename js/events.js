@@ -66,6 +66,12 @@ export function setupEventListeners() {
             e.stopPropagation();
             const file = decodeURIComponent(favBtn.dataset.file);
             toggleFavorite(file, getSourceSection(favBtn));
+            // Keep a fresh save in its calm saved state until the pointer leaves,
+            // so the red remove hover only shows on a later, deliberate hover
+            if (favBtn.classList.contains('is-favorite')) {
+                favBtn.classList.add('just-favorited');
+                favBtn.addEventListener('pointerleave', () => favBtn.classList.remove('just-favorited'), { once: true });
+            }
             return;
         }
 
@@ -162,7 +168,17 @@ export function setupEventListeners() {
     elements.categoryNav.addEventListener('click', (e) => {
         const navItem = e.target.closest('.nav-item');
         if (navItem) {
-            scrollToCategory(navItem.dataset.category);
+            const categoryId = navItem.dataset.category;
+            // From the no-results state, clear the search so the category's sounds appear
+            if (state.searchTerm && elements.searchEmptyState?.style.display === 'block') {
+                elements.searchInput.value = '';
+                state.searchTerm = '';
+                filterSounds();
+                // Scroll after filterSounds shows the sections in its animation frame
+                requestAnimationFrame(() => scrollToCategory(categoryId));
+            } else {
+                scrollToCategory(categoryId);
+            }
             // Close mobile menu if open
             closeMobileMenu();
         }
@@ -199,6 +215,19 @@ export function setupEventListeners() {
             state.searchTerm = '';
             filterSounds();
             elements.searchInput.focus();
+        });
+    }
+
+    // Suggested search terms in empty state run that search
+    if (elements.searchEmptyState) {
+        elements.searchEmptyState.addEventListener('click', (e) => {
+            const suggestion = e.target.closest('[data-search-term]');
+            if (suggestion) {
+                elements.searchInput.value = suggestion.dataset.searchTerm;
+                state.searchTerm = suggestion.dataset.searchTerm.toLowerCase();
+                filterSounds();
+                elements.searchInput.focus();
+            }
         });
     }
 
