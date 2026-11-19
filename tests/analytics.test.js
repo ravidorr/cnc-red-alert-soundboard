@@ -31,7 +31,7 @@ import { showOnboardingTooltip, showOnboardingTooltipForced } from '../js/onboar
 // Catalog sounds used as fixtures
 const ACKNOWLEDGED = 'allies_1_achnoledged.wav'; // allies, popular, tagged
 const AFFIRMATIVE = 'allies_1_affirmative.wav'; // allies, popular, tagged
-const ACKNOWLEDGED_2 = 'allies_2_achnoledged.wav'; // allies, untagged
+const ACKNOWLEDGED_2 = 'allies_2_achnoledged.wav'; // allies, tagged, not popular
 const REPORTING = 'soviet_1_reporting.wav'; // soviets, tagged
 
 // Rendered button for a sound inside a section ('allies', 'popular', 'favorites', ...)
@@ -192,7 +192,7 @@ describe('Pendo Track Events', () => {
                     is_popular: false,
                     active_search_term: 'ack',
                     volume: 42,
-                    sound_tags: [],
+                    sound_tags: ['voice', 'confirmation'],
                 })]);
             });
 
@@ -626,10 +626,10 @@ describe('Pendo Track Events', () => {
                 }),
                 expect.objectContaining({
                     search_term: 'voice',
-                    results_count: 3,
+                    results_count: 4,
                     matched_category_count: 2,
                     fuzzy_match_count: 0,
-                    tag_match_count: 3,
+                    tag_match_count: 4,
                 }),
             ]);
         });
