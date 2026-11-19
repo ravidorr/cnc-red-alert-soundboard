@@ -11,6 +11,7 @@ import {
     renderFavoritesSection,
     renderPopularSection,
     showToast,
+    revealFavorite,
     showSearchEmptyState,
     hideSearchEmptyState,
     shareSound,
@@ -165,6 +166,30 @@ describe('UI Rendering', () => {
 
             const favSections = document.querySelectorAll('#category-favorites');
             expect(favSections.length).toBe(1);
+        });
+
+        test('should keep a collapsed favorites section collapsed when it updates', () => {
+            state.favorites = ['allies_1_achnoledged.wav'];
+            renderFavoritesSection();
+            document.getElementById('category-favorites').classList.add('collapsed');
+
+            renderFavoritesSection();
+
+            const favSection = document.getElementById('category-favorites');
+            expect(favSection.classList.contains('collapsed')).toBe(true);
+            expect(favSection.querySelector('.category-header').getAttribute('aria-expanded')).toBe('false');
+        });
+
+        test('should keep a collapsed empty favorites section collapsed when it updates', () => {
+            state.favorites = [];
+            renderFavoritesSection();
+            document.getElementById('category-favorites').classList.add('collapsed');
+
+            renderFavoritesSection();
+
+            const favSection = document.getElementById('category-favorites');
+            expect(favSection.classList.contains('collapsed')).toBe(true);
+            expect(favSection.querySelector('.category-header').getAttribute('aria-expanded')).toBe('false');
         });
 
         test('should filter out invalid favorite files', () => {
@@ -394,6 +419,19 @@ describe('UI Rendering', () => {
             useRealTimers();
         });
 
+        test('should render an action button without a custom accessible name', () => {
+            const onClick = jest.fn();
+            showToast('Test message', 'info', 100, { label: 'ACT', onClick });
+
+            const actionBtn = document.querySelector('.toast-action');
+            expect(actionBtn.textContent).toBe('ACT');
+            expect(actionBtn.hasAttribute('aria-label')).toBe(false);
+
+            actionBtn.click();
+            expect(onClick).toHaveBeenCalledTimes(1);
+            expect(document.querySelector('.toast')).toBeNull();
+        });
+
         test('should tolerate a removed toast when its focus timer expires', () => {
             const localThis = {};
             useFakeTimers();
@@ -406,6 +444,103 @@ describe('UI Rendering', () => {
 
             expect(document.querySelector('.toast')).toBeNull();
             useRealTimers();
+        });
+
+        test('should not render an action button by default', () => {
+            showToast('Test message', 'info');
+
+            expect(document.querySelector('.toast-action')).toBeNull();
+        });
+
+        test('should render an action button that closes the toast and runs the action', () => {
+            const onClick = jest.fn();
+            showToast('Test message', 'success', 100, { label: 'VIEW IN FAVORITES', onClick });
+
+            const actionBtn = document.querySelector('.toast .toast-action');
+            expect(actionBtn).not.toBeNull();
+            expect(actionBtn.textContent).toBe('VIEW IN FAVORITES');
+            expect(actionBtn.getAttribute('type')).toBe('button');
+
+            actionBtn.click();
+
+            expect(onClick).toHaveBeenCalledTimes(1);
+            expect(document.querySelector('.toast')).toBeNull();
+        });
+    });
+
+    describe('revealFavorite', () => {
+        beforeEach(() => {
+            cacheElements();
+            renderCategories();
+            Element.prototype.scrollIntoView = jest.fn();
+        });
+
+        afterEach(() => {
+            useRealTimers();
+        });
+
+        test('should do nothing when the favorites section is missing', () => {
+            expect(() => revealFavorite('allies_1_achnoledged.wav')).not.toThrow();
+            expect(Element.prototype.scrollIntoView).not.toHaveBeenCalled();
+        });
+
+        test('should scroll to, highlight, and focus the saved sound', () => {
+            useFakeTimers();
+            state.favorites = ['allies_1_achnoledged.wav'];
+            renderFavoritesSection();
+
+            revealFavorite('allies_1_achnoledged.wav');
+
+            const wrapper = document.querySelector('#category-favorites .sound-btn-wrapper');
+            expect(Element.prototype.scrollIntoView).toHaveBeenCalledWith({ behavior: 'smooth', block: 'center' });
+            expect(wrapper.classList.contains('favorite-highlight')).toBe(true);
+            expect(document.activeElement).toBe(wrapper.querySelector('.sound-btn'));
+
+            advanceTimers(2500);
+            expect(wrapper.classList.contains('favorite-highlight')).toBe(false);
+        });
+
+        test('should expand a collapsed favorites section', () => {
+            state.favorites = ['allies_1_achnoledged.wav'];
+            renderFavoritesSection();
+            const section = document.getElementById('category-favorites');
+            const header = section.querySelector('.category-header');
+            section.classList.add('collapsed');
+            header.setAttribute('aria-expanded', 'false');
+
+            revealFavorite('allies_1_achnoledged.wav');
+
+            expect(section.classList.contains('collapsed')).toBe(false);
+            expect(header.getAttribute('aria-expanded')).toBe('true');
+        });
+
+        test('should expand a collapsed section without a header', () => {
+            elements.contentArea.insertAdjacentHTML('afterbegin', '<section id="category-favorites" class="collapsed"></section>');
+
+            revealFavorite('allies_1_achnoledged.wav');
+
+            expect(document.getElementById('category-favorites').classList.contains('collapsed')).toBe(false);
+            expect(Element.prototype.scrollIntoView).not.toHaveBeenCalled();
+        });
+
+        test('should not throw when the sound is not in favorites', () => {
+            state.favorites = ['allies_1_achnoledged.wav'];
+            renderFavoritesSection();
+
+            expect(() => revealFavorite('nonexistent.wav')).not.toThrow();
+            expect(Element.prototype.scrollIntoView).not.toHaveBeenCalled();
+        });
+
+        test('should highlight a wrapper that has no sound button', () => {
+            elements.contentArea.insertAdjacentHTML('afterbegin', `
+                <section id="category-favorites">
+                    <div class="sound-btn-wrapper" data-file="${encodeURIComponent('allies_1_achnoledged.wav')}"></div>
+                </section>
+            `);
+
+            revealFavorite('allies_1_achnoledged.wav');
+
+            expect(document.querySelector('#category-favorites .sound-btn-wrapper').classList.contains('favorite-highlight')).toBe(true);
         });
     });
 
@@ -479,7 +614,7 @@ describe('UI Rendering', () => {
 
             const toast = document.querySelector('.toast-success');
             expect(toast).not.toBeNull();
-            expect(toast.textContent).toContain('LINK ACQUIRED');
+            expect(toast.textContent).toContain('LINK ACQUIRED. Link copied. Paste it to share.');
             clipboard.restore();
         });
 
@@ -496,8 +631,50 @@ describe('UI Rendering', () => {
             clipboard.restore();
         });
 
+        test('should offer a retry that stays open after a copy failure', async () => {
+            const localThis = {};
+            useFakeTimers();
+            localThis.clipboard = mockClipboard({ shouldFail: true });
+
+            await shareSound('test.wav', 'Test Sound');
+
+            localThis.toast = document.querySelector('.toast-error');
+            expect(localThis.toast.textContent).toContain('The link could not be copied');
+            expect(localThis.toast.classList.contains('toast-persistent')).toBe(true);
+            localThis.retryBtn = localThis.toast.querySelector('.toast-action');
+            expect(localThis.retryBtn.textContent).toBe('RETRY');
+            expect(localThis.retryBtn.getAttribute('aria-label')).toBe('Retry sharing Test Sound');
+
+            advanceTimers(10000);
+            expect(document.querySelector('.toast-error')).toBe(localThis.toast);
+
+            localThis.clipboard.restore();
+            localThis.clipboard = mockClipboard();
+            localThis.retryBtn.click();
+            await Promise.resolve();
+            await Promise.resolve();
+
+            expect(localThis.toast.parentNode).toBeNull();
+            expect(localThis.clipboard.writeText).toHaveBeenCalledTimes(1);
+            expect(document.querySelector('.toast-success').textContent).toContain('LINK ACQUIRED');
+            localThis.clipboard.restore();
+            useRealTimers();
+        });
+
+        test('should name the default sound in the retry label', async () => {
+            const clipboard = mockClipboard({ shouldFail: true });
+
+            await shareSound('test.wav');
+
+            expect(document.querySelector('.toast-action').getAttribute('aria-label')).toBe('Retry sharing C&C Sound');
+            clipboard.restore();
+        });
+
         test('should handle Web Share API abort gracefully', async () => {
             // When user cancels share, no error toast should appear
+            global.fetch = jest.fn().mockResolvedValue({
+                blob: () => Promise.resolve(new Blob(['audio data'], { type: 'audio/wav' })),
+            });
             mockWebShare({ shouldAbort: true });
             mockClipboard();
 
@@ -509,6 +686,11 @@ describe('UI Rendering', () => {
             // No error toast should appear for abort
             const errorToast = document.querySelector('.toast-error');
             expect(errorToast).toBeNull();
+
+            // A neutral status confirms the cancel
+            const infoToast = document.querySelector('.toast-info');
+            expect(infoToast).not.toBeNull();
+            expect(infoToast.textContent).toContain('SHARE CANCELLED');
         });
 
         test('should use Web Share API with file when supported', async () => {
@@ -535,7 +717,7 @@ describe('UI Rendering', () => {
 
             const toast = document.querySelector('.toast-success');
             expect(toast).not.toBeNull();
-            expect(toast.textContent).toContain('INTEL TRANSMITTED');
+            expect(toast.textContent).toContain('INTEL TRANSMITTED. Sound sent.');
         });
 
         test('should share URL when file sharing not supported', async () => {
@@ -562,7 +744,7 @@ describe('UI Rendering', () => {
 
             const toast = document.querySelector('.toast-success');
             expect(toast).not.toBeNull();
-            expect(toast.textContent).toContain('INTEL TRANSMITTED');
+            expect(toast.textContent).toContain('INTEL TRANSMITTED. Link to the sound sent.');
         });
 
         test('should use default name when soundName not provided', async () => {
@@ -625,7 +807,7 @@ describe('UI Rendering', () => {
             expect(shareMock.mock.calls[0][0].title).toBe('Affirmative');
         });
 
-        test('should not show toast when user cancels share', async () => {
+        test('should not fall back to clipboard when user cancels share', async () => {
             const localThis = {};
             localThis.abortError = new Error('Share cancelled');
             localThis.abortError.name = 'AbortError';
@@ -653,6 +835,41 @@ describe('UI Rendering', () => {
 
             // Should NOT fall back to clipboard when user cancels
             expect(clipboardMock).not.toHaveBeenCalled();
+        });
+
+        test('should mark share button busy and ignore repeat taps until the share ends', async () => {
+            const localThis = {};
+            localThis.button = document.createElement('button');
+            localThis.button.className = 'share-btn';
+            localThis.button.dataset.file = encodeURIComponent('test.wav');
+            document.body.appendChild(localThis.button);
+
+            global.fetch = jest.fn().mockReturnValue(new Promise(resolve => {
+                localThis.resolveFetch = resolve;
+            }));
+            Object.assign(navigator, {
+                share: jest.fn().mockResolvedValue(),
+                canShare: jest.fn().mockReturnValue(true),
+            });
+
+            localThis.firstShare = shareSound('test.wav', 'Test Sound');
+
+            expect(localThis.button.getAttribute('aria-busy')).toBe('true');
+            expect(localThis.button.getAttribute('aria-disabled')).toBe('true');
+
+            // Repeat tap while the sound file downloads is ignored
+            await shareSound('test.wav', 'Test Sound');
+            expect(global.fetch).toHaveBeenCalledTimes(1);
+
+            localThis.resolveFetch({
+                blob: () => Promise.resolve(new Blob(['audio data'], { type: 'audio/wav' })),
+            });
+            await localThis.firstShare;
+
+            expect(navigator.share).toHaveBeenCalledTimes(1);
+            expect(localThis.button.hasAttribute('aria-busy')).toBe(false);
+            expect(localThis.button.hasAttribute('aria-disabled')).toBe(false);
+            localThis.button.remove();
         });
     });
 
