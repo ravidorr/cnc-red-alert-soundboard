@@ -4,7 +4,7 @@ All notable changes to the C&C Red Alert Soundboard are documented here. The
 format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 this project uses [Semantic Versioning](https://semver.org/).
 
-## [3.2.14] - 2026-11-17
+## [3.2.18] - 2026-11-19
 
 ### Fixed
 
@@ -12,6 +12,40 @@ this project uses [Semantic Versioning](https://semver.org/).
   the share sheet is open, and it ignores repeat taps until the attempt ends.
   Before, the button gave no feedback during the download and accepted extra
   taps.
+
+## [3.2.17] - 2026-11-19
+
+### Fixed
+
+- Closing the device share sheet no longer ends a share silently. The app now
+  shows a `SHARE CANCELLED` status and records a `sound_share_cancelled` event
+  with the sound and source section.
+
+## [3.2.16] - 2026-11-19
+
+### Changed
+
+- The empty Favorites and Recently Played placeholders now read as static
+  information instead of a control. They show a dashed outline, a default
+  cursor, a smaller and more muted icon, and a smaller title, so they no
+  longer look like the clickable sound tiles around them.
+
+## [3.2.15] - 2026-11-19
+
+### Fixed
+
+- The first-visit mission briefing no longer closes itself while someone is
+  reading it. Its 30-second auto-dismiss is paused while the pointer or focus
+  is inside the briefing, and starts over once both leave.
+
+## [3.2.14] - 2026-11-16
+
+### Fixed
+
+- The install prompt no longer opens on top of the mission briefing on
+  browsers that offer app install. It now waits until the briefing closes, so
+  first-time visitors don't have to handle 2 prompts at once and the briefing
+  keeps keyboard focus.
 
 ## [3.2.13] - 2026-11-14
 
