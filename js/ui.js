@@ -140,10 +140,9 @@ export function renderFavoritesSection() {
                 </button>
                 <div class="category-content" id="category-content-favorites">
                     <div class="favorites-empty">
-                        <div class="favorites-empty-icon" aria-hidden="true">&#9734;</div>
                         <div class="favorites-empty-title">AWAITING ORDERS</div>
                         <div class="favorites-empty-text">
-                            Mark priority targets with the star icon for rapid deployment.
+                            Mark priority targets with the star icon on any sound tile for rapid deployment.
                         </div>
                     </div>
                 </div>
