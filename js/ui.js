@@ -217,6 +217,45 @@ export function renderFavoritesSection() {
     setupFavoritesDragAndDrop();
 }
 
+// How long a newly revealed favorite stays highlighted
+const FAVORITE_HIGHLIGHT_DURATION = 2500;
+
+/**
+ * Bring a saved sound into view in the Favorites section and highlight it
+ * @param {string} soundFile - The favorited sound file
+ */
+export function revealFavorite(soundFile) {
+    const section = document.getElementById('category-favorites');
+    if (!section) {
+        return;
+    }
+
+    // Expand the section if it is collapsed
+    if (section.classList.contains('collapsed')) {
+        section.classList.remove('collapsed');
+        const header = section.querySelector('.category-header');
+        if (header) {
+            header.setAttribute('aria-expanded', 'true');
+        }
+    }
+
+    const wrapper = section.querySelector(`.sound-btn-wrapper[data-file="${encodeURIComponent(soundFile)}"]`);
+    if (!wrapper) {
+        return;
+    }
+
+    wrapper.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    wrapper.classList.add('favorite-highlight');
+    setTimeout(() => {
+        wrapper.classList.remove('favorite-highlight');
+    }, FAVORITE_HIGHLIGHT_DURATION);
+
+    const soundBtn = wrapper.querySelector('.sound-btn');
+    if (soundBtn) {
+        soundBtn.focus({ preventScroll: true });
+    }
+}
+
 // Render the popular sounds section
 export function renderPopularSection() {
     // Remove existing section
@@ -272,10 +311,11 @@ export function renderPopularSection() {
  * @param {string} message - The message to display
  * @param {string} type - Type: 'info', 'success', or 'error'
  * @param {number} duration - How long to show the toast in ms (default 7s to match CSS)
+ * @param {{label: string, onClick: Function}|null} [action] - Optional action button
  */
 const MAX_TOASTS = 3;
 
-export function showToast(message, type = 'info', duration = 7000) {
+export function showToast(message, type = 'info', duration = 7000, action = null) {
     if (!elements.toastContainer) {
         return;
     }
@@ -296,6 +336,19 @@ export function showToast(message, type = 'info', duration = 7000) {
     messageSpan.className = 'toast-message';
     messageSpan.textContent = message;
     toast.appendChild(messageSpan);
+
+    // Optional action button (closes the toast, then runs the action)
+    if (action) {
+        const actionBtn = document.createElement('button');
+        actionBtn.type = 'button';
+        actionBtn.className = 'toast-action';
+        actionBtn.textContent = action.label;
+        actionBtn.addEventListener('click', () => {
+            toast.remove();
+            action.onClick();
+        });
+        toast.appendChild(actionBtn);
+    }
 
     // Create dismiss button for keyboard accessibility
     const dismissBtn = document.createElement('button');

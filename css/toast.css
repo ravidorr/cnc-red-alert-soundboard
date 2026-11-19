@@ -33,6 +33,28 @@
     flex: 1;
 }
 
+.toast-action {
+    background: none;
+    border: 1px solid currentcolor;
+    color: inherit;
+    font-family: var(--font-primary);
+    font-size: 0.85rem;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    min-height: 44px;
+    cursor: pointer;
+    transition: var(--transition-base);
+}
+
+.toast-action:hover,
+.toast-action:focus {
+    background: var(--green-alpha-15);
+}
+
+.toast-action:focus-visible {
+    outline: 2px solid var(--green-primary);
+    outline-offset: 2px;
+}
+
 .toast-dismiss {
     position: absolute;
     right: 4px;

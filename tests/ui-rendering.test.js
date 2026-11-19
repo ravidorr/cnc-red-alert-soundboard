@@ -11,6 +11,7 @@ import {
     renderFavoritesSection,
     renderPopularSection,
     showToast,
+    revealFavorite,
     showSearchEmptyState,
     hideSearchEmptyState,
     shareSound,
@@ -430,6 +431,103 @@ describe('UI Rendering', () => {
 
             expect(document.querySelector('.toast')).toBeNull();
             useRealTimers();
+        });
+
+        test('should not render an action button by default', () => {
+            showToast('Test message', 'info');
+
+            expect(document.querySelector('.toast-action')).toBeNull();
+        });
+
+        test('should render an action button that closes the toast and runs the action', () => {
+            const onClick = jest.fn();
+            showToast('Test message', 'success', 100, { label: 'VIEW IN FAVORITES', onClick });
+
+            const actionBtn = document.querySelector('.toast .toast-action');
+            expect(actionBtn).not.toBeNull();
+            expect(actionBtn.textContent).toBe('VIEW IN FAVORITES');
+            expect(actionBtn.getAttribute('type')).toBe('button');
+
+            actionBtn.click();
+
+            expect(onClick).toHaveBeenCalledTimes(1);
+            expect(document.querySelector('.toast')).toBeNull();
+        });
+    });
+
+    describe('revealFavorite', () => {
+        beforeEach(() => {
+            cacheElements();
+            renderCategories();
+            Element.prototype.scrollIntoView = jest.fn();
+        });
+
+        afterEach(() => {
+            useRealTimers();
+        });
+
+        test('should do nothing when the favorites section is missing', () => {
+            expect(() => revealFavorite('allies_1_achnoledged.wav')).not.toThrow();
+            expect(Element.prototype.scrollIntoView).not.toHaveBeenCalled();
+        });
+
+        test('should scroll to, highlight, and focus the saved sound', () => {
+            useFakeTimers();
+            state.favorites = ['allies_1_achnoledged.wav'];
+            renderFavoritesSection();
+
+            revealFavorite('allies_1_achnoledged.wav');
+
+            const wrapper = document.querySelector('#category-favorites .sound-btn-wrapper');
+            expect(Element.prototype.scrollIntoView).toHaveBeenCalledWith({ behavior: 'smooth', block: 'center' });
+            expect(wrapper.classList.contains('favorite-highlight')).toBe(true);
+            expect(document.activeElement).toBe(wrapper.querySelector('.sound-btn'));
+
+            advanceTimers(2500);
+            expect(wrapper.classList.contains('favorite-highlight')).toBe(false);
+        });
+
+        test('should expand a collapsed favorites section', () => {
+            state.favorites = ['allies_1_achnoledged.wav'];
+            renderFavoritesSection();
+            const section = document.getElementById('category-favorites');
+            const header = section.querySelector('.category-header');
+            section.classList.add('collapsed');
+            header.setAttribute('aria-expanded', 'false');
+
+            revealFavorite('allies_1_achnoledged.wav');
+
+            expect(section.classList.contains('collapsed')).toBe(false);
+            expect(header.getAttribute('aria-expanded')).toBe('true');
+        });
+
+        test('should expand a collapsed section without a header', () => {
+            elements.contentArea.insertAdjacentHTML('afterbegin', '<section id="category-favorites" class="collapsed"></section>');
+
+            revealFavorite('allies_1_achnoledged.wav');
+
+            expect(document.getElementById('category-favorites').classList.contains('collapsed')).toBe(false);
+            expect(Element.prototype.scrollIntoView).not.toHaveBeenCalled();
+        });
+
+        test('should not throw when the sound is not in favorites', () => {
+            state.favorites = ['allies_1_achnoledged.wav'];
+            renderFavoritesSection();
+
+            expect(() => revealFavorite('nonexistent.wav')).not.toThrow();
+            expect(Element.prototype.scrollIntoView).not.toHaveBeenCalled();
+        });
+
+        test('should highlight a wrapper that has no sound button', () => {
+            elements.contentArea.insertAdjacentHTML('afterbegin', `
+                <section id="category-favorites">
+                    <div class="sound-btn-wrapper" data-file="${encodeURIComponent('allies_1_achnoledged.wav')}"></div>
+                </section>
+            `);
+
+            revealFavorite('allies_1_achnoledged.wav');
+
+            expect(document.querySelector('#category-favorites .sound-btn-wrapper').classList.contains('favorite-highlight')).toBe(true);
         });
     });
 
