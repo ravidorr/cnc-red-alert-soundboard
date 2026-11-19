@@ -91,6 +91,30 @@ describe('Favorites Functions', () => {
             expect(toast.textContent).toContain('Target unmarked');
         });
 
+        test('should expand a collapsed favorites section and persist it when adding', () => {
+            state.favorites = [];
+            renderFavoritesSection();
+            document.getElementById('category-favorites').classList.add('collapsed');
+            localStorage.setItem('cnc-collapsed-categories', JSON.stringify(['favorites']));
+
+            toggleFavorite('allies_1_achnoledged.wav');
+
+            const favSection = document.getElementById('category-favorites');
+            expect(favSection.classList.contains('collapsed')).toBe(false);
+            expect(JSON.parse(localStorage.getItem('cnc-collapsed-categories'))).not.toContain('favorites');
+        });
+
+        test('should keep a collapsed favorites section collapsed when removing', () => {
+            state.favorites = ['allies_1_achnoledged.wav', 'test.wav'];
+            renderFavoritesSection();
+            document.getElementById('category-favorites').classList.add('collapsed');
+
+            toggleFavorite('test.wav');
+
+            const favSection = document.getElementById('category-favorites');
+            expect(favSection.classList.contains('collapsed')).toBe(true);
+        });
+
         test('should update navigation count', () => {
             state.favorites = [];
             toggleFavorite('allies_1_achnoledged.wav');
