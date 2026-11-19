@@ -4,7 +4,7 @@ All notable changes to the C&C Red Alert Soundboard are documented here. The
 format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 this project uses [Semantic Versioning](https://semver.org/).
 
-## [3.2.14] - 2026-11-17
+## [3.2.22] - 2026-11-19
 
 ### Fixed
 
@@ -12,6 +12,74 @@ this project uses [Semantic Versioning](https://semver.org/).
   the pointer is still on the star. The star keeps its saved style until the
   pointer leaves, and the red remove style only shows on devices that support
   hover, so a tap on a touch screen no longer leaves it stuck red.
+
+## [3.2.21] - 2026-11-19
+
+### Changed
+
+- The toast shown after starring a sound now names the Favorites section
+  (`Target marked: <sound> added to FAVORITES`), so visitors know the save
+  worked and where to find the sound.
+
+## [3.2.20] - 2026-11-19
+
+### Fixed
+
+- Choosing a category in the navigation while a search shows no results now
+  clears the search, so the category's sounds appear and the page scrolls to
+  them. Before, the search term and the empty screen stayed, so nothing visible
+  changed.
+
+## [3.2.19] - 2026-11-19
+
+### Fixed
+
+- Search typo forgiveness now ignores punctuation and compares each typed word
+  with the words in a sound name, so near-miss phrases such as "yes sri" or
+  "lets rock" find "Yes Sir" and "Let's Rock" instead of showing no results.
+
+## [3.2.18] - 2026-11-19
+
+### Fixed
+
+- The Share button now shows a busy state while the sound file downloads and
+  the share sheet is open, and it ignores repeat taps until the attempt ends.
+  Before, the button gave no feedback during the download and accepted extra
+  taps.
+
+## [3.2.17] - 2026-11-19
+
+### Fixed
+
+- Closing the device share sheet no longer ends a share silently. The app now
+  shows a `SHARE CANCELLED` status and records a `sound_share_cancelled` event
+  with the sound and source section.
+
+## [3.2.16] - 2026-11-19
+
+### Changed
+
+- The empty Favorites and Recently Played placeholders now read as static
+  information instead of a control. They show a dashed outline, a default
+  cursor, a smaller and more muted icon, and a smaller title, so they no
+  longer look like the clickable sound tiles around them.
+
+## [3.2.15] - 2026-11-19
+
+### Fixed
+
+- The first-visit mission briefing no longer closes itself while someone is
+  reading it. Its 30-second auto-dismiss is paused while the pointer or focus
+  is inside the briefing, and starts over once both leave.
+
+## [3.2.14] - 2026-11-16
+
+### Fixed
+
+- The install prompt no longer opens on top of the mission briefing on
+  browsers that offer app install. It now waits until the briefing closes, so
+  first-time visitors don't have to handle 2 prompts at once and the briefing
+  keeps keyboard focus.
 
 ## [3.2.13] - 2026-11-14
 

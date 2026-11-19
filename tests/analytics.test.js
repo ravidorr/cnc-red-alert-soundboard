@@ -943,12 +943,18 @@ describe('Pendo Track Events', () => {
             })]);
         });
 
-        test('neither event fires when the user cancels the share sheet', async () => {
+        test('sound_share_cancelled fires when the user cancels the share sheet', async () => {
             withMock(mockFetch({ blob: createMockBlob() }));
             withMock(mockWebShare({ shouldAbort: true }));
 
             await shareSound(ACKNOWLEDGED, 'Acknowledged', 'allies');
 
+            expect(trackedCalls('sound_share_cancelled')).toEqual([{
+                sound_file: ACKNOWLEDGED,
+                sound_name: 'Acknowledged',
+                sound_category: 'allies',
+                source_section: 'allies',
+            }]);
             expect(trackedCalls('sound_shared')).toEqual([]);
             expect(trackedCalls('sound_share_failed')).toEqual([]);
         });
@@ -1383,12 +1389,15 @@ describe('Pendo Track Events', () => {
 
         test('reports the 30-second auto-dismiss', () => {
             showOnboardingTooltip();
+            // The countdown is paused while focus is inside the briefing
+            advanceTimers(100);
+            document.getElementById('onboarding-dismiss').blur();
             advanceTimers(30000);
 
             expect(trackedCalls('onboarding_dismissed')).toEqual([{
                 dismiss_method: 'auto_timeout',
                 is_replay: false,
-                visible_duration_ms: 30000,
+                visible_duration_ms: 30100,
             }]);
         });
 
