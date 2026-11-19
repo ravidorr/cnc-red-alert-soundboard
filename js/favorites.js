@@ -13,7 +13,7 @@ import {
     announce,
 } from './utils.js';
 import { showToast, renderFavoritesSection } from './ui.js';
-import { renderNavigation } from './navigation.js';
+import { renderNavigation, expandCategory } from './navigation.js';
 import { showConfirmModal } from './confirm-modal.js';
 import { trackEvent } from './analytics.js';
 
@@ -67,6 +67,10 @@ export function toggleFavorite(soundFile, sourceSection = null) {
     saveFavorites();
     window.pendo?.updateOptions?.({ visitor: { favorites_count: state.favorites.length } });
     renderFavoritesSection();
+    if (wasAdded) {
+        // Keep the new save visible now and on the next visit
+        expandCategory('favorites');
+    }
     renderNavigation();
     updateFavoriteButtons();
 
