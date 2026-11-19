@@ -4,6 +4,14 @@ All notable changes to the C&C Red Alert Soundboard are documented here. The
 format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 this project uses [Semantic Versioning](https://semver.org/).
 
+## [3.2.15] - 2026-11-19
+
+### Fixed
+
+- The first-visit mission briefing no longer closes itself while someone is
+  reading it. Its 30-second auto-dismiss is paused while the pointer or focus
+  is inside the briefing, and starts over once both leave.
+
 ## [3.2.14] - 2026-11-16
 
 ### Fixed

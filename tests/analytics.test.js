@@ -1383,12 +1383,15 @@ describe('Pendo Track Events', () => {
 
         test('reports the 30-second auto-dismiss', () => {
             showOnboardingTooltip();
+            // The countdown is paused while focus is inside the briefing
+            advanceTimers(100);
+            document.getElementById('onboarding-dismiss').blur();
             advanceTimers(30000);
 
             expect(trackedCalls('onboarding_dismissed')).toEqual([{
                 dismiss_method: 'auto_timeout',
                 is_replay: false,
-                visible_duration_ms: 30000,
+                visible_duration_ms: 30100,
             }]);
         });
 
