@@ -4,6 +4,15 @@ All notable changes to the C&C Red Alert Soundboard are documented here. The
 format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 this project uses [Semantic Versioning](https://semver.org/).
 
+## [3.2.28] - 2026-11-24
+
+### Changed
+
+- Updated dev dependencies from the minor-and-patch Dependabot group (#57):
+  eslint 10.15.0, html-validate 11.21.1, lint-staged 17.6.1, markdownlint-cli2
+  0.24.1, typescript-eslint 8.73.0 and vite 8.3.8. This release only records
+  the version bump the release gate requires for that merge.
+
 ## [3.2.27] - 2026-11-19
 
 ### Changed
