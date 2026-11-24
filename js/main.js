@@ -119,6 +119,11 @@ function handleShortcutActions() {
 function init() {
     initializePendo();
     cacheElements();
+    // Read the viewport width before any DOM writes below. Reading
+    // window.innerWidth after rendering forces a synchronous reflow, which
+    // Lighthouse flags as forced-reflow-insight.
+    initSidebarAccessibility();
+    setupViewportListener();
     setFooterVersion();
     loadFavorites();
     loadRecentlyPlayed();
@@ -137,10 +142,6 @@ function init() {
     setupNetworkStatusListeners();
     checkUrlHash();
     handleShortcutActions();
-
-    // Initialize sidebar accessibility based on viewport
-    initSidebarAccessibility();
-    setupViewportListener();
 
     // Show onboarding tooltip for first-time users (after a short delay)
     setTimeout(() => {
