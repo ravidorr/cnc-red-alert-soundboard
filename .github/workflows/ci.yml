@@ -69,9 +69,12 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
-      - run: npx --yes @lhci/cli@0.15.1 autorun
+      - run: |
+          google-chrome --version || chromium --version || true
+          npx --yes @lhci/cli@0.15.1 autorun
       - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: lighthouse-reports
           path: .lighthouseci
+          include-hidden-files: true
