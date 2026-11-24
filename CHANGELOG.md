@@ -4,6 +4,14 @@ All notable changes to the C&C Red Alert Soundboard are documented here. The
 format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 this project uses [Semantic Versioning](https://semver.org/).
 
+## [3.2.29] - 2026-11-24
+
+### Fixed
+
+- Read the viewport width in `init()` before any DOM rendering instead of
+  after it. The late `window.innerWidth` read forced a synchronous reflow that
+  failed the CI Lighthouse `forced-reflow-insight` audit (#59).
+
 ## [3.2.28] - 2026-11-24
 
 ### Changed
